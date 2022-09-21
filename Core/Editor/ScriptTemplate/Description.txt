@@ -1,0 +1,3 @@
+此目录下会存放模板脚本
+如需更改目录请找到Core-Data-Resources-DataContainer
+找到TemplateScriptPath进行更改
