@@ -193,9 +193,8 @@ namespace BindTool
 
         public override bool Equals(object obj)
         {
-            NameRule? equalsValue = (NameRule?) obj;
-            if (equalsValue != null) return Equals(equalsValue);
-            return false;
+            NameRule equalsValue = (NameRule) obj;
+            return Equals(equalsValue);
         }
 
         public bool Equals(NameRule other)

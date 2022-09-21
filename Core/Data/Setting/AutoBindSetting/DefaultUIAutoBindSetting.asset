@@ -13,6 +13,96 @@ MonoBehaviour:
   m_Name: DefaultUIAutoBindSetting
   m_EditorClassIdentifier: 
   programName: DefaultUIAutoBindSetting
-  nameBindDataList: []
+  nameBindDataList:
+  - nameCheck:
+      name: Text
+      nameRule:
+        isCaseSensitive: 0
+        nameMatchingRule: 0
+    typeString:
+      typeName: Text
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - nameCheck:
+      name: Button
+      nameRule:
+        isCaseSensitive: 0
+        nameMatchingRule: 0
+    typeString:
+      typeName: Button
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - nameCheck:
+      name: Image
+      nameRule:
+        isCaseSensitive: 0
+        nameMatchingRule: 0
+    typeString:
+      typeName: Image
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - nameCheck:
+      name: Toggle
+      nameRule:
+        isCaseSensitive: 0
+        nameMatchingRule: 0
+    typeString:
+      typeName: Toggle
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - nameCheck:
+      name: Scrollbar
+      nameRule:
+        isCaseSensitive: 0
+        nameMatchingRule: 0
+    typeString:
+      typeName: Scrollbar
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - nameCheck:
+      name: Slider
+      nameRule:
+        isCaseSensitive: 0
+        nameMatchingRule: 0
+    typeString:
+      typeName: Slider
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
   nameLgnoreDataList: []
-  sequenceTypeDataList: []
+  sequenceTypeDataList:
+  - sequence: 3
+    isElse: 1
+    typeString:
+      typeName: 
+      typeNameSpace: 
+      assemblyName: 
+  - sequence: 2
+    isElse: 0
+    typeString:
+      typeName: Image
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - sequence: 2
+    isElse: 0
+    typeString:
+      typeName: Text
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - sequence: 2
+    isElse: 0
+    typeString:
+      typeName: Button
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - sequence: 1
+    isElse: 0
+    typeString:
+      typeName: RectTransform
+      typeNameSpace: UnityEngine
+      assemblyName: UnityEngine.CoreModule
+  - sequence: 0
+    isElse: 0
+    typeString:
+      typeName: Transform
+      typeNameSpace: UnityEngine
+      assemblyName: UnityEngine.CoreModule

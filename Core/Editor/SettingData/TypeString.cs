@@ -3,7 +3,6 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using BindTool;
 
 #endregion
 
@@ -74,9 +73,8 @@ public struct TypeString
 
     public override bool Equals(object obj)
     {
-        TypeString? typeString = (TypeString?)obj;
-        if (typeString != null) return Equals(typeString);
-        return false;
+        TypeString typeString = (TypeString) obj;
+        return Equals(typeString);
     }
 
     public bool Equals(TypeString other)

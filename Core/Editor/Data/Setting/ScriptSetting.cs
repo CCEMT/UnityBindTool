@@ -49,7 +49,7 @@ namespace BindTool
         public List<VariableData> variableList;
         public List<TemplateData> templateDataList;
 
-        public string templateScriptSavaPath;//模板脚本保存路径
+        public string templateScriptSavaPath; //模板脚本保存路径
 
         #region Equals
 
@@ -65,7 +65,8 @@ namespace BindTool
             return programName == other.programName && isGenerateNew == other.isGenerateNew && inheritClass.Equals(other.inheritClass) && isGeneratePartial == other.isGeneratePartial &&
                    partialName == other.partialName && isSpecifyNamespace == other.isSpecifyNamespace && useNamespace == other.useNamespace && variableVisitType == other.variableVisitType &&
                    nameSetting.Equals(other.nameSetting) && isAddProperty == other.isAddProperty && propertyVisitType == other.propertyVisitType && propertyType == other.propertyType &&
-                   propertyNameSetting.Equals(other.propertyNameSetting) && isSavaOldScript == other.isSavaOldScript && savaOldScriptPath == other.savaOldScriptPath && methodVisitType == other.methodVisitType &&
+                   propertyNameSetting.Equals(other.propertyNameSetting) && isSavaOldScript == other.isSavaOldScript && savaOldScriptPath == other.savaOldScriptPath &&
+                   methodVisitType == other.methodVisitType &&
                    methodNameSetting.Equals(other.methodNameSetting) && Equals(variableList, other.variableList) && Equals(templateDataList, other.templateDataList);
         }
 
@@ -208,9 +209,8 @@ namespace BindTool
 
         public override bool Equals(object obj)
         {
-            NameSetting? nameSetting = (NameSetting?) obj;
-            if (nameSetting != null) { return Equals(nameSetting); }
-            else { return false; }
+            NameSetting nameSetting = (NameSetting) obj;
+            return Equals(nameSetting);
         }
 
         public bool Equals(NameSetting other)

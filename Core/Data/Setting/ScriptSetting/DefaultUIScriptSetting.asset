@@ -87,17 +87,5 @@ MonoBehaviour:
       typeNameSpace: System
       assemblyName: mscorlib
     varialbleName: text
-  templateDataList:
-  - targetType:
-      typeName: Button
-      typeNameSpace: UnityEngine.UI
-      assemblyName: UnityEngine.UI
-    temlateType:
-      typeName: ButtonTemplate
-      typeNameSpace: BindTool.Template
-      assemblyName: Assembly-CSharp-Editor
-    temlateBaseType:
-      typeName: MonoBehaviour
-      typeNameSpace: UnityEngine
-      assemblyName: UnityEngine.CoreModule
+  templateDataList: []
   templateScriptSavaPath: BindTool/Core/Editor/ScriptTemplate
