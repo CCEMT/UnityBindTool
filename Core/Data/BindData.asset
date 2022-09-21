@@ -12,4 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9080b02ed9c451144ad3ed511a62ece6, type: 3}
   m_Name: BindData
   m_EditorClassIdentifier: 
-  objectInfoList: []
+  objectInfoList:
+  - typeString:
+      typeName: 
+      typeNameSpace: 
+      assemblyName: 
+    rootBindInfo:
+      name: 
+      typeStrings:
+      - typeName: GameObject
+        typeNameSpace: UnityEngine
+        assemblyName: UnityEngine.CoreModule
+      - typeName: RectTransform
+        typeNameSpace: UnityEngine
+        assemblyName: UnityEngine.CoreModule
+      - typeName: CanvasRenderer
+        typeNameSpace: UnityEngine
+        assemblyName: UnityEngine.UIModule
+      - typeName: Text
+        typeNameSpace: UnityEngine.UI
+        assemblyName: UnityEngine.UI
+      index: 0
+      instanceObject: {fileID: 0}
+      prefabObject: {fileID: 0}
+      autoBindSetting: {fileID: 0}
+    gameObjectBindInfoList: []
+    dataBindInfoList: []

@@ -45,7 +45,7 @@ MonoBehaviour:
     isAddBehind: 0
     behindName: 
   isSavaOldScript: 1
-  savaOldScriptPath: BindTool/SavaOldScript
+  savaOldScriptPath: CBindTool/SavaOldScript
   methodVisitType: 0
   methodNameSetting:
     namingDispose: 2
@@ -88,4 +88,4 @@ MonoBehaviour:
       assemblyName: mscorlib
     varialbleName: text
   templateDataList: []
-  templateScriptSavaPath: BindTool/Core/Editor/ScriptTemplate
+  templateScriptSavaPath: CBindTool/Core/Editor/ScriptTemplate

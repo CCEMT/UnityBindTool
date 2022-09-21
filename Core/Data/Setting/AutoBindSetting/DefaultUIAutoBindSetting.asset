@@ -68,6 +68,33 @@ MonoBehaviour:
       typeName: Slider
       typeNameSpace: UnityEngine.UI
       assemblyName: UnityEngine.UI
+  - nameCheck:
+      name: Dropdown
+      nameRule:
+        isCaseSensitive: 0
+        nameMatchingRule: 0
+    typeString:
+      typeName: Dropdown
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - nameCheck:
+      name: InputField
+      nameRule:
+        isCaseSensitive: 0
+        nameMatchingRule: 0
+    typeString:
+      typeName: InputField
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - nameCheck:
+      name: Scroll View
+      nameRule:
+        isCaseSensitive: 0
+        nameMatchingRule: 0
+    typeString:
+      typeName: ScrollRect
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
   nameLgnoreDataList: []
   sequenceTypeDataList:
   - sequence: 3
@@ -76,24 +103,6 @@ MonoBehaviour:
       typeName: 
       typeNameSpace: 
       assemblyName: 
-  - sequence: 2
-    isElse: 0
-    typeString:
-      typeName: Image
-      typeNameSpace: UnityEngine.UI
-      assemblyName: UnityEngine.UI
-  - sequence: 2
-    isElse: 0
-    typeString:
-      typeName: Text
-      typeNameSpace: UnityEngine.UI
-      assemblyName: UnityEngine.UI
-  - sequence: 2
-    isElse: 0
-    typeString:
-      typeName: Button
-      typeNameSpace: UnityEngine.UI
-      assemblyName: UnityEngine.UI
   - sequence: 1
     isElse: 0
     typeString:
