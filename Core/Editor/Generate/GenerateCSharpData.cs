@@ -321,45 +321,52 @@ namespace BindTool
                 for (int i = 0; i < addLineAmount; i++)
                 {
                     string line = addLine[i];
-                    if (methodNameAmountDict.ContainsKey(methodName))
-                    {
-                        bool isCanName = false;
-                        while (isCanName == false)
-                        {
-                            methodNameAmountDict[methodName]++;
-                            switch (selectSettion.propertyNameSetting.repetitionNameDispose)
-                            {
-                                case RepetitionNameDispose.AddNumber:
-                                    var targetName = methodName + methodNameAmountDict[methodName].ToString();
-
-                                    if (methodNameList.Contains(targetName)) continue;
-                                    var findNameData = coomponentNameList.Find((findData) => {
-                                        if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
-                                        return false;
-                                    });
-                                    if (findNameData == null)
-                                    {
-                                        methodName = targetName;
-                                        isCanName = true;
-                                    }
-                                    break;
-                                case RepetitionNameDispose.None:
-                                default:
-                                    isCanName = true;
-                                    break;
-                            }
-                        }
-                    }
-                    else { methodNameAmountDict.Add(methodName, 1); }
-
-                    methodNameList.Add(methodName);
-
                     line = line.Replace($"templateValue", variableName);
 
                     for (int j = 0; j < memberAmount; j++)
                     {
                         MemberInfo memberInfo = members[j];
-                        line = line.Replace(memberInfo.Name, methodName);
+                        string fullName = methodName + memberInfo.Name;
+
+                        if (line.Contains(memberInfo.Name))
+                        {
+                            if (methodNameAmountDict.ContainsKey(fullName))
+                            {
+                                bool isCanName = false;
+                                while (isCanName == false)
+                                    switch (selectSettion.propertyNameSetting.repetitionNameDispose)
+                                    {
+                                        case RepetitionNameDispose.AddNumber:
+                                            var targetName = methodName + methodNameAmountDict[fullName].ToString() + memberInfo.Name;
+
+                                            if (methodNameList.Contains(targetName))
+                                            {
+                                                methodNameAmountDict[fullName] += 1;
+                                                continue;
+                                            }
+                                            var findNameData = coomponentNameList.Find((findData) => {
+                                                if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
+                                                return false;
+                                            });
+                                            if (findNameData == null)
+                                            {
+                                                fullName = targetName;
+                                                isCanName = true;
+                                            }
+                                            else { methodNameAmountDict[fullName] += 1; }
+                                            break;
+                                        case RepetitionNameDispose.None:
+                                        default:
+                                            isCanName = true;
+                                            break;
+                                    }
+                            }
+                            else { methodNameAmountDict.Add(fullName, 1); }
+
+                            line = line.Replace(memberInfo.Name, fullName);
+                            methodNameList.Add(fullName);
+                            break;
+                        }
                     }
                     Writer(line);
                 }

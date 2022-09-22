@@ -196,15 +196,15 @@ namespace BindTool
             {
                 EditorGUILayout.BeginHorizontal();
 
-                GUILayout.Label("路径：");
-                string tempOldSavaPath = GUILayout.TextField(selectSetting.savaOldScriptPath);
+                GUILayout.Label("路径：",GUILayout.MinWidth(50));
+                string tempOldSavaPath = GUILayout.TextArea(selectSetting.savaOldScriptPath,GUILayout.MaxWidth(500));
                 if (tempOldSavaPath != selectSetting.savaOldScriptPath)
                 {
                     selectSetting.savaOldScriptPath = tempOldSavaPath;
                     isSavaSetting = true;
                 }
 
-                if (GUILayout.Button("浏览"))
+                if (GUILayout.Button("浏览",GUILayout.MinWidth(50)))
                 {
                     string targetPath = EditorUtility.OpenFolderPanel("选择代码保存路径", Application.dataPath, null);
                     if (string.IsNullOrEmpty(targetPath) == false)
@@ -765,15 +765,15 @@ namespace BindTool
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("模板脚本保存路径");
-            string tempTemplateScriptSavaPath = GUILayout.TextField(selectSetting.templateScriptSavaPath);
+            GUILayout.Label("模板脚本保存路径：",GUILayout.MinWidth(100));
+            string tempTemplateScriptSavaPath = GUILayout.TextArea(selectSetting.templateScriptSavaPath, GUILayout.MaxWidth(300));
             if (tempTemplateScriptSavaPath != selectSetting.templateScriptSavaPath)
             {
                 selectSetting.templateScriptSavaPath = tempTemplateScriptSavaPath;
                 isSavaSetting = true;
             }
 
-            if (GUILayout.Button("浏览"))
+            if (GUILayout.Button("浏览",GUILayout.MinWidth(50)))
             {
                 string targetPath = EditorUtility.OpenFolderPanel("选择模板脚本保存路径", Application.dataPath, null);
                 if (string.IsNullOrEmpty(targetPath) == false)

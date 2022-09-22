@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 #endregion
@@ -191,6 +190,11 @@ namespace BindTool
                         }
                     }
                 }
+                if (startLine == -1)
+                {
+                    Debug.Log("文件格式错误");
+                    return;
+                }
             }
             else
             {
@@ -309,7 +313,6 @@ namespace BindTool
                 mainWriter.WriteLine(CreateTab(level) + content);
             }
         }
-
 
         public static TypeString GenerateCSharpTemplateScript(TypeString targetType, string path)
         {
