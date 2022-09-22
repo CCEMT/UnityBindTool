@@ -27,13 +27,13 @@
 3、点击Build按钮进行构建
 
 
-## （Build）构建界面介绍
+## 构建界面介绍（Build）
 
 保存路径，生文件时位置
 是否创建文件夹：生成时在路径上创建一个与脚本名或物体名其同名的文件夹并将文件放入其中
 Copy CSharp Code:将生成好的代码拷贝到剪切栏
 
-## （Bind）自定义绑定界面介绍
+## 自定义绑定界面介绍（Bind）
 
 第一栏用于设置生成的数据会有两种模式显示
 1、生成，该模式下将会生成新的脚本，显示输入栏输入生成脚本的名称
@@ -56,14 +56,14 @@ Copy CSharp Code:将生成好的代码拷贝到剪切栏
 查看绑定：点击需要查看的组件后在绑定列表中查看对应的数据即可
 五角星表示：红色为主物体，黄色为该物体绑定了组件，白色为该物体绑定了组件但并不是主物体的子物体
 
-## （Setting）设置界面介绍
+## 设置界面介绍（Setting）
 
 可以将当前所有的设置保存起来,然后根据不同的情况来选择对应的设置
 点击新建后选择位置创建新的设置
 ScriptSetting，AutonBindSetting，CreateSetting的设置分别独立
 第一次导入注意修改ScriptSetting-CommonGenerate中的旧脚本保存路径和ScriptSetting-MethodGenerate中的模板脚本保存路径
 
-### （ScriptSetting）脚本设置
+### 脚本设置（ScriptSetting）
 生成脚本时的设置
 #### 通用生成
 
@@ -111,7 +111,7 @@ ScriptSetting，AutonBindSetting，CreateSetting的设置分别独立
 在生成脚本时会生成#region Template Method中的内容。
 方法生成搜素栏规则：类型名，字段名
 
-### （AutoBindSetting）自动绑定设置
+### 自动绑定设置（AutoBindSetting）
 
 在绑定组件时选择自动绑定时的绑定规则
 
@@ -133,7 +133,7 @@ ScriptSetting，AutonBindSetting，CreateSetting的设置分别独立
 
 自动绑定设置搜索栏搜素规则：检查名称，对应类型，顺序数字
 
-### （CreateNameSetting）创建名称设置
+### 创建名称设置（CreateNameSetting）
 
 当绑定组件或数据时自动为它们创建名称，默认为物体名称
 
