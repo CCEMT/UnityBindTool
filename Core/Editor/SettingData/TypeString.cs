@@ -79,6 +79,7 @@ public struct TypeString
 
     public bool Equals(TypeString other)
     {
+        if (string.IsNullOrEmpty(other.typeNameSpace) && string.IsNullOrEmpty(typeNameSpace)) return typeName == other.typeName && assemblyName == other.assemblyName;
         return typeName == other.typeName && typeNameSpace == other.typeNameSpace && assemblyName == other.assemblyName;
     }
 

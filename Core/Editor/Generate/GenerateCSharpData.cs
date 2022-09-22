@@ -126,7 +126,8 @@ namespace BindTool
                 for (int j = 0; j < componentNameAmount; j++)
                 {
                     var data = coomponentNameList[j];
-                    if (data.componentBindInfo.GetTypeString().Equals(variableData.targetType)) addComponentMethodList.Add(data);
+                    var type = data.componentBindInfo.GetTypeString();
+                    if (type.Equals(variableData.targetType)) addComponentMethodList.Add(data);
                 }
                 for (int j = 0; j < dataNameAmount; j++)
                 {
@@ -269,7 +270,8 @@ namespace BindTool
                 for (int j = 0; j < componentNameAmount; j++)
                 {
                     var data = coomponentNameList[j];
-                    if (data.componentBindInfo.GetTypeString().Equals(templateData.targetType)) addComponentMethodList.Add(data);
+                    var type = data.componentBindInfo.GetTypeString();
+                    if (type.Equals(templateData.targetType)) addComponentMethodList.Add(data);
                 }
                 for (int j = 0; j < dataNameAmount; j++)
                 {
