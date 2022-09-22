@@ -14,7 +14,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bindData: {fileID: 11400000, guid: 5eb5b036c52691047a9b069b56e436ce, type: 2}
   commonSettingData: {fileID: 11400000, guid: 4216c2d1884e8444eaa946c5347e4e41, type: 2}
-  templateScriptPath: BindTool/Core/Editor/ScriptTemplate
-  autoBindSettingPath: Assets/BindTool/Core/Data/Setting/AutoBindSetting
-  createNameSettingPath: Assets/BindTool/Core/Data/Setting/CreateNameSetting
-  scriptSettingPath: Assets/BindTool/Core/Data/Setting/ScriptSetting

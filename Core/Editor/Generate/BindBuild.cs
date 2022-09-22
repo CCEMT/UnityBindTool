@@ -114,11 +114,16 @@ namespace BindTool
             path += $"/{bindObject.name}.prefab";
 
             Type addType = commonSettingData.tempGenerateData.objectInfo.typeString.ToType();
-            Component component = commonSettingData.tempGenerateData.bindObject.GetComponent(addType);
-            if (component == null) component = commonSettingData.tempGenerateData.bindObject.AddComponent(addType);
+            Component component = null;
+            if (addType != null)
+            {
+                component = commonSettingData.tempGenerateData.bindObject.GetComponent(addType);
+                if (component == null) component = commonSettingData.tempGenerateData.bindObject.AddComponent(addType);
 
-            MethodInfo method = addType.GetMethod(commonSettingData.tempGenerateData.getBindDataMethodName, new Type[] { });
-            method.Invoke(component, new object[] { });
+                MethodInfo method = addType.GetMethod(commonSettingData.tempGenerateData.getBindDataMethodName, new Type[] { });
+                method.Invoke(component, new object[] { });
+            }
+            else { Debug.Log("添加类型为空"); }
 
             //创建预制体
             PrefabUtility.SaveAsPrefabAssetAndConnect(bindObject, path, InteractionMode.AutomatedAction);

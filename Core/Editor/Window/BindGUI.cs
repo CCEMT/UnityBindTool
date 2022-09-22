@@ -59,8 +59,12 @@ namespace BindTool
 
         void BindInfo()
         {
+            string createErrorInfo = "错误：目标路径已存在对应的脚本！如果要覆盖更改请以附加的模式进行！";
+            string addErrorInfo = "错误：附加模式下选择的类型必须继承MonoBehaviour！";
+
             if (commonSettingData.selectScriptSetting.isGenerateNew == false)
             {
+                if (errorList.Contains(createErrorInfo)) errorList.Remove(createErrorInfo);
                 EditorGUILayout.BeginHorizontal();
 
                 GUILayout.Label("绑定的组件");
@@ -92,24 +96,24 @@ namespace BindTool
                 Type monoType = typeof(MonoBehaviour);
                 Type type = objectInfo.rootBindInfo.GetTypeString().ToType();
 
-                string errorInfo = "错误：附加模式下选择的类型必须继承MonoBehaviour！";
                 if (monoType.IsAssignableFrom(type) == false)
                 {
-                    if (errorList.Contains(errorInfo) == false) errorList.Add(errorInfo);
+                    if (errorList.Contains(addErrorInfo) == false) errorList.Add(addErrorInfo);
                     GUI.color = Color.red;
                     GUILayout.BeginVertical("box");
-                    GUILayout.Label(errorInfo);
+                    GUILayout.Label(addErrorInfo);
                     GUILayout.EndHorizontal();
                     GUI.color = Color.white;
                 }
                 else
                 {
-                    if (errorList.Contains(errorInfo)) errorList.Remove(errorInfo);
+                    if (errorList.Contains(addErrorInfo)) errorList.Remove(addErrorInfo);
                 }
                 commonSettingData.tempGenerateData.addTypeString = objectInfo.typeString;
             }
             else
             {
+                if (errorList.Contains(addErrorInfo)) errorList.Remove(addErrorInfo);
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Label("生成脚本的名称：");
                 string content = GUILayout.TextField(commonSettingData.tempGenerateData.newScriptName);
@@ -121,19 +125,18 @@ namespace BindTool
                 string directoryName = "";
                 if (commonSettingData.isCreateScriptFolder) directoryName = commonSettingData.tempGenerateData.newScriptName + "/";
                 string path = $"{Application.dataPath}/{commonSettingData.createScriptPath}/{directoryName}{commonSettingData.tempGenerateData.newScriptName}.cs";
-                string errorInfo = "错误：目标路径已存在对应的脚本！如果要覆盖更改请以附加的模式进行！";
                 if (File.Exists(path))
                 {
-                    if (errorList.Contains(errorInfo) == false) errorList.Add(errorInfo);
+                    if (errorList.Contains(createErrorInfo) == false) errorList.Add(createErrorInfo);
                     GUI.color = Color.red;
                     GUILayout.BeginVertical("box");
-                    GUILayout.Label(errorInfo);
+                    GUILayout.Label(createErrorInfo);
                     GUILayout.EndHorizontal();
                     GUI.color = Color.white;
                 }
                 else
                 {
-                    if (errorList.Contains(errorInfo)) errorList.Remove(errorInfo);
+                    if (errorList.Contains(createErrorInfo)) errorList.Remove(createErrorInfo);
                 }
             }
 
@@ -333,7 +336,7 @@ namespace BindTool
 
             float maxAmount = 5;
             float itemHeight = 54.5f;
-            float height = Mathf.Clamp(objectInfo.gameObjectBindInfoList.Count * itemHeight, 0, itemHeight * maxAmount);
+            float height = Mathf.Clamp(selectComponentAmount * itemHeight, 0, itemHeight * maxAmount);
             if (height > 0)
             {
                 GUILayout.BeginVertical("box");
@@ -347,11 +350,12 @@ namespace BindTool
 
                     EditorGUILayout.BeginVertical();
                     ComponentBindInfo componentBindInfo = selectComponentList[i];
+                    int itemIndex = objectInfo.gameObjectBindInfoList.IndexOf(componentBindInfo);
 
                     int tempComponentBindInfoIndex = EditorGUILayout.Popup(componentBindInfo.index, componentBindInfo.GetTypeStrings());
                     if (tempComponentBindInfoIndex != componentBindInfo.index)
                     {
-                        componentBindInfo.index = tempComponentBindInfoIndex;
+                        objectInfo.gameObjectBindInfoList[itemIndex].index = tempComponentBindInfoIndex;
                         isSavaSetting = true;
                     }
                     if (componentBindInfo.GetTypeName() == nameof(GameObject)) { EditorGUILayout.ObjectField(componentBindInfo.instanceObject, componentBindInfo.GetValue().GetType(), true); }
@@ -365,7 +369,7 @@ namespace BindTool
                     string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(componentBindInfo.name));
                     if (tempComponentBindInfoName != componentBindInfo.name)
                     {
-                        componentBindInfo.name = tempComponentBindInfoName;
+                        objectInfo.gameObjectBindInfoList[itemIndex].name = tempComponentBindInfoName;
                         isSavaSetting = true;
                     }
 
@@ -377,7 +381,7 @@ namespace BindTool
                     {
                         GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
                         menu.AddItem(new GUIContent("设置默认名"), false, () => {
-                            componentBindInfo.name = CommonTools.SetName(componentBindInfo.instanceObject.name, commonSettingData.selectCreateNameSetting);
+                            objectInfo.gameObjectBindInfoList[itemIndex].name = CommonTools.SetName(componentBindInfo.instanceObject.name, commonSettingData.selectCreateNameSetting);
                             isSavaSetting = true;
                         });
 
@@ -387,7 +391,7 @@ namespace BindTool
                     GUI.color = Color.red;
                     if (GUILayout.Button("删除", GUILayout.Width(100)))
                     {
-                        objectInfo.gameObjectBindInfoList.Remove(componentBindInfo);
+                        objectInfo.gameObjectBindInfoList.RemoveAt(itemIndex);
                         isSavaSetting = true;
                     }
                     GUI.color = Color.white;
@@ -404,6 +408,7 @@ namespace BindTool
                     GUILayout.BeginVertical("frameBox", GUILayout.Height(50));
 
                     DataBindInfo dataBindInfo = selectDataList[i];
+                    int itemIndex = objectInfo.dataBindInfoList.IndexOf(dataBindInfo);
 
                     EditorGUILayout.BeginHorizontal();
 
@@ -421,7 +426,7 @@ namespace BindTool
                     string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(dataBindInfo.name));
                     if (tempComponentBindInfoName != dataBindInfo.name)
                     {
-                        dataBindInfo.name = tempComponentBindInfoName;
+                        objectInfo.dataBindInfoList[itemIndex].name = tempComponentBindInfoName;
                         isSavaSetting = true;
                     }
 
@@ -433,7 +438,7 @@ namespace BindTool
                     {
                         GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
                         menu.AddItem(new GUIContent("设置默认名"), false, () => {
-                            dataBindInfo.name = CommonTools.SetName(dataBindInfo.bindObject.name, commonSettingData.selectCreateNameSetting);
+                            objectInfo.dataBindInfoList[itemIndex].name = CommonTools.SetName(dataBindInfo.bindObject.name, commonSettingData.selectCreateNameSetting);
                             isSavaSetting = true;
                         });
 
@@ -443,7 +448,7 @@ namespace BindTool
                     GUI.color = Color.red;
                     if (GUILayout.Button("删除", GUILayout.Width(100)))
                     {
-                        objectInfo.dataBindInfoList.Remove(dataBindInfo);
+                        objectInfo.dataBindInfoList.RemoveAt(itemIndex);
                         isSavaSetting = true;
                     }
                     GUI.color = Color.white;

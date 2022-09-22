@@ -38,8 +38,9 @@ namespace BindTool
 
         public override bool Equals(object obj)
         {
-            if (obj != null) return Equals((ComponentBindInfo) obj);
-            return false;
+            ComponentBindInfo componentBindInfo = (ComponentBindInfo)obj;
+            if (componentBindInfo != null) { return Equals(componentBindInfo); }
+            else { return false; }
         }
 
         protected bool Equals(ComponentBindInfo other)

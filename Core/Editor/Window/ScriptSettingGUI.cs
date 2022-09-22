@@ -486,7 +486,7 @@ namespace BindTool
             GUI.color = Color.green;
             if (GUILayout.Button(variableSelectType.typeName))
             {
-                TypeSelectWindown.ShowWindown(typeof(MonoBehaviour), (isSelect, type) => {
+                TypeSelectWindown.ShowWindown(typeof(Component), (isSelect, type) => {
                     if (isSelect) variableSelectType = type;
                 }, position.position);
             }
@@ -574,7 +574,7 @@ namespace BindTool
             GUI.color = Color.green;
             if (GUILayout.Button(templateSelectType.typeName))
             {
-                TypeSelectWindown.ShowWindown(typeof(MonoBehaviour), (isSelect, type) => {
+                TypeSelectWindown.ShowWindown(typeof(Component), (isSelect, type) => {
                     if (isSelect) templateSelectType = type;
                 }, position.position);
             }

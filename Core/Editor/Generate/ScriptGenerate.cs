@@ -92,9 +92,9 @@ namespace BindTool
             }
             else
             {
-                string scriptPartialFile = scriptPath + $"{commonSettingData.tempGenerateData.newScriptName}.{selectSettion.partialName}.cs";
                 if (selectSettion.isGeneratePartial)
                 {
+                    string scriptPartialFile = scriptPath + $"{commonSettingData.tempGenerateData.newScriptName}.{selectSettion.partialName}.cs";
                     //检查是否包含Partial关键字
                     //创建Partial并写入数据
 
@@ -107,6 +107,7 @@ namespace BindTool
                 }
                 else
                 {
+                    string scriptPartialFile = scriptPath + $"{commonSettingData.tempGenerateData.newScriptName}.cs";
                     //打开文件并更改数据
                     if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData);
                     OpenCSharpFileAlterData(commonSettingData, scriptPartialFile);

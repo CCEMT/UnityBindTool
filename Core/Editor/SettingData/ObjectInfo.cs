@@ -137,9 +137,10 @@ namespace BindTool
                 {
                     if (targetObject == rootBindInfo.instanceObject) { return true; }
                     else if (targetObject == rootBindInfo.prefabObject) return true;
-
+                   
                     GameObject targetPrefab = CommonTools.GetPrefabAsset(targetObject);
-                    if (targetPrefab == rootBindInfo.prefabObject) return true;
+                    GameObject currentPrefab = CommonTools.GetPrefabAsset(rootBindInfo.GetObject());
+                    if (targetPrefab == currentPrefab) return true;
                 }
             }
             return false;
