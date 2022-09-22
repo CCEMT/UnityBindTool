@@ -222,16 +222,22 @@ namespace BindTool
 
             string savaPath = Application.dataPath + "/" + selectSettion.savaOldScriptPath + "/";
 
-            string directoryName = tempData.addTypeString.typeName + "/";
-            string directoryPath = savaPath + directoryName;
+            string directoryName = "";
+            if (tempData.addTypeString.IsEmpty() == false) { directoryName = tempData.addTypeString.typeName + "/"; }
+            else { directoryName = tempData.newScriptName + "/"; }
 
-            string savaText = File.ReadAllText(path);
+            string directoryPath = savaPath + directoryName;
 
             if (Directory.Exists(directoryPath) == false) Directory.CreateDirectory(directoryPath);
             DirectoryInfo direction = new DirectoryInfo(directoryPath);
+
+            string savaText = File.ReadAllText(path);
+
             FileInfo[] files = direction.GetFiles("*", SearchOption.AllDirectories);
 
-            string fileName = tempData.addTypeString.typeName + ".txt";
+            string fileName = "";
+            if (tempData.addTypeString.IsEmpty() == false) { fileName = tempData.addTypeString.typeName + ".txt"; }
+            else { fileName = tempData.newScriptName + "/"; }
 
             List<string> nameList = new List<string>();
             int amount = files.Length;
