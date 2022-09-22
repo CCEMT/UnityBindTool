@@ -81,7 +81,7 @@ ScriptSetting，AutonBindSetting，CreateSetting的设置分别独立
 * 是否创建属性：如果勾选则会创建一个对应变量的属性
 * 属性类型：选择创建set与get
 * 是否添加类名：如果勾选了则会在生成时添加类型名(类型名添加后才会添加前缀和后缀)
-* 脚本命名处理：处理初始名称
+* 脚本命名处理：Initial（Upper|Lower）首字母大小写，All（Upper|Lower）全名称大小写
 * 名称重复处理规则：1.不处理；2.添加数字（后缀）
 
 #### 方法生成

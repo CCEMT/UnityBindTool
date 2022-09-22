@@ -17,7 +17,8 @@ namespace BindTool
         static CommonSettingData GetCommonSettingData()
         {
             DataContainer dataContainer = Resources.Load<DataContainer>(ConstData.DataContainerName);
-            return dataContainer.commonSettingData;
+            if (dataContainer != null) { return dataContainer.commonSettingData; }
+            else { return null; }
         }
 
         public static void Build(GameObject bindObject, ObjectInfo objectInfo)
