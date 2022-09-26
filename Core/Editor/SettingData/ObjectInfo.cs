@@ -91,6 +91,7 @@ namespace BindTool
 
             List<TypeString> elseType = new List<TypeString>();
             elseType.AddRange(tempTypeList);
+            elseType.Remove(new TypeString(typeof(GameObject)));
             autoBindSetting.sequenceTypeDataList = autoBindSetting.sequenceTypeDataList.OrderByDescending(x => x.sequence).ToList();
             int sequenceAmount = autoBindSetting.sequenceTypeDataList.Count;
             for (int i = 0; i < sequenceAmount; i++)
@@ -104,11 +105,19 @@ namespace BindTool
                 var data = autoBindSetting.sequenceTypeDataList[i];
                 if (data.isElse)
                 {
-                    if (elseType.Count > 0) bindInfo.SetIndex(elseType.First());
+                    if (elseType.Count > 0)
+                    {
+                        bindInfo.SetIndex(elseType.First());
+                        break;
+                    }
                 }
                 else
                 {
-                    if (tempTypeList.Contains(data.typeString)) bindInfo.SetIndex(data.typeString);
+                    if (tempTypeList.Contains(data.typeString))
+                    {
+                        bindInfo.SetIndex(data.typeString);
+                        break;
+                    }
                 }
             }
         }
@@ -137,7 +146,7 @@ namespace BindTool
                 {
                     if (targetObject == rootBindInfo.instanceObject) { return true; }
                     else if (targetObject == rootBindInfo.prefabObject) return true;
-                   
+
                     GameObject targetPrefab = CommonTools.GetPrefabAsset(targetObject);
                     GameObject currentPrefab = CommonTools.GetPrefabAsset(rootBindInfo.GetObject());
                     if (targetPrefab == currentPrefab) return true;
