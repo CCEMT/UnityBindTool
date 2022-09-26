@@ -532,6 +532,17 @@ namespace BindTool
             selectDataAmount = objectInfo.dataBindInfoList.Count;
         }
 
+        void BindComponent(GameObject bindObject,int index)
+        {
+            ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindObject);
+            objectInfo.Bind(componentBindInfo, index);
+            if (bindWindown.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
+            {
+                componentBindInfo.name = CommonTools.GetNumberAlpha(componentBindInfo.instanceObject.name);
+            }
+            bindWindown.isSavaSetting = true;
+        }
+
         void SelectBindInfo(int index)
         {
             selectComponentList = new List<ComponentBindInfo>();
@@ -587,6 +598,8 @@ namespace BindTool
                     break;
                 }
             }
+
+            isSavaSetting = true;
         }
 
         
