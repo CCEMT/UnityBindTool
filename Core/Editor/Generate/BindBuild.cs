@@ -125,10 +125,13 @@ namespace BindTool
             }
             else { Debug.Log("添加类型为空"); }
 
-            //创建预制体
-            PrefabUtility.SaveAsPrefabAssetAndConnect(bindObject, path, InteractionMode.AutomatedAction);
+            if (commonSettingData.isCreatePrefab)
+            {
+                //创建预制体
+                PrefabUtility.SaveAsPrefabAssetAndConnect(bindObject, path, InteractionMode.AutomatedAction);
 
-            Debug.Log("Create Prefab Finish.");
+                Debug.Log("Create Prefab Finish.");
+            }
         }
     }
 }
