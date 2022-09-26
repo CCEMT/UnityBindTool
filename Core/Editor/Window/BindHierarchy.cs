@@ -92,7 +92,10 @@ namespace BindTool
                         for (int i = 0; i < typeAmount; i++)
                         {
                             var index = i;
-                            menu.AddItem(new GUIContent(componentBindInfo.typeStrings[i].typeName), false, () => { bindWindown.BindComponent(go, index); }); //向菜单中添加菜单项
+                            menu.AddItem(new GUIContent(componentBindInfo.typeStrings[i].typeName), false, () => {
+                                bindWindown.BindComponent(go, index);
+                                bindWindown.Repaint();
+                            }); //向菜单中添加菜单项
                         }
 
                         menu.ShowAsContext(); //显示菜单

@@ -82,7 +82,7 @@ namespace BindTool
             GUI.FocusControl("Input");
             GUILayout.EndHorizontal();
 
-            float height = 520f;
+            float height = 525f;
 
             GUILayout.BeginVertical("box");
             typeSelectScrollPosition1 = EditorGUILayout.BeginScrollView(typeSelectScrollPosition1, false, false, GUILayout.ExpandWidth(true), GUILayout.Height(height));
@@ -93,7 +93,7 @@ namespace BindTool
                 GUILayout.BeginVertical("box");
 
                 Type type = selectList[i];
-                if (GUILayout.Button($"({type.Namespace}) {type.Name}"))
+                if (GUILayout.Button($"({type.Namespace}) {type.Name}",GUILayout.Width(457.5f)))
                 {
                     Close();
                     callBack?.Invoke(true, new TypeString(type));
@@ -121,8 +121,8 @@ namespace BindTool
 
         void InputControl()
         {
-            float height = 520f;
-            float itmeHeight = 520f / 18f;
+            float height = 525f;
+            float itmeHeight = 525f / 18f;
             float currentHeight = 0;
 
             if (currentEvent.type == EventType.KeyDown)
