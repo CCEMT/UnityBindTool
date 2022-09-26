@@ -34,6 +34,8 @@ namespace BindTool
 
             Writer($"#region {ConstData.DefaultName}", 1);
 
+            Writer($"///#region {ConstData.DefaultName}里的内容为自动生成，请勿去修改它", 1);
+
             List<ComponentNameData> coomponentNameList = new List<ComponentNameData>();
             List<DataName> dataNameList = new List<DataName>();
             Dictionary<string, int> variableNameAmountDict = new Dictionary<string, int>();
@@ -98,17 +100,19 @@ namespace BindTool
                     }
                 }
             }
-
-            Writer("#if UNITY_EDITOR");
             int dataAmount = dataNameList.Count;
-            for (int i = 0; i < dataAmount; i++)
+            if (dataAmount > 0)
             {
-                var data = dataNameList[i];
-                TypeString type = data.dataBindInfo.typeString;
-                string contnet = $"{data.variableName} = UnityEditor.AssetDatabase.LoadAssetAtPath<{type.GetVisitString()}>(\"{AssetDatabase.GetAssetPath(data.dataBindInfo.bindObject)}\");";
-                Writer(contnet, 2);
+                Writer("#if UNITY_EDITOR");
+                for (int i = 0; i < dataAmount; i++)
+                {
+                    var data = dataNameList[i];
+                    TypeString type = data.dataBindInfo.typeString;
+                    string contnet = $"{data.variableName} = UnityEditor.AssetDatabase.LoadAssetAtPath<{type.GetVisitString()}>(\"{AssetDatabase.GetAssetPath(data.dataBindInfo.bindObject)}\");";
+                    Writer(contnet, 2);
+                }
+                Writer("#endif");
             }
-            Writer("#endif");
 
             Writer("}", 1);
             generateList.Add("");
@@ -193,14 +197,16 @@ namespace BindTool
                     {
                         bool isCanName = false;
                         while (isCanName == false)
-                        {
-                            methodNameAmountDict[methodName]++;
                             switch (selectSettion.propertyNameSetting.repetitionNameDispose)
                             {
                                 case RepetitionNameDispose.AddNumber:
                                     var targetName = methodName + methodNameAmountDict[methodName].ToString();
 
-                                    if (methodNameList.Contains(targetName)) continue;
+                                    if (methodNameList.Contains(targetName))
+                                    {
+                                        methodNameAmountDict[methodName]++;
+                                        continue;
+                                    }
                                     var findNameData = coomponentNameList.Find((findData) => {
                                         if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
                                         return false;
@@ -210,19 +216,19 @@ namespace BindTool
                                         methodName = targetName;
                                         isCanName = true;
                                     }
+                                    else { methodNameAmountDict[methodName]++; }
                                     break;
                                 case RepetitionNameDispose.None:
                                 default:
                                     isCanName = true;
                                     break;
                             }
-                        }
                     }
                     else { methodNameAmountDict.Add(methodName, 1); }
 
                     methodNameList.Add(methodName);
 
-                    Writer($"public  {variableData.variableType.GetVisitString()} Get{methodName}()", 1);
+                    Writer($"public {variableData.variableType.GetVisitString()} Get{methodName}()", 1);
                     Writer("{", 1);
                     Writer($"return {dataName.variableName}.{variableData.varialbleName};", 2);
                     Writer("}", 1);

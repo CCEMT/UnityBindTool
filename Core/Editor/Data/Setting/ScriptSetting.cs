@@ -44,7 +44,6 @@ namespace BindTool
         public bool isSavaOldScript; //是否保存旧脚本
         public string savaOldScriptPath; //保存路径
 
-        public VisitType methodVisitType;
         public NameSetting methodNameSetting;
         public List<VariableData> variableList;
         public List<TemplateData> templateDataList;
@@ -66,7 +65,6 @@ namespace BindTool
                    partialName == other.partialName && isSpecifyNamespace == other.isSpecifyNamespace && useNamespace == other.useNamespace && variableVisitType == other.variableVisitType &&
                    nameSetting.Equals(other.nameSetting) && isAddProperty == other.isAddProperty && propertyVisitType == other.propertyVisitType && propertyType == other.propertyType &&
                    propertyNameSetting.Equals(other.propertyNameSetting) && isSavaOldScript == other.isSavaOldScript && savaOldScriptPath == other.savaOldScriptPath &&
-                   methodVisitType == other.methodVisitType &&
                    methodNameSetting.Equals(other.methodNameSetting) && Equals(variableList, other.variableList) && Equals(templateDataList, other.templateDataList);
         }
 
@@ -89,7 +87,6 @@ namespace BindTool
                 hashCode = (hashCode * 397) ^ propertyNameSetting.GetHashCode();
                 hashCode = (hashCode * 397) ^ isSavaOldScript.GetHashCode();
                 hashCode = (hashCode * 397) ^ (savaOldScriptPath != null ? savaOldScriptPath.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (int) methodVisitType;
                 hashCode = (hashCode * 397) ^ methodNameSetting.GetHashCode();
                 hashCode = (hashCode * 397) ^ (variableList != null ? variableList.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (templateDataList != null ? templateDataList.GetHashCode() : 0);

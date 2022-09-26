@@ -327,6 +327,11 @@ namespace BindTool
 
             StreamWriter mainWriter = File.CreateText(fullPath);
 
+            Writer("///该脚本为模板方法");
+            Writer("///注意：");
+            Writer($"///需要生成的方法写入#region{ConstData.TemplateRegionName}");
+            Writer("///生成方法使用到的类型必须为[命名空间].[类型名]，如果使用using引用命名空间生成时可能会生成失败");
+
             Writer($"namespace {ConstData.TemplateNamespace}");
             Writer("{");
 
@@ -374,6 +379,11 @@ namespace BindTool
             List<string> addLine = new List<string>();
 
             int lineAmount = contents.Count;
+
+            addLine.Add("///该脚本为模板方法");
+            addLine.Add("///注意：");
+            addLine.Add($"///需要生成的方法写入#region{ConstData.TemplateRegionName}");
+            addLine.Add("///生成方法使用到的类型必须为[命名空间].[类型名]，如果使用using引用命名空间生成时可能会生成失败");
 
             for (int i = 0; i < lineAmount; i++)
             {
