@@ -209,6 +209,8 @@ namespace BindTool
                 for (int i = 0; i < deleteAmount + 1; i++) contents.RemoveAt(startLine);
             }
 
+            tempData.objectInfo.typeString = tempData.addTypeString;
+
             //添加数据
             List<string> addData = GenerateCSharpData.Generate(commonSettingData, isSpecifyNamespace);
             int addAmount = addData.Count;
