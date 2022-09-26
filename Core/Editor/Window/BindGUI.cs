@@ -342,123 +342,131 @@ namespace BindTool
                 GUILayout.BeginVertical("box");
                 bindScrollPosition = EditorGUILayout.BeginScrollView(bindScrollPosition, false, false, GUILayout.ExpandWidth(true), GUILayout.Height(height));
 
-                for (int i = selectComponentAmount - 1; i >= 0; i--)
+                try
                 {
-                    GUILayout.BeginVertical("frameBox");
-
-                    EditorGUILayout.BeginHorizontal();
-
-                    EditorGUILayout.BeginVertical();
-                    ComponentBindInfo componentBindInfo = selectComponentList[i];
-                    int itemIndex = objectInfo.gameObjectBindInfoList.IndexOf(componentBindInfo);
-
-                    int tempComponentBindInfoIndex = EditorGUILayout.Popup(componentBindInfo.index, componentBindInfo.GetTypeStrings());
-                    if (tempComponentBindInfoIndex != componentBindInfo.index)
+                    for (int i = selectComponentAmount - 1; i >= 0; i--)
                     {
-                        objectInfo.gameObjectBindInfoList[itemIndex].index = tempComponentBindInfoIndex;
-                        isSavaSetting = true;
-                    }
-                    if (componentBindInfo.GetTypeName() == nameof(GameObject)) { EditorGUILayout.ObjectField(componentBindInfo.instanceObject, componentBindInfo.GetValue().GetType(), true); }
-                    else { EditorGUILayout.ObjectField(componentBindInfo.GetValue(), componentBindInfo.GetValue().GetType(), true); }
+                        GUILayout.BeginVertical("frameBox");
 
-                    EditorGUILayout.EndVertical();
+                        EditorGUILayout.BeginHorizontal();
 
-                    EditorGUILayout.BeginVertical();
+                        EditorGUILayout.BeginVertical();
+                        ComponentBindInfo componentBindInfo = selectComponentList[i];
+                        int itemIndex = objectInfo.gameObjectBindInfoList.IndexOf(componentBindInfo);
 
-                    GUILayout.Label("变量名");
-                    string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(componentBindInfo.name));
-                    if (tempComponentBindInfoName != componentBindInfo.name)
-                    {
-                        objectInfo.gameObjectBindInfoList[itemIndex].name = tempComponentBindInfoName;
-                        isSavaSetting = true;
-                    }
+                        if (itemIndex == -1) GetBindSelectList();
 
-                    EditorGUILayout.EndVertical();
-
-                    EditorGUILayout.BeginVertical();
-
-                    if (GUILayout.Button("操作", GUILayout.Width(100)))
-                    {
-                        GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
-                        menu.AddItem(new GUIContent("设置默认名"), false, () => {
-                            objectInfo.gameObjectBindInfoList[itemIndex].name = CommonTools.SetName(componentBindInfo.instanceObject.name, commonSettingData.selectCreateNameSetting);
+                        int tempComponentBindInfoIndex = EditorGUILayout.Popup(componentBindInfo.index, componentBindInfo.GetTypeStrings());
+                        if (tempComponentBindInfoIndex != componentBindInfo.index)
+                        {
+                            objectInfo.gameObjectBindInfoList[itemIndex].index = tempComponentBindInfoIndex;
                             isSavaSetting = true;
-                        });
+                        }
+                        if (componentBindInfo.GetTypeName() == nameof(GameObject)) { EditorGUILayout.ObjectField(componentBindInfo.instanceObject, componentBindInfo.GetValue().GetType(), true); }
+                        else { EditorGUILayout.ObjectField(componentBindInfo.GetValue(), componentBindInfo.GetValue().GetType(), true); }
 
-                        menu.ShowAsContext(); //显示菜单
-                    }
+                        EditorGUILayout.EndVertical();
 
-                    GUI.color = Color.red;
-                    if (GUILayout.Button("删除", GUILayout.Width(100)))
-                    {
-                        objectInfo.gameObjectBindInfoList.RemoveAt(itemIndex);
-                        isSavaSetting = true;
-                    }
-                    GUI.color = Color.white;
+                        EditorGUILayout.BeginVertical();
 
-                    EditorGUILayout.EndVertical();
-
-                    EditorGUILayout.EndHorizontal();
-
-                    GUILayout.EndHorizontal();
-                }
-
-                for (int i = 0; i < selectDataAmount; i++)
-                {
-                    GUILayout.BeginVertical("frameBox");
-
-                    DataBindInfo dataBindInfo = selectDataList[i];
-                    int itemIndex = objectInfo.dataBindInfoList.IndexOf(dataBindInfo);
-
-                    EditorGUILayout.BeginHorizontal();
-
-                    EditorGUILayout.BeginVertical();
-
-                    GUILayout.Label(dataBindInfo.typeString.typeName);
-
-                    EditorGUILayout.ObjectField(dataBindInfo.bindObject, dataBindInfo.typeString.ToType(), true);
-
-                    EditorGUILayout.EndVertical();
-
-                    EditorGUILayout.BeginVertical();
-
-                    GUILayout.Label("变量名");
-                    string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(dataBindInfo.name));
-                    if (tempComponentBindInfoName != dataBindInfo.name)
-                    {
-                        objectInfo.dataBindInfoList[itemIndex].name = tempComponentBindInfoName;
-                        isSavaSetting = true;
-                    }
-
-                    EditorGUILayout.EndVertical();
-
-                    EditorGUILayout.BeginVertical();
-
-                    if (GUILayout.Button("操作", GUILayout.Width(100)))
-                    {
-                        GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
-                        menu.AddItem(new GUIContent("设置默认名"), false, () => {
-                            objectInfo.dataBindInfoList[itemIndex].name = CommonTools.SetName(dataBindInfo.bindObject.name, commonSettingData.selectCreateNameSetting);
+                        GUILayout.Label("变量名");
+                        string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(componentBindInfo.name));
+                        if (tempComponentBindInfoName != componentBindInfo.name)
+                        {
+                            objectInfo.gameObjectBindInfoList[itemIndex].name = tempComponentBindInfoName;
                             isSavaSetting = true;
-                        });
+                        }
 
-                        menu.ShowAsContext(); //显示菜单
+                        EditorGUILayout.EndVertical();
+
+                        EditorGUILayout.BeginVertical();
+
+                        if (GUILayout.Button("操作", GUILayout.Width(100)))
+                        {
+                            GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
+                            menu.AddItem(new GUIContent("设置默认名"), false, () => {
+                                objectInfo.gameObjectBindInfoList[itemIndex].name = CommonTools.SetName(componentBindInfo.instanceObject.name, commonSettingData.selectCreateNameSetting);
+                                isSavaSetting = true;
+                            });
+
+                            menu.ShowAsContext(); //显示菜单
+                        }
+
+                        GUI.color = Color.red;
+                        if (GUILayout.Button("删除", GUILayout.Width(100)))
+                        {
+                            objectInfo.gameObjectBindInfoList.RemoveAt(itemIndex);
+                            isSavaSetting = true;
+                        }
+                        GUI.color = Color.white;
+
+                        EditorGUILayout.EndVertical();
+
+                        EditorGUILayout.EndHorizontal();
+
+                        GUILayout.EndHorizontal();
                     }
 
-                    GUI.color = Color.red;
-                    if (GUILayout.Button("删除", GUILayout.Width(100)))
+                    for (int i = 0; i < selectDataAmount; i++)
                     {
-                        objectInfo.dataBindInfoList.RemoveAt(itemIndex);
-                        isSavaSetting = true;
+                        GUILayout.BeginVertical("frameBox");
+
+                        DataBindInfo dataBindInfo = selectDataList[i];
+                        int itemIndex = objectInfo.dataBindInfoList.IndexOf(dataBindInfo);
+
+                        if (itemIndex == -1) GetBindSelectList();
+
+                        EditorGUILayout.BeginHorizontal();
+
+                        EditorGUILayout.BeginVertical();
+
+                        GUILayout.Label(dataBindInfo.typeString.typeName);
+
+                        EditorGUILayout.ObjectField(dataBindInfo.bindObject, dataBindInfo.typeString.ToType(), true);
+
+                        EditorGUILayout.EndVertical();
+
+                        EditorGUILayout.BeginVertical();
+
+                        GUILayout.Label("变量名");
+                        string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(dataBindInfo.name));
+                        if (tempComponentBindInfoName != dataBindInfo.name)
+                        {
+                            objectInfo.dataBindInfoList[itemIndex].name = tempComponentBindInfoName;
+                            isSavaSetting = true;
+                        }
+
+                        EditorGUILayout.EndVertical();
+
+                        EditorGUILayout.BeginVertical();
+
+                        if (GUILayout.Button("操作", GUILayout.Width(100)))
+                        {
+                            GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
+                            menu.AddItem(new GUIContent("设置默认名"), false, () => {
+                                objectInfo.dataBindInfoList[itemIndex].name = CommonTools.SetName(dataBindInfo.bindObject.name, commonSettingData.selectCreateNameSetting);
+                                isSavaSetting = true;
+                            });
+
+                            menu.ShowAsContext(); //显示菜单
+                        }
+
+                        GUI.color = Color.red;
+                        if (GUILayout.Button("删除", GUILayout.Width(100)))
+                        {
+                            objectInfo.dataBindInfoList.RemoveAt(itemIndex);
+                            isSavaSetting = true;
+                        }
+                        GUI.color = Color.white;
+
+                        EditorGUILayout.EndVertical();
+
+                        EditorGUILayout.EndHorizontal();
+
+                        EditorGUILayout.EndHorizontal();
                     }
-                    GUI.color = Color.white;
-
-                    EditorGUILayout.EndVertical();
-
-                    EditorGUILayout.EndHorizontal();
-
-                    EditorGUILayout.EndHorizontal();
                 }
+                catch (Exception e) { }
 
                 EditorGUILayout.EndScrollView();
 
@@ -532,14 +540,11 @@ namespace BindTool
             selectDataAmount = objectInfo.dataBindInfoList.Count;
         }
 
-        void BindComponent(GameObject bindObject,int index)
+        void BindComponent(GameObject bindObject, int index)
         {
             ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindObject);
             objectInfo.Bind(componentBindInfo, index);
-            if (bindWindown.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
-            {
-                componentBindInfo.name = CommonTools.GetNumberAlpha(componentBindInfo.instanceObject.name);
-            }
+            if (bindWindown.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName) componentBindInfo.name = CommonTools.GetNumberAlpha(componentBindInfo.instanceObject.name);
             bindWindown.isSavaSetting = true;
         }
 
@@ -601,7 +606,5 @@ namespace BindTool
 
             isSavaSetting = true;
         }
-
-        
     }
 }
