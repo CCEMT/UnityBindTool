@@ -738,16 +738,6 @@ namespace BindTool
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("访问类型：", GUILayout.Width(120));
-            VisitType tempVisitType = (VisitType) EditorGUILayout.EnumPopup(selectSetting.methodVisitType, GUILayout.Width(100));
-            if (tempVisitType != selectSetting.methodVisitType)
-            {
-                selectSetting.methodVisitType = tempVisitType;
-                isSavaSetting = true;
-            }
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
             GUILayout.Label("脚本命名处理");
             ScriptNamingDispose tempNamingDispose = (ScriptNamingDispose) EditorGUILayout.EnumPopup(selectSetting.methodNameSetting.namingDispose);
             if (tempNamingDispose != selectSetting.methodNameSetting.namingDispose)

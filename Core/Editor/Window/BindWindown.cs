@@ -95,6 +95,8 @@ namespace BindTool
             commonTitleStyle.normal.textColor = Color.white;
             commonTitleStyle.fontStyle = FontStyle.Bold;
             commonTitleStyle.fontSize = 14;
+
+            isSavaSetting = true;
         }
 
         static bool Check()
@@ -146,6 +148,7 @@ namespace BindTool
         void SavaSetting()
         {
             isSavaSetting = false;
+            EditorUtility.SetDirty(dataContainer);
             EditorUtility.SetDirty(bindData);
             EditorUtility.SetDirty(commonSettingData);
             int scriptSettingAmount = commonSettingData.scriptSettingList.Count;

@@ -109,7 +109,7 @@ namespace BindTool
                 {
                     if (errorList.Contains(addErrorInfo)) errorList.Remove(addErrorInfo);
                 }
-                commonSettingData.tempGenerateData.addTypeString = objectInfo.typeString;
+                commonSettingData.tempGenerateData.addTypeString = objectInfo.rootBindInfo.GetTypeString();
             }
             else
             {

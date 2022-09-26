@@ -156,6 +156,7 @@ namespace BindTool
             if (startLine == -1 || endLine == -1)
             {
                 //未找到数据
+                startLine = -1;
                 int classLine = -1;
                 for (int i = 0; i < lineAmount; i++)
                 {
@@ -180,15 +181,19 @@ namespace BindTool
                     }
                     else
                     {
-                        int lineLength = line.Length;
-                        for (int j = 0; j < lineLength; j++)
+                        if (startLine == -1)
                         {
-                            if (line[j] == '{')
+                            int lineLength = line.Length;
+                            for (int j = 0; j < lineLength; j++)
                             {
-                                startLine = i + 1;
-                                break;
+                                if (line[j] == '{')
+                                {
+                                    startLine = i + 1;
+                                    break;
+                                }
                             }
                         }
+                        else { break; }
                     }
                 }
                 if (startLine == -1)
