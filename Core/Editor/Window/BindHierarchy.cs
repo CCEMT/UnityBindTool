@@ -46,7 +46,7 @@ namespace BindTool
                         if (bindInfo.instanceObject == go || CommonTools.GetPrefabAsset(go) == bindInfo.instanceObject) { return true; }
                         else { return false; }
                     });
-                 
+
                     if (findInfo != null)
                     {
                         var r = new Rect(rect);
@@ -58,7 +58,8 @@ namespace BindTool
                             style.normal.textColor = Color.yellow;
                             GUI.Label(r, "★", style);
                         }
-                        else {
+                        else
+                        {
                             style.normal.textColor = Color.white;
                             GUI.Label(r, "★", style);
                         }
@@ -74,12 +75,15 @@ namespace BindTool
                 GameObject go = EditorUtility.InstanceIDToObject(id) as GameObject;
                 if (go != null)
                 {
-                    float width = 50f;
+                    float width = 30f;
                     float height = 17.5f;
                     rect.x += rect.width - width;
                     rect.width = width;
                     rect.height = height;
-                    if (GUI.Button(rect, "绑定"))
+                    GUIStyle style = new GUIStyle();
+                    style.fontSize = 12;
+                    style.normal.textColor = Color.green;
+                    if (GUI.Button(rect, "绑定", style))
                     {
                         GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
 
@@ -126,12 +130,17 @@ namespace BindTool
 
                     if (bindList.Count > 0)
                     {
-                        float width = 75f;
-                        float height = 17.5f;
-                        rect.x += rect.width - width - 50f;
-                        rect.width = width;
-                        rect.height = height;
-                        if (GUI.Button(rect, "查看绑定"))
+                        Rect lookRect = new Rect(rect);
+
+                        float lookWidth = 30f;
+                        float lookHeight = 17.5f;
+                        lookRect.x += rect.width - lookWidth - 30f;
+                        lookRect.width = lookWidth;
+                        lookRect.height = lookHeight;
+                        GUIStyle lookStyle = new GUIStyle();
+                        lookStyle.fontSize = 12;
+                        lookStyle.normal.textColor = Color.white;
+                        if (GUI.Button(lookRect, "查看", lookStyle))
                         {
                             GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
 
@@ -142,6 +151,40 @@ namespace BindTool
                                 int index = bindIndex[i];
                                 menu.AddItem(new GUIContent(info.GetTypeName()), false, () => { bindWindown.SelectBindInfo(index); }); //向菜单中添加菜单项
                             }
+                            menu.ShowAsContext(); //显示菜单
+                        }
+
+                        Rect deleteRect = new Rect(rect);
+                        float deleteWidth = 30f;
+                        float deleteHeight = 17.5f;
+                        deleteRect.x += rect.width - deleteWidth - lookWidth - 30f;
+                        deleteRect.width = deleteHeight;
+                        deleteRect.height = deleteHeight;
+
+                        GUIStyle deleteStyle = new GUIStyle();
+                        deleteStyle.fontSize = 12;
+                        deleteStyle.normal.textColor = Color.red;
+                        if (GUI.Button(deleteRect, "解除", deleteStyle))
+                        {
+                            List<RemoveType> removeTypes = new List<RemoveType>();
+                            removeTypes.Add(RemoveType.This);
+
+                            var transforms = go.GetComponentsInChildren<Transform>(true);
+                            if (transforms.Length > 1)
+                            {
+                                removeTypes.Add(RemoveType.Child);
+                                removeTypes.Add(RemoveType.ThisAndChild);
+                            }
+
+                            GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
+
+                            int selectAmount = removeTypes.Count;
+                            for (int i = 0; i < selectAmount; i++)
+                            {
+                                RemoveType removeType = removeTypes[i];
+                                menu.AddItem(new GUIContent(CommonTools.GetRemoveString(removeType)), false, () => { bindWindown.RemoveBindInfo(go, removeType); });
+                            }
+
                             menu.ShowAsContext(); //显示菜单
                         }
                     }

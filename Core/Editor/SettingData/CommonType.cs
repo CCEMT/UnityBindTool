@@ -7,4 +7,10 @@
         Protected,
         Internal
     }
+    public enum RemoveType
+    {
+        This,
+        Child,
+        ThisAndChild,
+    }
 }

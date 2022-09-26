@@ -336,7 +336,7 @@ namespace BindTool
 
             float maxAmount = 5;
             float itemHeight = 54.5f;
-            float height = Mathf.Clamp(selectComponentAmount * itemHeight, 0, itemHeight * maxAmount);
+            float height = Mathf.Clamp((selectComponentAmount + selectDataAmount) * itemHeight, 0, itemHeight * maxAmount);
             if (height > 0)
             {
                 GUILayout.BeginVertical("box");
@@ -344,7 +344,7 @@ namespace BindTool
 
                 for (int i = selectComponentAmount - 1; i >= 0; i--)
                 {
-                    GUILayout.BeginVertical("frameBox", GUILayout.Height(50));
+                    GUILayout.BeginVertical("frameBox");
 
                     EditorGUILayout.BeginHorizontal();
 
@@ -405,7 +405,7 @@ namespace BindTool
 
                 for (int i = 0; i < selectDataAmount; i++)
                 {
-                    GUILayout.BeginVertical("frameBox", GUILayout.Height(50));
+                    GUILayout.BeginVertical("frameBox");
 
                     DataBindInfo dataBindInfo = selectDataList[i];
                     int itemIndex = objectInfo.dataBindInfoList.IndexOf(dataBindInfo);
@@ -538,5 +538,57 @@ namespace BindTool
             selectComponentList.Add(objectInfo.gameObjectBindInfoList[index]);
             selectComponentAmount = 1;
         }
+
+        void RemoveBindInfo(GameObject removeObject, RemoveType removeType)
+        {
+            switch (removeType)
+            {
+                case RemoveType.This:
+                    int thisBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
+                    for (int i = thisBindInfoAmount - 1; i >= 0; i--)
+                    {
+                        ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[i];
+                        if (componentBindInfo.instanceObject == removeObject) objectInfo.gameObjectBindInfoList.RemoveAt(i);
+                    }
+                    break;
+                case RemoveType.Child:
+                {
+                    var transforms = removeObject.GetComponentsInChildren<Transform>(true);
+                    int amount = transforms.Length;
+                    for (int i = 0; i < amount; i++)
+                    {
+                        Transform transform = transforms[i];
+                        if (transform.gameObject != removeObject)
+                        {
+                            int childBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
+                            for (int j = childBindInfoAmount - 1; j >= 0; j--)
+                            {
+                                ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[j];
+                                if (componentBindInfo.instanceObject == transform.gameObject) objectInfo.gameObjectBindInfoList.RemoveAt(j);
+                            }
+                        }
+                    }
+                    break;
+                }
+                case RemoveType.ThisAndChild:
+                {
+                    var transforms = removeObject.GetComponentsInChildren<Transform>(true);
+                    int amount = transforms.Length;
+                    for (int i = 0; i < amount; i++)
+                    {
+                        Transform transform = transforms[i];
+                        int childBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
+                        for (int j = childBindInfoAmount - 1; j >= 0; j--)
+                        {
+                            ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[j];
+                            if (componentBindInfo.instanceObject == transform.gameObject) objectInfo.gameObjectBindInfoList.RemoveAt(j);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        
     }
 }
