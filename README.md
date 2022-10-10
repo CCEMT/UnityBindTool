@@ -159,6 +159,7 @@ ScriptSetting，AutonBindSetting，CreateSetting的设置分别独立
 ## 待开发功能
 
 * 添加对Lua的支持
+* 增加是否开启流式绑定，不开启则绑定所有组件，顺序绑定命名将改为流式绑定规则
 
 ## 问题与建议
 
