@@ -22,8 +22,17 @@ namespace BindTool
         //忽略数据
         public List<NameCheck> nameLgnoreDataList = new List<NameCheck>();
 
-        //根据顺序绑定
-        public List<SequenceTypeData> sequenceTypeDataList = new List<SequenceTypeData>();
+        //是否启用流绑定
+        public bool isEnableStreamingBind;
+
+        //是否绑定
+        public bool isBindComponent;
+
+        //是否绑定所有
+        public bool isBindAllComponent;
+
+        //根据流绑定
+        public List<StreamingBindData> streamingBindDataList = new List<StreamingBindData>();
 
         #region Equals
 
@@ -36,8 +45,9 @@ namespace BindTool
 
         protected bool Equals(AutoBindSetting other)
         {
-            return base.Equals(other) && programName == other.programName && Equals(nameBindDataList, other.nameBindDataList) && Equals(nameLgnoreDataList, other.nameLgnoreDataList) &&
-                   Equals(sequenceTypeDataList, other.sequenceTypeDataList);
+            return base.Equals(other) && this.programName == other.programName && Equals(this.nameBindDataList, other.nameBindDataList) && Equals(this.nameLgnoreDataList, other.nameLgnoreDataList) &&
+                   this.isEnableStreamingBind == other.isEnableStreamingBind && this.isBindComponent == other.isBindComponent && this.isBindAllComponent == other.isBindAllComponent &&
+                   Equals(this.streamingBindDataList, other.streamingBindDataList);
         }
 
         public override int GetHashCode()
@@ -45,10 +55,13 @@ namespace BindTool
             unchecked
             {
                 int hashCode = base.GetHashCode();
-                hashCode = (hashCode * 397) ^ (programName != null ? programName.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (nameBindDataList != null ? nameBindDataList.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (nameLgnoreDataList != null ? nameLgnoreDataList.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (sequenceTypeDataList != null ? sequenceTypeDataList.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.programName != null ? this.programName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.nameBindDataList != null ? this.nameBindDataList.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.nameLgnoreDataList != null ? this.nameLgnoreDataList.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.isEnableStreamingBind.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.isBindComponent.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.isBindAllComponent.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.streamingBindDataList != null ? this.streamingBindDataList.GetHashCode() : 0);
                 return hashCode;
             }
         }
@@ -149,7 +162,7 @@ namespace BindTool
     }
 
     [Serializable]
-    public class SequenceTypeData
+    public class StreamingBindData
     {
         public int sequence;
         public bool isElse;
@@ -159,12 +172,12 @@ namespace BindTool
 
         public override bool Equals(object obj)
         {
-            SequenceTypeData equalsValue = (SequenceTypeData) obj;
+            StreamingBindData equalsValue = (StreamingBindData) obj;
             if (equalsValue != null) return Equals(equalsValue);
             return false;
         }
 
-        protected bool Equals(SequenceTypeData other)
+        protected bool Equals(StreamingBindData other)
         {
             return sequence == other.sequence && isElse == other.isElse && typeString.Equals(other.typeString);
         }

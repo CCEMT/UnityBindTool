@@ -120,7 +120,7 @@ ScriptSetting，AutonBindSetting，CreateSetting的设置分别独立
 
 * （NameBindList）根据名称来绑定对应的类型
 * （NameLgnoreList）根据名称忽略对应的物体
-* （SequenceTypeList）按照类型的顺序进行绑定
+* （StreamingBindList）按照类型的顺序进行绑定
 
 检查名称将和物体名称相匹配，匹配成功会绑定对应的类型或忽略不绑定
 匹配规则为四种：
@@ -131,6 +131,9 @@ ScriptSetting，AutonBindSetting，CreateSetting的设置分别独立
 
 区分大小写：匹配时是否区分大小写
 
+是否开启流式绑定：开启后如果名称匹配失败则使用流式绑定（顺序绑定）
+是否绑定组件：如果名称匹配失败则不绑定组件
+是否绑定所有组件：如果名称匹配失败则绑定该物体上的所有组件
 顺序匹配规则：优先匹配顺序数字大的条件
 是否为其他：匹配时如果该物体中有组件是顺序列表中所没定义的组件那么则绑定它，通常在顺序列表中没定义的组件为用户自定义的脚本
 
@@ -159,7 +162,6 @@ ScriptSetting，AutonBindSetting，CreateSetting的设置分别独立
 ## 待开发功能
 
 * 添加对Lua的支持
-* 增加是否开启流式绑定，不开启则绑定所有组件，顺序绑定命名将改为流式绑定规则
 
 ## 问题与建议
 

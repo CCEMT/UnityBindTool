@@ -14,22 +14,22 @@ namespace BindTool
     {
         private int autoBindSettingIndex;
 
-        private string autoSettingInput = "";
-
         private Vector2 autoScrollPosition1;
         private Vector2 autoScrollPosition2;
         private Vector2 autoScrollPosition3;
 
-        private List<NameBindData> selectNameBindDataList;
-        private List<NameCheck> selectLgnoreDataList;
-        private List<SequenceTypeData> selectSequenceTypeDataList;
-
-        private int selectNameBindAmount;
-        private int selectLgnoreAmount;
-        private int selectSequenceAmount;
+        private string autoSettingInput = "";
+        private int lgnoreCount;
 
         private int nameBindCount;
-        private int lgnoreCount;
+        private int selectLgnoreAmount;
+        private List<NameCheck> selectLgnoreDataList;
+
+        private int selectNameBindAmount;
+
+        private List<NameBindData> selectNameBindDataList;
+        private int selectSequenceAmount;
+        private List<StreamingBindData> selectSequenceTypeDataList;
         private int sequenceCount;
 
         public void DrawAutoSettingGUI()
@@ -128,7 +128,7 @@ namespace BindTool
                     DrawNameLgnoreList();
                     break;
                 case 2:
-                    DrawSequenceTypeList();
+                    DrawStreamingBindList();
                     break;
             }
             GUILayout.EndHorizontal();
@@ -296,25 +296,62 @@ namespace BindTool
             GUILayout.EndHorizontal();
         }
 
-        void DrawSequenceTypeList()
+        void DrawStreamingBindList()
         {
             var selectSetting = commonSettingData.selectAutoBindSetting;
 
-            if (sequenceCount != selectSetting.sequenceTypeDataList.Count)
+            if (sequenceCount != selectSetting.streamingBindDataList.Count)
             {
                 GetSelectAutoBindData();
-                sequenceCount = selectSetting.sequenceTypeDataList.Count;
+                sequenceCount = selectSetting.streamingBindDataList.Count;
             }
 
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("类型顺序列表");
+            GUILayout.Label("流式绑定列表");
+
             if (GUILayout.Button("添加"))
             {
-                selectSetting.sequenceTypeDataList.Add(new SequenceTypeData());
-                isSavaSetting = true;
+                if (selectSetting.isEnableStreamingBind)
+                {
+                    selectSetting.streamingBindDataList.Add(new StreamingBindData());
+                    isSavaSetting = true;
+                }
             }
             EditorGUILayout.EndHorizontal();
 
+            EditorGUILayout.BeginHorizontal();
+            bool tempIsEnable = GUILayout.Toggle(selectSetting.isEnableStreamingBind, "是否开启流式绑定");
+            if (tempIsEnable != selectSetting.isEnableStreamingBind)
+            {
+                selectSetting.isEnableStreamingBind = tempIsEnable;
+                this.isSavaSetting = true;
+            }
+
+            EditorGUI.BeginDisabledGroup(selectSetting.isEnableStreamingBind);
+
+            bool tempIsBindComponent = GUILayout.Toggle(selectSetting.isBindComponent, "是否绑定组件");
+            if (tempIsBindComponent != selectSetting.isBindComponent)
+            {
+                selectSetting.isBindComponent = tempIsBindComponent;
+                this.isSavaSetting = true;
+            }
+
+            EditorGUI.BeginDisabledGroup(selectSetting.isBindComponent==false);
+
+            bool tempIsBindAllComponent = GUILayout.Toggle(selectSetting.isBindAllComponent, "是否绑定所有组件");
+            if (tempIsBindAllComponent != selectSetting.isBindAllComponent)
+            {
+                selectSetting.isBindAllComponent = tempIsBindAllComponent;
+                this.isSavaSetting = true;
+            }
+
+            EditorGUI.EndDisabledGroup();
+
+            EditorGUI.EndDisabledGroup();
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUI.BeginDisabledGroup(selectSetting.isEnableStreamingBind == false);
             GUILayout.BeginVertical("box");
             autoScrollPosition3 = EditorGUILayout.BeginScrollView(autoScrollPosition3, false, false, GUILayout.ExpandWidth(true), GUILayout.Height(300));
             for (int i = selectSequenceAmount - 1; i >= 0; i--)
@@ -350,7 +387,7 @@ namespace BindTool
                         if (isSelect)
                         {
                             data.typeString = type;
-                            selectSetting.sequenceTypeDataList[index] = data;
+                            selectSetting.streamingBindDataList[index] = data;
                             isSavaSetting = true;
                         }
                     }, position.position);
@@ -359,7 +396,7 @@ namespace BindTool
                 GUI.color = Color.red;
                 if (GUILayout.Button("删除", GUILayout.Width(50)))
                 {
-                    selectSetting.sequenceTypeDataList.Remove(data);
+                    selectSetting.streamingBindDataList.Remove(data);
                     isSavaSetting = true;
                 }
                 GUI.color = Color.white;
@@ -369,6 +406,7 @@ namespace BindTool
             }
             EditorGUILayout.EndScrollView();
             GUILayout.EndHorizontal();
+            EditorGUI.EndDisabledGroup();
         }
 
         void GetSelectAutoBindData()
@@ -391,11 +429,11 @@ namespace BindTool
             }
             selectLgnoreAmount = selectLgnoreDataList.Count;
 
-            selectSequenceTypeDataList = new List<SequenceTypeData>();
-            int sequenceAmount = commonSettingData.selectAutoBindSetting.sequenceTypeDataList.Count;
+            selectSequenceTypeDataList = new List<StreamingBindData>();
+            int sequenceAmount = commonSettingData.selectAutoBindSetting.streamingBindDataList.Count;
             for (int i = 0; i < sequenceAmount; i++)
             {
-                var sequenceData = commonSettingData.selectAutoBindSetting.sequenceTypeDataList[i];
+                var sequenceData = commonSettingData.selectAutoBindSetting.streamingBindDataList[i];
                 if (CommonTools.Search(sequenceData.typeString.typeName, autoSettingInput) || CommonTools.SearchNumber(sequenceData.sequence.ToString(), autoSettingInput))
                 {
                     selectSequenceTypeDataList.Add(sequenceData);

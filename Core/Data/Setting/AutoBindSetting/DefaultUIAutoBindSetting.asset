@@ -96,22 +96,31 @@ MonoBehaviour:
       typeNameSpace: UnityEngine.UI
       assemblyName: UnityEngine.UI
   nameLgnoreDataList: []
-  sequenceTypeDataList:
-  - sequence: 3
-    isElse: 1
-    typeString:
-      typeName: 
-      typeNameSpace: 
-      assemblyName: 
-  - sequence: 1
+  isEnableStreamingBind: 1
+  isBindComponent: 1
+  isBindAllComponent: 0
+  streamingBindDataList:
+  - sequence: 0
     isElse: 0
     typeString:
       typeName: RectTransform
       typeNameSpace: UnityEngine
       assemblyName: UnityEngine.CoreModule
-  - sequence: 0
+  - sequence: 1
     isElse: 0
     typeString:
-      typeName: Transform
-      typeNameSpace: UnityEngine
-      assemblyName: UnityEngine.CoreModule
+      typeName: Image
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - sequence: 1
+    isElse: 0
+    typeString:
+      typeName: Text
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI
+  - sequence: 1
+    isElse: 0
+    typeString:
+      typeName: Button
+      typeNameSpace: UnityEngine.UI
+      assemblyName: UnityEngine.UI

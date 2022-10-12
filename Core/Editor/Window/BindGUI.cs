@@ -466,7 +466,7 @@ namespace BindTool
                         EditorGUILayout.EndHorizontal();
                     }
                 }
-                catch (Exception e) { }
+                catch (Exception e) {Debug.Log(e); }
 
                 EditorGUILayout.EndScrollView();
 

@@ -63,8 +63,8 @@ namespace BindTool
                 var data = autoBindSetting.nameLgnoreDataList[i];
                 if (data.Check(bindObject.name, out string _)) return;
             }
-            gameObjectBindInfoList.Add(bindInfo);
             ComponentBind(bindInfo, autoBindSetting);
+
         }
 
         void ComponentBind(ComponentBindInfo bindInfo, AutoBindSetting autoBindSetting)
@@ -84,40 +84,66 @@ namespace BindTool
                     if (tempTypeList.Contains(data.typeString))
                     {
                         var index = bindInfo.SetIndex(data.typeString);
-                        if (index != -1) return;
+                        if (index != -1)
+                        {
+                            this.gameObjectBindInfoList.Add(bindInfo);
+                            return;
+                        }
                     }
                 }
             }
 
-            List<TypeString> elseType = new List<TypeString>();
-            elseType.AddRange(tempTypeList);
-            elseType.Remove(new TypeString(typeof(GameObject)));
-            autoBindSetting.sequenceTypeDataList = autoBindSetting.sequenceTypeDataList.OrderByDescending(x => x.sequence).ToList();
-            int sequenceAmount = autoBindSetting.sequenceTypeDataList.Count;
-            for (int i = 0; i < sequenceAmount; i++)
+            if (autoBindSetting.isEnableStreamingBind)
             {
-                var data = autoBindSetting.sequenceTypeDataList[i];
-                if (tempTypeList.Contains(data.typeString)) elseType.Remove(data.typeString);
-            }
-
-            for (int i = 0; i < sequenceAmount; i++)
-            {
-                var data = autoBindSetting.sequenceTypeDataList[i];
-                if (data.isElse)
+                List<TypeString> elseType = new List<TypeString>();
+                elseType.AddRange(tempTypeList);
+                elseType.Remove(new TypeString(typeof(GameObject)));
+                autoBindSetting.streamingBindDataList = autoBindSetting.streamingBindDataList.OrderByDescending(x => x.sequence).ToList();
+                int sequenceAmount = autoBindSetting.streamingBindDataList.Count;
+                for (int i = 0; i < sequenceAmount; i++)
                 {
-                    if (elseType.Count > 0)
+                    var data = autoBindSetting.streamingBindDataList[i];
+                    if (tempTypeList.Contains(data.typeString)) elseType.Remove(data.typeString);
+                }
+
+                for (int i = 0; i < sequenceAmount; i++)
+                {
+                    var data = autoBindSetting.streamingBindDataList[i];
+                    if (data.isElse)
                     {
-                        bindInfo.SetIndex(elseType.First());
-                        break;
+                        if (elseType.Count > 0)
+                        {
+                            bindInfo.SetIndex(elseType.First());
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (tempTypeList.Contains(data.typeString))
+                        {
+                            bindInfo.SetIndex(data.typeString);
+                            break;
+                        }
                     }
                 }
-                else
+
+                this.gameObjectBindInfoList.Add(bindInfo);
+            }
+            else
+            {
+                if (autoBindSetting.isBindComponent)
                 {
-                    if (tempTypeList.Contains(data.typeString))
+                    if (autoBindSetting.isBindAllComponent)
                     {
-                        bindInfo.SetIndex(data.typeString);
-                        break;
+                        int amount = bindInfo.typeStrings.Length;
+                        for (int i = 0; i < amount; i++)
+                        {
+                            ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindInfo.instanceObject);
+                            componentBindInfo.index = i;
+                            this.gameObjectBindInfoList.Add(componentBindInfo);
+                        }
                     }
+                    else { this.gameObjectBindInfoList.Add(bindInfo); }
                 }
             }
         }
