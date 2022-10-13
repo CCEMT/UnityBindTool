@@ -339,11 +339,11 @@ namespace BindTool
             float height = Mathf.Clamp((selectComponentAmount + selectDataAmount) * itemHeight, 0, itemHeight * maxAmount);
             if (height > 0)
             {
-                GUILayout.BeginVertical("box");
-                bindScrollPosition = EditorGUILayout.BeginScrollView(bindScrollPosition, false, false, GUILayout.ExpandWidth(true), GUILayout.Height(height));
-
                 try
                 {
+                    GUILayout.BeginVertical("box");
+                    bindScrollPosition = EditorGUILayout.BeginScrollView(bindScrollPosition, false, false, GUILayout.ExpandWidth(true), GUILayout.Height(height));
+
                     for (int i = selectComponentAmount - 1; i >= 0; i--)
                     {
                         GUILayout.BeginVertical("frameBox");
@@ -465,12 +465,12 @@ namespace BindTool
 
                         EditorGUILayout.EndHorizontal();
                     }
+
+                    EditorGUILayout.EndScrollView();
+
+                    GUILayout.EndHorizontal();
                 }
-                catch (Exception e) {Debug.Log(e); }
-
-                EditorGUILayout.EndScrollView();
-
-                GUILayout.EndHorizontal();
+                catch (Exception e) { Debug.Log(e); }
             }
         }
 
