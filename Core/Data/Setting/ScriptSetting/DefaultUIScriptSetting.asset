@@ -46,7 +46,6 @@ MonoBehaviour:
     behindName: 
   isSavaOldScript: 1
   savaOldScriptPath: CBindTool/SavaOldScript
-  methodVisitType: 0
   methodNameSetting:
     namingDispose: 2
     repetitionNameDispose: 0

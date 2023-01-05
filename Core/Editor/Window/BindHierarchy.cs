@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace BindTool
 {
-    public partial class BindWindown
+    public partial class BindWindow
     {
         [InitializeOnLoadMethod]
         static void Initilalize()
@@ -18,7 +18,7 @@ namespace BindTool
 
         static void SetShow(int id, Rect rect)
         {
-            if (bindWindown != null && bindWindown.commonSettingData != null && bindWindown.commonSettingData.isCustomBind && bindWindown.bindObject != null)
+            if (_bindWindow != null && _bindWindow.commonSettingData != null && _bindWindow.commonSettingData.isCustomBind && _bindWindow.bindObject != null)
             {
                 BindInfo(id, rect);
                 BindOperate(id, rect);
@@ -31,7 +31,7 @@ namespace BindTool
             GameObject go = EditorUtility.InstanceIDToObject(id) as GameObject;
             if (go != null)
             {
-                if (go == bindWindown.bindObject)
+                if (go == _bindWindow.bindObject)
                 {
                     var r = new Rect(rect);
                     r.x = 34;
@@ -42,7 +42,7 @@ namespace BindTool
                 }
                 else
                 {
-                    var findInfo = bindWindown.objectInfo.gameObjectBindInfoList.Find((bindInfo) => {
+                    var findInfo = _bindWindow.objectInfo.gameObjectBindInfoList.Find((bindInfo) => {
                         if (bindInfo.instanceObject == go || CommonTools.GetPrefabAsset(go) == bindInfo.instanceObject) { return true; }
                         else { return false; }
                     });
@@ -53,7 +53,7 @@ namespace BindTool
                         r.x = 34;
                         r.width = 80;
                         GUIStyle style = new GUIStyle();
-                        if (CommonTools.GetIsParent(go.transform, bindWindown.bindObject))
+                        if (CommonTools.GetIsParent(go.transform, _bindWindow.bindObject))
                         {
                             style.normal.textColor = Color.yellow;
                             GUI.Label(r, "★", style);
@@ -93,8 +93,8 @@ namespace BindTool
                         {
                             var index = i;
                             menu.AddItem(new GUIContent(componentBindInfo.typeStrings[i].typeName), false, () => {
-                                bindWindown.BindComponent(go, index);
-                                bindWindown.Repaint();
+                                _bindWindow.BindComponent(go, index);
+                                _bindWindow.Repaint();
                             }); //向菜单中添加菜单项
                         }
 
@@ -113,7 +113,7 @@ namespace BindTool
                 {
                     List<ComponentBindInfo> bindList = new List<ComponentBindInfo>();
                     List<int> bindIndex = new List<int>();
-                    ObjectInfo objectInfo = bindWindown.objectInfo;
+                    ObjectInfo objectInfo = _bindWindow.objectInfo;
                     int amount = objectInfo.gameObjectBindInfoList.Count;
                     for (int i = 0; i < amount; i++)
                     {
@@ -146,7 +146,7 @@ namespace BindTool
                             {
                                 ComponentBindInfo info = bindList[i];
                                 int index = bindIndex[i];
-                                menu.AddItem(new GUIContent(info.GetTypeName()), false, () => { bindWindown.SelectBindInfo(index); }); //向菜单中添加菜单项
+                                menu.AddItem(new GUIContent(info.GetTypeName()), false, () => { _bindWindow.SelectBindInfo(index); }); //向菜单中添加菜单项
                             }
                             menu.ShowAsContext(); //显示菜单
                         }
@@ -179,7 +179,7 @@ namespace BindTool
                             for (int i = 0; i < selectAmount; i++)
                             {
                                 RemoveType removeType = removeTypes[i];
-                                menu.AddItem(new GUIContent(CommonTools.GetRemoveString(removeType)), false, () => { bindWindown.RemoveBindInfo(go, removeType); });
+                                menu.AddItem(new GUIContent(CommonTools.GetRemoveString(removeType)), false, () => { _bindWindow.RemoveBindInfo(go, removeType); });
                             }
 
                             menu.ShowAsContext(); //显示菜单

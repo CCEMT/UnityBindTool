@@ -12,7 +12,7 @@ using Object = UnityEngine.Object;
 
 namespace BindTool
 {
-    public partial class BindWindown
+    public partial class BindWindow
     {
         enum SearchType
         {
@@ -546,8 +546,8 @@ namespace BindTool
         {
             ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindObject);
             objectInfo.Bind(componentBindInfo, index);
-            if (bindWindown.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName) componentBindInfo.name = CommonTools.GetNumberAlpha(componentBindInfo.instanceObject.name);
-            bindWindown.isSavaSetting = true;
+            if (_bindWindow.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName) componentBindInfo.name = CommonTools.GetNumberAlpha(componentBindInfo.instanceObject.name);
+            _bindWindow.isSavaSetting = true;
         }
 
         void SelectBindInfo(int index)

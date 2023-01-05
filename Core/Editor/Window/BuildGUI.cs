@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace BindTool
 {
-    public partial class BindWindown
+    public partial class BindWindow
     {
         public void DrawBuildGUI()
         {

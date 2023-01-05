@@ -35,7 +35,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2aec32ab9ae390e46ad1c09b84cf1a2e, type: 2}
   tempGenerateData:
     isStartBuild: 0
-    newScriptName: Text
+    newScriptName: idle
     bindObject: {fileID: 0}
     objectInfo:
       typeString:

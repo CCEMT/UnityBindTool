@@ -23,18 +23,15 @@ MonoBehaviour:
       - typeName: GameObject
         typeNameSpace: UnityEngine
         assemblyName: UnityEngine.CoreModule
-      - typeName: RectTransform
+      - typeName: Transform
         typeNameSpace: UnityEngine
         assemblyName: UnityEngine.CoreModule
-      - typeName: CanvasRenderer
+      - typeName: Animator
         typeNameSpace: UnityEngine
-        assemblyName: UnityEngine.UIModule
-      - typeName: Text
-        typeNameSpace: UnityEngine.UI
-        assemblyName: UnityEngine.UI
+        assemblyName: UnityEngine.AnimationModule
       index: 0
       instanceObject: {fileID: 0}
-      prefabObject: {fileID: 0}
+      prefabObject: {fileID: 100124, guid: 641e2dd2f9e63e64f8d9a1cb3853e767, type: 3}
       autoBindSetting: {fileID: 0}
     gameObjectBindInfoList: []
     dataBindInfoList: []

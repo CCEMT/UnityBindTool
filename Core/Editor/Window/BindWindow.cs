@@ -9,9 +9,9 @@ using UnityEngine;
 
 namespace BindTool
 {
-    public partial class BindWindown : EditorWindow
+    public partial class BindWindow : EditorWindow
     {
-        private static BindWindown bindWindown;
+        private static BindWindow _bindWindow;
 
         private DataContainer dataContainer;
         private CommonSettingData commonSettingData;
@@ -36,17 +36,17 @@ namespace BindTool
         {
             if (Check())
             {
-                bindWindown = GetWindowWithRect<BindWindown>(new Rect(Screen.width / 2f, Screen.height / 2f, 500, 600), true, "BindWindown");
-                bindWindown.CenterOnMainWin();
-                bindWindown.Init();
-                bindWindown.Show();
+                _bindWindow = GetWindowWithRect<BindWindow>(new Rect(Screen.width / 2f, Screen.height / 2f, 500, 600), true, "BindWindown");
+                _bindWindow.CenterOnMainWin();
+                _bindWindow.Init();
+                _bindWindow.Show();
             }
         }
 
         void Init()
         {
             errorList = new List<string>();
-            bindWindown.bindObject = Selection.objects.First() as GameObject;
+            _bindWindow.bindObject = Selection.objects.First() as GameObject;
 
             dataContainer = Resources.Load<DataContainer>(ConstData.DataContainerName);
 
@@ -123,7 +123,7 @@ namespace BindTool
 
         private void OnGUI()
         {
-            bindWindown = this;
+            _bindWindow = this;
             ShowControl();
             if (isSavaSetting) SavaSetting();
         }
@@ -175,7 +175,7 @@ namespace BindTool
 
         private void OnDestroy()
         {
-            bindWindown = null;
+            _bindWindow = null;
             commonSettingData = null;
             bindData = null;
             dataContainer = null;

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace BindTool
 {
-    public partial class BindWindown
+    public partial class BindWindow
     {
         private int autoBindSettingIndex;
 
@@ -178,7 +178,7 @@ namespace BindTool
                 if (GUILayout.Button(data.typeString.typeName))
                 {
                     var bindIndex = i;
-                    TypeSelectWindown.ShowWindown(typeof(Component), (isSelect, type) => {
+                    TypeSelectWindow.ShowWindown(typeof(Component), (isSelect, type) => {
                         if (isSelect)
                         {
                             data.typeString = type;
@@ -383,7 +383,7 @@ namespace BindTool
                 if (GUILayout.Button(data.typeString.typeName))
                 {
                     var index = i;
-                    TypeSelectWindown.ShowWindown(typeof(Component), (isSelect, type) => {
+                    TypeSelectWindow.ShowWindown(typeof(Component), (isSelect, type) => {
                         if (isSelect)
                         {
                             data.typeString = type;

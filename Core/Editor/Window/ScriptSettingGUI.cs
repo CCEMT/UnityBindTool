@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace BindTool
 {
-    public partial class BindWindown
+    public partial class BindWindow
     {
         private int scriptSettingIndex;
         private int nameBindIndex;
@@ -157,7 +157,7 @@ namespace BindTool
             GUI.color = Color.green;
             if (GUILayout.Button(selectSetting.inheritClass.typeName))
             {
-                TypeSelectWindown.ShowWindown(typeof(MonoBehaviour), (isSelect, type) => {
+                TypeSelectWindow.ShowWindown(typeof(MonoBehaviour), (isSelect, type) => {
                     if (isSelect)
                     {
                         selectSetting.inheritClass = type;
@@ -486,7 +486,7 @@ namespace BindTool
             GUI.color = Color.green;
             if (GUILayout.Button(variableSelectType.typeName))
             {
-                TypeSelectWindown.ShowWindown(typeof(Component), (isSelect, type) => {
+                TypeSelectWindow.ShowWindown(typeof(Component), (isSelect, type) => {
                     if (isSelect) variableSelectType = type;
                 }, position.position);
             }
@@ -574,7 +574,7 @@ namespace BindTool
             GUI.color = Color.green;
             if (GUILayout.Button(templateSelectType.typeName))
             {
-                TypeSelectWindown.ShowWindown(typeof(Component), (isSelect, type) => {
+                TypeSelectWindow.ShowWindown(typeof(Component), (isSelect, type) => {
                     if (isSelect) templateSelectType = type;
                 }, position.position);
             }
@@ -632,7 +632,7 @@ namespace BindTool
                 GUI.color = Color.green;
                 if (GUILayout.Button(templateData.temlateBaseType.typeName))
                 {
-                    TypeSelectWindown.ShowWindown(typeof(MonoBehaviour), (isSelect, type) => {
+                    TypeSelectWindow.ShowWindown(typeof(MonoBehaviour), (isSelect, type) => {
                         if (isSelect)
                         {
                             templateData.temlateBaseType = type;
