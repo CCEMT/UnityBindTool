@@ -34,7 +34,7 @@ namespace BindTool
         {
             unchecked
             {
-                var hashCode = name != null ? name.GetHashCode() : 0;
+                int hashCode = name != null ? name.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ typeString.GetHashCode();
                 hashCode = (hashCode * 397) ^ (bindObject != null ? bindObject.GetHashCode() : 0);
                 return hashCode;

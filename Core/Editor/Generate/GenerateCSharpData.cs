@@ -29,8 +29,8 @@ namespace BindTool
         {
             List<string> generateList = new List<string>();
 
-            var selectSettion = commonSettingData.selectScriptSetting;
-            var tempData = commonSettingData.tempGenerateData;
+            ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+            TempGenerateData tempData = commonSettingData.tempGenerateData;
 
             Writer($"#region {ConstData.DefaultName}", 1);
 
@@ -77,7 +77,7 @@ namespace BindTool
             int componentAmount = coomponentNameList.Count;
             for (int i = 0; i < componentAmount; i++)
             {
-                var data = coomponentNameList[i];
+                ComponentNameData data = coomponentNameList[i];
                 TypeString type = data.componentBindInfo.GetTypeString();
                 if (data.componentBindInfo.instanceObject == tempData.bindObject)
                 {
@@ -106,7 +106,7 @@ namespace BindTool
                 Writer("#if UNITY_EDITOR");
                 for (int i = 0; i < dataAmount; i++)
                 {
-                    var data = dataNameList[i];
+                    DataName data = dataNameList[i];
                     TypeString type = data.dataBindInfo.typeString;
                     string contnet = $"{data.variableName} = UnityEditor.AssetDatabase.LoadAssetAtPath<{type.GetVisitString()}>(\"{AssetDatabase.GetAssetPath(data.dataBindInfo.bindObject)}\");";
                     Writer(contnet, 2);
@@ -129,13 +129,13 @@ namespace BindTool
 
                 for (int j = 0; j < componentNameAmount; j++)
                 {
-                    var data = coomponentNameList[j];
-                    var type = data.componentBindInfo.GetTypeString();
+                    ComponentNameData data = coomponentNameList[j];
+                    TypeString type = data.componentBindInfo.GetTypeString();
                     if (type.Equals(variableData.targetType)) addComponentMethodList.Add(data);
                 }
                 for (int j = 0; j < dataNameAmount; j++)
                 {
-                    var data = dataNameList[j];
+                    DataName data = dataNameList[j];
                     if (data.dataBindInfo.typeString.Equals(variableData.targetType)) addDataMethodList.Add(data);
                 }
 
@@ -153,10 +153,10 @@ namespace BindTool
                             switch (selectSettion.propertyNameSetting.repetitionNameDispose)
                             {
                                 case RepetitionNameDispose.AddNumber:
-                                    var targetName = methodName + methodNameAmountDict[methodName].ToString();
+                                    string targetName = methodName + methodNameAmountDict[methodName].ToString();
 
                                     if (methodNameList.Contains(targetName)) continue;
-                                    var findNameData = coomponentNameList.Find((findData) => {
+                                    ComponentNameData findNameData = coomponentNameList.Find((findData) => {
                                         if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
                                         return false;
                                     });
@@ -200,14 +200,14 @@ namespace BindTool
                             switch (selectSettion.propertyNameSetting.repetitionNameDispose)
                             {
                                 case RepetitionNameDispose.AddNumber:
-                                    var targetName = methodName + methodNameAmountDict[methodName].ToString();
+                                    string targetName = methodName + methodNameAmountDict[methodName].ToString();
 
                                     if (methodNameList.Contains(targetName))
                                     {
                                         methodNameAmountDict[methodName]++;
                                         continue;
                                     }
-                                    var findNameData = coomponentNameList.Find((findData) => {
+                                    ComponentNameData findNameData = coomponentNameList.Find((findData) => {
                                         if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
                                         return false;
                                     });
@@ -275,13 +275,13 @@ namespace BindTool
 
                 for (int j = 0; j < componentNameAmount; j++)
                 {
-                    var data = coomponentNameList[j];
-                    var type = data.componentBindInfo.GetTypeString();
+                    ComponentNameData data = coomponentNameList[j];
+                    TypeString type = data.componentBindInfo.GetTypeString();
                     if (type.Equals(templateData.targetType)) addComponentMethodList.Add(data);
                 }
                 for (int j = 0; j < dataNameAmount; j++)
                 {
-                    var data = dataNameList[j];
+                    DataName data = dataNameList[j];
                     if (data.dataBindInfo.typeString.Equals(templateData.targetType)) addDataMethodList.Add(data);
                 }
 
@@ -345,14 +345,14 @@ namespace BindTool
                                     switch (selectSettion.propertyNameSetting.repetitionNameDispose)
                                     {
                                         case RepetitionNameDispose.AddNumber:
-                                            var targetName = methodName + methodNameAmountDict[fullName].ToString() + memberInfo.Name;
+                                            string targetName = methodName + methodNameAmountDict[fullName].ToString() + memberInfo.Name;
 
                                             if (methodNameList.Contains(targetName))
                                             {
                                                 methodNameAmountDict[fullName] += 1;
                                                 continue;
                                             }
-                                            var findNameData = coomponentNameList.Find((findData) => {
+                                            ComponentNameData findNameData = coomponentNameList.Find((findData) => {
                                                 if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
                                                 return false;
                                             });
@@ -391,9 +391,9 @@ namespace BindTool
                         switch (selectSettion.nameSetting.repetitionNameDispose)
                         {
                             case RepetitionNameDispose.AddNumber:
-                                var targetName = variableName + variableNameAmountDict[variableName].ToString();
+                                string targetName = variableName + variableNameAmountDict[variableName].ToString();
 
-                                var findNameData = dataNameList.Find((findData) => {
+                                DataName findNameData = dataNameList.Find((findData) => {
                                     if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
                                     return false;
                                 });
@@ -431,9 +431,9 @@ namespace BindTool
                             switch (selectSettion.propertyNameSetting.repetitionNameDispose)
                             {
                                 case RepetitionNameDispose.AddNumber:
-                                    var targetName = propertyName + propertyNameAmountDict[propertyName].ToString();
+                                    string targetName = propertyName + propertyNameAmountDict[propertyName].ToString();
 
-                                    var findNameData = dataNameList.Find((findData) => {
+                                    DataName findNameData = dataNameList.Find((findData) => {
                                         if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
                                         return false;
                                     });

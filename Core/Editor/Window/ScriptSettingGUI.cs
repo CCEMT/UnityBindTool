@@ -48,7 +48,7 @@ namespace BindTool
                 int amount = commonSettingData.scriptSettingList.Count;
                 for (int i = 0; i < amount; i++)
                 {
-                    var scriptIndex = i;
+                    int scriptIndex = i;
                     menu.AddItem(new GUIContent(commonSettingData.scriptSettingList[i].programName), false,
                         () => {
                             commonSettingData.selectScriptSetting = commonSettingData.scriptSettingList[scriptIndex];
@@ -123,7 +123,7 @@ namespace BindTool
             GUILayout.Label("Create", commonTitleStyle);
             GUILayout.BeginVertical("frameBox");
 
-            var selectSetting = commonSettingData.selectScriptSetting;
+            ScriptSetting selectSetting = commonSettingData.selectScriptSetting;
 
             EditorGUILayout.BeginHorizontal();
             bool tempIsGenerateNew = GUILayout.Toggle(selectSetting.isGenerateNew, "是否生成新脚本");
@@ -270,7 +270,7 @@ namespace BindTool
 
         void VariableName()
         {
-            var selectSetting = commonSettingData.selectScriptSetting;
+            ScriptSetting selectSetting = commonSettingData.selectScriptSetting;
 
             EditorGUILayout.BeginHorizontal();
             bool tempIsAddClassName = GUILayout.Toggle(selectSetting.nameSetting.isAddClassName, "变量名中是否添加类名");
@@ -357,7 +357,7 @@ namespace BindTool
 
         void PropertyName()
         {
-            var selectSetting = commonSettingData.selectScriptSetting;
+            ScriptSetting selectSetting = commonSettingData.selectScriptSetting;
 
             EditorGUILayout.BeginHorizontal();
             bool tempIsAddClassName = GUILayout.Toggle(selectSetting.propertyNameSetting.isAddClassName, "变量名中是否添加类名");
@@ -453,7 +453,7 @@ namespace BindTool
         void TemplateGenerate()
         {
             MethodName();
-            var selectSetting = commonSettingData.selectScriptSetting;
+            ScriptSetting selectSetting = commonSettingData.selectScriptSetting;
 
             if (this.variableListAmount != selectSetting.variableList.Count || this.templateListAmount != selectSetting.templateDataList.Count)
             {
@@ -623,7 +623,7 @@ namespace BindTool
                 if (GUILayout.Button("打开脚本"))
                 {
                     string fullPath = $"Assets/{selectSetting.templateScriptSavaPath}/{templateData.temlateType.typeName}.cs";
-                    var script = AssetDatabase.LoadAssetAtPath<Object>(fullPath);
+                    Object script = AssetDatabase.LoadAssetAtPath<Object>(fullPath);
                     if (script != null) AssetDatabase.OpenAsset(script);
                 }
                 EditorGUILayout.EndVertical();
@@ -674,7 +674,7 @@ namespace BindTool
 
         void MethodName()
         {
-            var selectSetting = commonSettingData.selectScriptSetting;
+            ScriptSetting selectSetting = commonSettingData.selectScriptSetting;
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(5);

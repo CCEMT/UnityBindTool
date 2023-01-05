@@ -23,7 +23,7 @@ namespace BindTool
 
         public static void Build(GameObject bindObject, ObjectInfo objectInfo)
         {
-            var commonSettingData = GetCommonSettingData();
+            CommonSettingData commonSettingData = GetCommonSettingData();
 
             string path = Application.dataPath + "/" + commonSettingData.createScriptPath + "/";
             if (Directory.Exists(path) == false)
@@ -50,14 +50,14 @@ namespace BindTool
                 List<ComponentBindInfo> oldBindDataList = objectInfo.gameObjectBindInfoList;
 
                 objectInfo.gameObjectBindInfoList.Clear();
-                var gameObjects = bindObject.GetComponentsInChildren<Transform>(true);
+                Transform[] gameObjects = bindObject.GetComponentsInChildren<Transform>(true);
 
                 List<ComponentBindInfo> componentBindInfoList = new List<ComponentBindInfo>();
 
                 int amount = gameObjects.Length;
                 for (int i = 0; i < amount; i++)
                 {
-                    var go = gameObjects[i];
+                    Transform go = gameObjects[i];
                     int componentAmount = new ComponentBindInfo(go.gameObject).typeStrings.Length;
                     for (int j = 0; j < componentAmount; j++)
                     {
@@ -88,12 +88,12 @@ namespace BindTool
 
         static void CreatePrefab()
         {
-            var commonSettingData = GetCommonSettingData();
+            CommonSettingData commonSettingData = GetCommonSettingData();
             if (commonSettingData == null) return;
             if (commonSettingData.tempGenerateData.isStartBuild) { commonSettingData.tempGenerateData.isStartBuild = false; }
             else { return; }
 
-            var bindObject = commonSettingData.tempGenerateData.bindObject;
+            GameObject bindObject = commonSettingData.tempGenerateData.bindObject;
             if (bindObject == null) return;
             string path = Application.dataPath + "/" + commonSettingData.createPrefabPath;
 

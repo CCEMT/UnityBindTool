@@ -31,7 +31,7 @@ namespace BindTool
             Vector2 targetPosition = Vector2.zero;
             if (position != null) targetPosition = (Vector2) position;
 
-            var selectWindown = GetWindowWithRect<TypeSelectWindow>(new Rect(targetPosition.x, targetPosition.y, 500, 600), true, "Select Type");
+            TypeSelectWindow selectWindown = GetWindowWithRect<TypeSelectWindow>(new Rect(targetPosition.x, targetPosition.y, 500, 600), true, "Select Type");
             selectWindown.position = new Rect(targetPosition.x, targetPosition.y, 500, 600);
             selectWindown.callBack = callBack;
 

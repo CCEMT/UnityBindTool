@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 #endregion
 
@@ -34,12 +35,12 @@ namespace BindTool
             if (PrefabUtility.IsPartOfPrefabInstance(gameObject))
             {
                 // 获取预制体资源
-                var prefabAsset = PrefabUtility.GetCorrespondingObjectFromOriginalSource(gameObject);
+                GameObject prefabAsset = PrefabUtility.GetCorrespondingObjectFromOriginalSource(gameObject);
                 return prefabAsset;
             }
 
             // PrefabMode中的GameObject既不是Instance也不是Asset
-            var prefabStage = PrefabStageUtility.GetPrefabStage(gameObject);
+            PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(gameObject);
             if (prefabStage != null)
             {
                 // 预制体资源：prefabAsset = prefabStage.prefabContentsRoot
@@ -97,7 +98,7 @@ namespace BindTool
             string pattern = "[A-Za-z0-9_]";
             string strRet = "";
             MatchCollection results = Regex.Matches(source, pattern);
-            foreach (var v in results) strRet += v.ToString();
+            foreach (Match v in results) strRet += v.ToString();
             return strRet;
         }
 
@@ -107,7 +108,7 @@ namespace BindTool
             string pattern = "[0-9]";
             string strRet = "";
             MatchCollection results = Regex.Matches(source, pattern);
-            foreach (var v in results) strRet += v.ToString();
+            foreach (Match v in results) strRet += v.ToString();
             return strRet;
         }
 
@@ -233,37 +234,45 @@ namespace BindTool
             return GetIsParent(currentGameObject.parent, target);
         }
 
-        public static Type[] GetAllDerivedTypes(this AppDomain aAppDomain, Type aType)
+        public static Type[] GetAllDerivedTypes(this AppDomain targetAppDomain, Type targetType)
         {
-            var result = new List<Type>();
-            var assemblies = aAppDomain.GetAssemblies();
-            foreach (var assembly in assemblies)
+            List<Type> result = new List<Type>();
+            Assembly[] assemblies = targetAppDomain.GetAssemblies();
+            int assebliesAmount = assemblies.Length;
+            for (int i = 0; i < assebliesAmount; i++)
             {
-                var types = assembly.GetTypes();
-                foreach (var type in types)
-                    if (type.IsSubclassOf(aType))
-                        result.Add(type);
+                Assembly assembly = assemblies[i];
+                Type[] types = assembly.GetTypes();
+                int typesAmount = types.Length;
+                for (int j = 0; j < typesAmount; j++)
+                {
+                    Type type = types[j];
+                    if (type.IsSubclassOf(targetType)) result.Add(type);
+                }
             }
+
             return result.ToArray();
         }
 
         public static Rect GetEditorMainWindowPos()
         {
-            var containerWinType = AppDomain.CurrentDomain.GetAllDerivedTypes(typeof(ScriptableObject)).FirstOrDefault(t => t.Name == "ContainerWindow");
+            Type containerWinType = AppDomain.CurrentDomain.GetAllDerivedTypes(typeof(ScriptableObject)).FirstOrDefault(t => t.Name == "ContainerWindow");
             if (containerWinType == null) throw new MissingMemberException("Can't find internal type ContainerWindow. Maybe something has changed inside Unity");
-            var showModeField = containerWinType.GetField("m_ShowMode", BindingFlags.NonPublic | BindingFlags.Instance);
-            var positionProperty = containerWinType.GetProperty("position", BindingFlags.Public | BindingFlags.Instance);
+            FieldInfo showModeField = containerWinType.GetField("m_ShowMode", BindingFlags.NonPublic | BindingFlags.Instance);
+            PropertyInfo positionProperty = containerWinType.GetProperty("position", BindingFlags.Public | BindingFlags.Instance);
             if (showModeField == null || positionProperty == null)
             {
                 throw new MissingFieldException("Can't find internal fields 'm_ShowMode' or 'position'. Maybe something has changed inside Unity");
             }
-            var windows = Resources.FindObjectsOfTypeAll(containerWinType);
-            foreach (var win in windows)
+            Object[] windows = Resources.FindObjectsOfTypeAll(containerWinType);
+            int amount = windows.Length;
+            for (int i = 0; i < amount; i++)
             {
-                var showmode = (int) showModeField.GetValue(win);
+                Object window = windows[i];
+                int showmode = (int) showModeField.GetValue(window);
                 if (showmode == 4) // main window
                 {
-                    var pos = (Rect) positionProperty.GetValue(win, null);
+                    Rect pos = (Rect) positionProperty.GetValue(window, null);
                     return pos;
                 }
             }
@@ -272,8 +281,8 @@ namespace BindTool
 
         public static void CenterOnMainWin(this EditorWindow aWin)
         {
-            var main = GetEditorMainWindowPos();
-            var pos = aWin.position;
+            Rect main = GetEditorMainWindowPos();
+            Rect pos = aWin.position;
             float w = (main.width - pos.width) * 0.5f;
             float h = (main.height - pos.height) * 0.5f;
             pos.x = main.x + w;

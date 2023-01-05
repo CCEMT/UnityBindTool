@@ -33,7 +33,7 @@ namespace BindTool
             int amount = gameObjectBindInfoList.Count;
             for (int i = 0; i < amount; i++)
             {
-                var info = gameObjectBindInfoList[i];
+                ComponentBindInfo info = gameObjectBindInfoList[i];
                 if (info.AgainGet() == false)
                 {
                     if (info.autoBindSetting != null) ComponentBind(info, info.autoBindSetting);
@@ -55,12 +55,12 @@ namespace BindTool
 
         void BindByAutoSetting(ComponentBindInfo bindInfo, AutoBindSetting autoBindSetting)
         {
-            var bindObject = bindInfo.GetObject();
+            GameObject bindObject = bindInfo.GetObject();
             if (bindObject == null) return;
             int lgnoreAmount = autoBindSetting.nameLgnoreDataList.Count;
             for (int i = 0; i < lgnoreAmount; i++)
             {
-                var data = autoBindSetting.nameLgnoreDataList[i];
+                NameCheck data = autoBindSetting.nameLgnoreDataList[i];
                 if (data.Check(bindObject.name, out string _)) return;
             }
             ComponentBind(bindInfo, autoBindSetting);
@@ -70,7 +70,7 @@ namespace BindTool
         void ComponentBind(ComponentBindInfo bindInfo, AutoBindSetting autoBindSetting)
         {
             bindInfo.autoBindSetting = autoBindSetting;
-            var bindObject = bindInfo.GetObject();
+            GameObject bindObject = bindInfo.GetObject();
 
             List<TypeString> tempTypeList = new List<TypeString>();
             tempTypeList.AddRange(bindInfo.typeStrings);
@@ -78,12 +78,12 @@ namespace BindTool
             int nameBindAmont = autoBindSetting.nameBindDataList.Count;
             for (int i = 0; i < nameBindAmont; i++)
             {
-                var data = autoBindSetting.nameBindDataList[i];
+                NameBindData data = autoBindSetting.nameBindDataList[i];
                 if (data.nameCheck.Check(bindObject.name, out string _))
                 {
                     if (tempTypeList.Contains(data.typeString))
                     {
-                        var index = bindInfo.SetIndex(data.typeString);
+                        int index = bindInfo.SetIndex(data.typeString);
                         if (index != -1)
                         {
                             this.gameObjectBindInfoList.Add(bindInfo);
@@ -102,13 +102,13 @@ namespace BindTool
                 int sequenceAmount = autoBindSetting.streamingBindDataList.Count;
                 for (int i = 0; i < sequenceAmount; i++)
                 {
-                    var data = autoBindSetting.streamingBindDataList[i];
+                    StreamingBindData data = autoBindSetting.streamingBindDataList[i];
                     if (tempTypeList.Contains(data.typeString)) elseType.Remove(data.typeString);
                 }
 
                 for (int i = 0; i < sequenceAmount; i++)
                 {
-                    var data = autoBindSetting.streamingBindDataList[i];
+                    StreamingBindData data = autoBindSetting.streamingBindDataList[i];
                     if (data.isElse)
                     {
                         if (elseType.Count > 0)
@@ -198,7 +198,7 @@ namespace BindTool
         {
             unchecked
             {
-                var hashCode = typeString.GetHashCode();
+                int hashCode = typeString.GetHashCode();
                 hashCode = (hashCode * 397) ^ (rootBindInfo != null ? rootBindInfo.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (gameObjectBindInfoList != null ? gameObjectBindInfoList.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (dataBindInfoList != null ? dataBindInfoList.GetHashCode() : 0);

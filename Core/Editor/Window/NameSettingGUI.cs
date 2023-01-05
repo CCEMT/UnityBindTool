@@ -30,7 +30,7 @@ namespace BindTool
                 int amount = commonSettingData.createNameSettingList.Count;
                 for (int i = 0; i < amount; i++)
                 {
-                    var scriptIndex = i;
+                    int scriptIndex = i;
                     menu.AddItem(new GUIContent(commonSettingData.createNameSettingList[i].programName), false,
                         () => {
                             commonSettingData.selectCreateNameSetting = commonSettingData.createNameSettingList[scriptIndex];
@@ -97,7 +97,7 @@ namespace BindTool
         {
             GUILayout.BeginVertical("box");
 
-            var selectSetting = commonSettingData.selectCreateNameSetting;
+            CreateNameSetting selectSetting = commonSettingData.selectCreateNameSetting;
             if (nameReqlaceAmount != selectSetting.nameReplaceDataList.Count)
             {
                 nameReqlaceAmount = selectSetting.nameReplaceDataList.Count;

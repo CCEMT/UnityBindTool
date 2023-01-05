@@ -72,7 +72,7 @@ namespace BindTool
         {
             unchecked
             {
-                var hashCode = programName != null ? programName.GetHashCode() : 0;
+                int hashCode = programName != null ? programName.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ isGenerateNew.GetHashCode();
                 hashCode = (hashCode * 397) ^ inheritClass.GetHashCode();
                 hashCode = (hashCode * 397) ^ isGeneratePartial.GetHashCode();
@@ -126,7 +126,7 @@ namespace BindTool
         {
             unchecked
             {
-                var hashCode = (int) visitType;
+                int hashCode = (int) visitType;
                 hashCode = (hashCode * 397) ^ targetType.GetHashCode();
                 hashCode = (hashCode * 397) ^ variableType.GetHashCode();
                 hashCode = (hashCode * 397) ^ (varialbleName != null ? varialbleName.GetHashCode() : 0);
@@ -165,7 +165,7 @@ namespace BindTool
         {
             unchecked
             {
-                var hashCode = targetType.GetHashCode();
+                int hashCode = targetType.GetHashCode();
                 hashCode = (hashCode * 397) ^ temlateType.GetHashCode();
                 hashCode = (hashCode * 397) ^ temlateBaseType.GetHashCode();
                 return hashCode;
@@ -220,7 +220,7 @@ namespace BindTool
         {
             unchecked
             {
-                var hashCode = (int) namingDispose;
+                int hashCode = (int) namingDispose;
                 hashCode = (hashCode * 397) ^ (int) repetitionNameDispose;
                 hashCode = (hashCode * 397) ^ isAddClassName.GetHashCode();
                 hashCode = (hashCode * 397) ^ isFrontOrBehind.GetHashCode();

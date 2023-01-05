@@ -53,7 +53,7 @@ namespace BindTool
         {
             unchecked
             {
-                var hashCode = name != null ? name.GetHashCode() : 0;
+                int hashCode = name != null ? name.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (typeStrings != null ? typeStrings.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ index;
                 hashCode = (hashCode * 397) ^ (instanceObject != null ? instanceObject.GetHashCode() : 0);
@@ -150,7 +150,7 @@ namespace BindTool
                 }
                 else
                 {
-                    var t = ob.GetType();
+                    Type t = ob.GetType();
                     typeStrings = new TypeString[1] {new TypeString(t)};
                     index = 0;
                 }
@@ -159,14 +159,14 @@ namespace BindTool
 
         private void AddComponentsTypes(GameObject go)
         {
-            var typeStringList = new List<TypeString>();
+            List<TypeString> typeStringList = new List<TypeString>();
 
             Type gameObjectType = typeof(GameObject);
             TypeString gameObjectTypeString = new TypeString(gameObjectType);
             typeStringList.Add(gameObjectTypeString);
 
-            var cs = go.GetComponents(typeof(Component));
-            foreach (var t in cs)
+            Component[] cs = go.GetComponents(typeof(Component));
+            foreach (Component t in cs)
             {
                 if (t == null) continue;
                 Type type = t.GetType();

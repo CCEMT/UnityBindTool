@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -32,16 +33,16 @@ public struct TypeString
         typeString.typeName = typeName;
         typeString.typeNameSpace = typeNameSpace;
         typeString.assemblyName = assemblyName;
-        var type = typeString.ToType();
+        Type type = typeString.ToType();
         return type != null;
     }
 
     public Type ToType()
     {
-        var assembly = GetAssemblyByName(assemblyName);
+        Assembly assembly = GetAssemblyByName(assemblyName);
         if (assembly == null) return null;
-        var types = assembly.GetTypes().Where(CheckTypeNamespace).ToList();
-        var find = types.Find(CheckTypeName);
+        List<Type> types = assembly.GetTypes().Where(CheckTypeNamespace).ToList();
+        Type find = types.Find(CheckTypeName);
         return find;
     }
 
@@ -87,7 +88,7 @@ public struct TypeString
     {
         unchecked
         {
-            var hashCode = typeName != null ? typeName.GetHashCode() : 0;
+            int hashCode = typeName != null ? typeName.GetHashCode() : 0;
             hashCode = (hashCode * 397) ^ (typeNameSpace != null ? typeNameSpace.GetHashCode() : 0);
             hashCode = (hashCode * 397) ^ (assemblyName != null ? assemblyName.GetHashCode() : 0);
             return hashCode;

@@ -14,8 +14,8 @@ namespace BindTool
     {
         public static void CSharpWrite(CommonSettingData commonSettingData, string scriptPath)
         {
-            var selectSettion = commonSettingData.selectScriptSetting;
-            var tempData = commonSettingData.tempGenerateData;
+            ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+            TempGenerateData tempData = commonSettingData.tempGenerateData;
 
             if (selectSettion.isGenerateNew)
             {
@@ -117,8 +117,8 @@ namespace BindTool
 
         static void OpenCSharpFileAlterData(CommonSettingData commonSettingData, string path)
         {
-            var selectSettion = commonSettingData.selectScriptSetting;
-            var tempData = commonSettingData.tempGenerateData;
+            ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+            TempGenerateData tempData = commonSettingData.tempGenerateData;
 
             if (selectSettion.isSavaOldScript) SavaOldScript(path, commonSettingData);
 
@@ -224,8 +224,8 @@ namespace BindTool
 
         static void SavaOldScript(string path, CommonSettingData commonSettingData)
         {
-            var selectSettion = commonSettingData.selectScriptSetting;
-            var tempData = commonSettingData.tempGenerateData;
+            ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+            TempGenerateData tempData = commonSettingData.tempGenerateData;
 
             string savaPath = Application.dataPath + "/" + selectSettion.savaOldScriptPath + "/";
 
@@ -275,8 +275,8 @@ namespace BindTool
 
         static void GenerateCSharpScript(CommonSettingData commonSettingData, string path, string className, bool isGenerateData, bool isPartial)
         {
-            var selectSettion = commonSettingData.selectScriptSetting;
-            var tempData = commonSettingData.tempGenerateData;
+            ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+            TempGenerateData tempData = commonSettingData.tempGenerateData;
 
             tempData.objectInfo.typeString.typeName = tempData.newScriptName;
             tempData.objectInfo.typeString.typeNameSpace = selectSettion.useNamespace;

@@ -186,7 +186,7 @@ namespace BindTool
         {
             unchecked
             {
-                var hashCode = sequence;
+                int hashCode = sequence;
                 hashCode = (hashCode * 397) ^ isElse.GetHashCode();
                 hashCode = (hashCode * 397) ^ typeString.GetHashCode();
                 return hashCode;

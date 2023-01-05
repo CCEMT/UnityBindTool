@@ -33,7 +33,7 @@ namespace BindTool
             {
                 if (go == _bindWindow.bindObject)
                 {
-                    var r = new Rect(rect);
+                    Rect r = new Rect(rect);
                     r.x = 34;
                     r.width = 80;
                     GUIStyle style = new GUIStyle();
@@ -42,14 +42,14 @@ namespace BindTool
                 }
                 else
                 {
-                    var findInfo = _bindWindow.objectInfo.gameObjectBindInfoList.Find((bindInfo) => {
+                    ComponentBindInfo findInfo = _bindWindow.objectInfo.gameObjectBindInfoList.Find((bindInfo) => {
                         if (bindInfo.instanceObject == go || CommonTools.GetPrefabAsset(go) == bindInfo.instanceObject) { return true; }
                         else { return false; }
                     });
 
                     if (findInfo != null)
                     {
-                        var r = new Rect(rect);
+                        Rect r = new Rect(rect);
                         r.x = 34;
                         r.width = 80;
                         GUIStyle style = new GUIStyle();
@@ -91,7 +91,7 @@ namespace BindTool
                         int typeAmount = componentBindInfo.typeStrings.Length;
                         for (int i = 0; i < typeAmount; i++)
                         {
-                            var index = i;
+                            int index = i;
                             menu.AddItem(new GUIContent(componentBindInfo.typeStrings[i].typeName), false, () => {
                                 _bindWindow.BindComponent(go, index);
                                 _bindWindow.Repaint();
@@ -166,7 +166,7 @@ namespace BindTool
                             List<RemoveType> removeTypes = new List<RemoveType>();
                             removeTypes.Add(RemoveType.This);
 
-                            var transforms = go.GetComponentsInChildren<Transform>(true);
+                            Transform[] transforms = go.GetComponentsInChildren<Transform>(true);
                             if (transforms.Length > 1)
                             {
                                 removeTypes.Add(RemoveType.Child);

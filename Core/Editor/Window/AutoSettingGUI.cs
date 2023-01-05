@@ -47,7 +47,7 @@ namespace BindTool
                 int amount = commonSettingData.autoBindSettingList.Count;
                 for (int i = 0; i < amount; i++)
                 {
-                    var bindIndex = i;
+                    int bindIndex = i;
                     menu.AddItem(new GUIContent(commonSettingData.autoBindSettingList[i].programName), false,
                         () => { commonSettingData.selectAutoBindSetting = commonSettingData.autoBindSettingList[bindIndex]; });
                 }
@@ -136,7 +136,7 @@ namespace BindTool
 
         void DrawNameBindList()
         {
-            var selectSetting = commonSettingData.selectAutoBindSetting;
+            AutoBindSetting selectSetting = commonSettingData.selectAutoBindSetting;
 
             if (nameBindCount != selectSetting.nameBindDataList.Count)
             {
@@ -160,7 +160,7 @@ namespace BindTool
                 GUILayout.BeginVertical("frameBox");
                 EditorGUILayout.BeginHorizontal();
 
-                var data = selectNameBindDataList[i];
+                NameBindData data = selectNameBindDataList[i];
 
                 EditorGUILayout.BeginVertical();
                 EditorGUILayout.BeginHorizontal();
@@ -177,7 +177,7 @@ namespace BindTool
                 GUI.color = Color.green;
                 if (GUILayout.Button(data.typeString.typeName))
                 {
-                    var bindIndex = i;
+                    int bindIndex = i;
                     TypeSelectWindow.ShowWindown(typeof(Component), (isSelect, type) => {
                         if (isSelect)
                         {
@@ -233,7 +233,7 @@ namespace BindTool
 
         void DrawNameLgnoreList()
         {
-            var selectSetting = commonSettingData.selectAutoBindSetting;
+            AutoBindSetting selectSetting = commonSettingData.selectAutoBindSetting;
 
             if (lgnoreCount != selectSetting.nameLgnoreDataList.Count)
             {
@@ -257,7 +257,7 @@ namespace BindTool
                 GUILayout.BeginVertical("frameBox");
                 EditorGUILayout.BeginHorizontal();
 
-                var data = selectLgnoreDataList[i];
+                NameCheck data = selectLgnoreDataList[i];
                 GUILayout.Label("检查名称");
                 string tempCheckName = GUILayout.TextField(data.name, GUILayout.MinWidth(50));
                 if (tempCheckName != data.name)
@@ -298,7 +298,7 @@ namespace BindTool
 
         void DrawStreamingBindList()
         {
-            var selectSetting = commonSettingData.selectAutoBindSetting;
+            AutoBindSetting selectSetting = commonSettingData.selectAutoBindSetting;
 
             if (sequenceCount != selectSetting.streamingBindDataList.Count)
             {
@@ -359,7 +359,7 @@ namespace BindTool
                 GUILayout.BeginVertical("frameBox");
                 EditorGUILayout.BeginHorizontal();
 
-                var data = selectSequenceTypeDataList[i];
+                StreamingBindData data = selectSequenceTypeDataList[i];
 
                 GUILayout.Label("顺序");
                 string numberString = GUILayout.TextField(data.sequence.ToString(), 3, GUILayout.Width(30));
@@ -382,7 +382,7 @@ namespace BindTool
                 GUI.color = Color.green;
                 if (GUILayout.Button(data.typeString.typeName))
                 {
-                    var index = i;
+                    int index = i;
                     TypeSelectWindow.ShowWindown(typeof(Component), (isSelect, type) => {
                         if (isSelect)
                         {
@@ -415,7 +415,7 @@ namespace BindTool
             int nameBindAmount = commonSettingData.selectAutoBindSetting.nameBindDataList.Count;
             for (int i = 0; i < nameBindAmount; i++)
             {
-                var nameBind = commonSettingData.selectAutoBindSetting.nameBindDataList[i];
+                NameBindData nameBind = commonSettingData.selectAutoBindSetting.nameBindDataList[i];
                 if (CommonTools.Search(nameBind.typeString.typeName, autoSettingInput) || CommonTools.Search(nameBind.nameCheck.name, autoSettingInput)) selectNameBindDataList.Add(nameBind);
             }
             selectNameBindAmount = selectNameBindDataList.Count;
@@ -424,7 +424,7 @@ namespace BindTool
             int lgnoreAmount = commonSettingData.selectAutoBindSetting.nameLgnoreDataList.Count;
             for (int i = 0; i < lgnoreAmount; i++)
             {
-                var lgnore = commonSettingData.selectAutoBindSetting.nameLgnoreDataList[i];
+                NameCheck lgnore = commonSettingData.selectAutoBindSetting.nameLgnoreDataList[i];
                 if (CommonTools.Search(lgnore.name, autoSettingInput)) selectLgnoreDataList.Add(lgnore);
             }
             selectLgnoreAmount = selectLgnoreDataList.Count;
@@ -433,7 +433,7 @@ namespace BindTool
             int sequenceAmount = commonSettingData.selectAutoBindSetting.streamingBindDataList.Count;
             for (int i = 0; i < sequenceAmount; i++)
             {
-                var sequenceData = commonSettingData.selectAutoBindSetting.streamingBindDataList[i];
+                StreamingBindData sequenceData = commonSettingData.selectAutoBindSetting.streamingBindDataList[i];
                 if (CommonTools.Search(sequenceData.typeString.typeName, autoSettingInput) || CommonTools.SearchNumber(sequenceData.sequence.ToString(), autoSettingInput))
                 {
                     selectSequenceTypeDataList.Add(sequenceData);

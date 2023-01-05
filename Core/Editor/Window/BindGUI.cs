@@ -148,12 +148,12 @@ namespace BindTool
             GUI.color = Color.green;
             if (GUILayout.Button("全部自动绑定", GUILayout.Width(250)))
             {
-                var gameObjects = bindObject.GetComponentsInChildren<Transform>(true);
+                Transform[] gameObjects = bindObject.GetComponentsInChildren<Transform>(true);
                 int amount = gameObjects.Length;
                 for (int i = 0; i < amount; i++)
                 {
-                    var go = gameObjects[i];
-                    var info = objectInfo.AutoBind(go, commonSettingData.selectAutoBindSetting);
+                    Transform go = gameObjects[i];
+                    ComponentBindInfo info = objectInfo.AutoBind(go, commonSettingData.selectAutoBindSetting);
                     if (info != null)
                     {
                         if (commonSettingData.selectCreateNameSetting.isBindAutoGenerateName) info.name = CommonTools.SetName(info.instanceObject.name, commonSettingData.selectCreateNameSetting);
@@ -186,7 +186,7 @@ namespace BindTool
             Event e = Event.current;
             GUI.color = Color.green;
             //绘制一个监听区域
-            var dragArea = GUILayoutUtility.GetRect(0f, 30f, GUILayout.ExpandWidth(true), GUILayout.Height(50));
+            Rect dragArea = GUILayoutUtility.GetRect(0f, 30f, GUILayout.ExpandWidth(true), GUILayout.Height(50));
             GUIContent guiContent = new GUIContent("将组件拖拽至此进行绑定");
             GUI.Box(dragArea, guiContent);
 
@@ -215,7 +215,7 @@ namespace BindTool
                                     int typeAmount = componentBindInfo.typeStrings.Length;
                                     for (int i = 0; i < typeAmount; i++)
                                     {
-                                        var infoIndex = i;
+                                        int infoIndex = i;
                                         menu.AddItem(new GUIContent(componentBindInfo.typeStrings[i].typeName), false, () => {
                                             objectInfo.Bind(componentBindInfo, infoIndex);
                                             if (commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
@@ -279,7 +279,7 @@ namespace BindTool
                                 int typeAmount = bindTypeList.Count;
                                 for (int i = 0; i < typeAmount; i++)
                                 {
-                                    var typeString = bindTypeList[i];
+                                    TypeString typeString = bindTypeList[i];
                                     menu.AddItem(new GUIContent(typeString.typeName), false, () => {
                                         int bindComponentAmount = bindList.Count;
                                         for (int j = 0; j < bindComponentAmount; j++)
@@ -571,7 +571,7 @@ namespace BindTool
                     break;
                 case RemoveType.Child:
                 {
-                    var transforms = removeObject.GetComponentsInChildren<Transform>(true);
+                    Transform[] transforms = removeObject.GetComponentsInChildren<Transform>(true);
                     int amount = transforms.Length;
                     for (int i = 0; i < amount; i++)
                     {
@@ -590,7 +590,7 @@ namespace BindTool
                 }
                 case RemoveType.ThisAndChild:
                 {
-                    var transforms = removeObject.GetComponentsInChildren<Transform>(true);
+                    Transform[] transforms = removeObject.GetComponentsInChildren<Transform>(true);
                     int amount = transforms.Length;
                     for (int i = 0; i < amount; i++)
                     {

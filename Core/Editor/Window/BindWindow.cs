@@ -101,10 +101,10 @@ namespace BindTool
 
         static bool Check()
         {
-            var selectObjects = Selection.objects;
+            Object[] selectObjects = Selection.objects;
             if (selectObjects.Length > 0)
             {
-                var selectObject = selectObjects.First();
+                Object selectObject = selectObjects.First();
                 if (selectObject != null)
                 {
                     GameObject gameObject = selectObjects.First() as GameObject;
@@ -154,19 +154,19 @@ namespace BindTool
             int scriptSettingAmount = commonSettingData.scriptSettingList.Count;
             for (int i = 0; i < scriptSettingAmount; i++)
             {
-                var scriptSerting = commonSettingData.scriptSettingList[i];
+                ScriptSetting scriptSerting = commonSettingData.scriptSettingList[i];
                 EditorUtility.SetDirty(scriptSerting);
             }
             int autoBindSettingAmount = commonSettingData.autoBindSettingList.Count;
             for (int i = 0; i < autoBindSettingAmount; i++)
             {
-                var autoBindSetting = commonSettingData.autoBindSettingList[i];
+                AutoBindSetting autoBindSetting = commonSettingData.autoBindSettingList[i];
                 EditorUtility.SetDirty(autoBindSetting);
             }
             int createNameSetting = commonSettingData.createNameSettingList.Count;
             for (int i = 0; i < createNameSetting; i++)
             {
-                var nameSetting = commonSettingData.createNameSettingList[i];
+                CreateNameSetting nameSetting = commonSettingData.createNameSettingList[i];
                 EditorUtility.SetDirty(nameSetting);
             }
             AssetDatabase.SaveAssets();
