@@ -14,15 +14,9 @@ namespace BindTool
 {
     public class BindBuild
     {
-        static CommonSettingData GetCommonSettingData()
-        {
-            CommonSettingData commonSettingData = Resources.Load<CommonSettingData>(ConstData.CommonSettingName);
-            return commonSettingData;
-        }
-
         public static void Build(GameObject bindObject, ObjectInfo objectInfo)
         {
-            CommonSettingData commonSettingData = GetCommonSettingData();
+            CommonSettingData commonSettingData = CommonTools.GetCommonSettingData();
 
             string path = Application.dataPath + "/" + commonSettingData.createScriptPath + "/";
             if (Directory.Exists(path) == false) {
@@ -30,18 +24,23 @@ namespace BindTool
                 return;
             }
 
+            GenerateData generateData = CommonTools.CreateGenerateData();
+
+            //保存临时数据
+            generateData.newScriptName = commonSettingData.newScriptName;
+            generateData.addTypeString = commonSettingData.addTypeString;
+            generateData.bindObject = bindObject;
+            generateData.objectInfo = objectInfo;
+            generateData.isStartBuild = true;
+
             //创建文件夹
             if (commonSettingData.isCreateScriptFolder) {
-                path += $"{commonSettingData.tempGenerateData.newScriptName}/";
+                path += $"{generateData.newScriptName}/";
                 if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
             }
 
-            //保存临时数据
-            commonSettingData.tempGenerateData.bindObject = bindObject;
-            commonSettingData.tempGenerateData.objectInfo = objectInfo;
-            commonSettingData.tempGenerateData.isStartBuild = true;
             Debug.Log("脚本生成路径：" + path);
-            if (commonSettingData.isCustomBind) { ScriptGenerate.CSharpWrite(commonSettingData, path); }
+            if (commonSettingData.isCustomBind) { ScriptGenerate.CSharpWrite(commonSettingData, generateData, path); }
             else {
                 List<ComponentBindInfo> oldBindDataList = objectInfo.gameObjectBindInfoList;
 
@@ -67,7 +66,7 @@ namespace BindTool
                     if (objectInfo.gameObjectBindInfoList.Contains(info) == false) objectInfo.gameObjectBindInfoList.Add(info);
                 }
                 Debug.Log("脚本生成路径：" + path);
-                ScriptGenerate.CSharpWrite(commonSettingData, path);
+                ScriptGenerate.CSharpWrite(commonSettingData, generateData, path);
                 objectInfo.gameObjectBindInfoList = oldBindDataList;
             }
             Debug.Log("Create ScriptSetting Finish.");
@@ -81,12 +80,19 @@ namespace BindTool
 
         static void CreatePrefab()
         {
-            CommonSettingData commonSettingData = GetCommonSettingData();
-            if (commonSettingData == null) return;
-            if (commonSettingData.tempGenerateData.isStartBuild) { commonSettingData.tempGenerateData.isStartBuild = false; }
-            else { return; }
+            CommonSettingData commonSettingData = CommonTools.GetCommonSettingData();
+            GenerateData generateData = CommonTools.GetGenerateData();
+            string generateDataPath = AssetDatabase.GetAssetPath(generateData);
 
-            GameObject bindObject = commonSettingData.tempGenerateData.bindObject;
+            if (generateData == null) return;
+            if (generateData.isStartBuild) { generateData.isStartBuild = false; }
+            else {
+                AssetDatabase.DeleteAsset(generateDataPath);
+                AssetDatabase.Refresh();
+                return;
+            }
+
+            GameObject bindObject = generateData.bindObject;
             if (bindObject == null) return;
             string path = Application.dataPath + "/" + commonSettingData.createPrefabPath;
 
@@ -104,22 +110,28 @@ namespace BindTool
 
             path += $"/{bindObject.name}.prefab";
 
-            Type addType = commonSettingData.tempGenerateData.objectInfo.typeString.ToType();
+            BindComponents bindComponents = bindObject.GetComponent<BindComponents>();
+            Type addType = generateData.objectInfo.typeString.ToType();
             Component component = null;
             if (addType != null) {
-                component = commonSettingData.tempGenerateData.bindObject.GetComponent(addType);
-                if (component == null) component = commonSettingData.tempGenerateData.bindObject.AddComponent(addType);
+                component = generateData.bindObject.GetComponent(addType);
+                if (component == null) component = generateData.bindObject.AddComponent(addType);
+                bindComponents.bindRoot = component;
 
-                MethodInfo method = addType.GetMethod(commonSettingData.tempGenerateData.getBindDataMethodName, new Type[] { });
+                MethodInfo method = addType.GetMethod(generateData.getBindDataMethodName, new Type[] { });
                 method.Invoke(component, new object[] { });
             }
             else { Debug.Log("添加类型为空"); }
+
 
             if (commonSettingData.isCreatePrefab) {
                 //创建预制体
                 PrefabUtility.SaveAsPrefabAssetAndConnect(bindObject, path, InteractionMode.AutomatedAction);
                 Debug.Log("Create Prefab Finish.");
             }
+
+            AssetDatabase.DeleteAsset(generateDataPath);
+            AssetDatabase.Refresh();
         }
     }
 }

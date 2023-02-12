@@ -25,12 +25,11 @@ namespace BindTool
             public DataBindInfo dataBindInfo;
         }
 
-        public static List<string> Generate(CommonSettingData commonSettingData, bool isSpecifyNamespace)
+        public static List<string> Generate(CommonSettingData commonSettingData,GenerateData generateData, bool isSpecifyNamespace)
         {
             List<string> generateList = new List<string>();
 
             ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
-            TempGenerateData tempData = commonSettingData.tempGenerateData;
 
             Writer($"#region {ConstData.DefaultName}", 1);
 
@@ -43,10 +42,10 @@ namespace BindTool
             Dictionary<string, int> methodNameAmountDict = new Dictionary<string, int>();
             List<string> methodNameList = new List<string>();
 
-            int componentBindAmount = tempData.objectInfo.gameObjectBindInfoList.Count;
+            int componentBindAmount = generateData.objectInfo.gameObjectBindInfoList.Count;
             for (int i = 0; i < componentBindAmount; i++)
             {
-                ComponentBindInfo data = tempData.objectInfo.gameObjectBindInfoList[i];
+                ComponentBindInfo data = generateData.objectInfo.gameObjectBindInfoList[i];
                 string propertyName = CommonTools.NameSettingByName(data, selectSettion.propertyNameSetting);
                 string variableName = CommonTools.NameSettingByName(data, selectSettion.nameSetting);
                 ComponentNameData componentNameData = new ComponentNameData();
@@ -55,10 +54,10 @@ namespace BindTool
                 coomponentNameList.Add(componentNameData);
             }
 
-            int dataBindAmount = tempData.objectInfo.dataBindInfoList.Count;
+            int dataBindAmount = generateData.objectInfo.dataBindInfoList.Count;
             for (int i = 0; i < dataBindAmount; i++)
             {
-                DataBindInfo dataBindInfo = tempData.objectInfo.dataBindInfoList[i];
+                DataBindInfo dataBindInfo = generateData.objectInfo.dataBindInfoList[i];
                 string variableName = CommonTools.NameSettingByName(dataBindInfo, selectSettion.nameSetting);
                 string propertyName = CommonTools.NameSettingByName(dataBindInfo, selectSettion.propertyNameSetting);
                 DataName dataName = new DataName();
@@ -70,7 +69,7 @@ namespace BindTool
             generateList.Add("");
 
             string bindMethodName = ConstData.DefaultBindMethodName;
-            tempData.getBindDataMethodName = bindMethodName;
+            generateData.getBindDataMethodName = bindMethodName;
             Writer($"public  void {bindMethodName}()", 1);
             Writer("{", 1);
 
@@ -79,7 +78,7 @@ namespace BindTool
             {
                 ComponentNameData data = coomponentNameList[i];
                 TypeString type = data.componentBindInfo.GetTypeString();
-                if (data.componentBindInfo.instanceObject == tempData.bindObject)
+                if (data.componentBindInfo.instanceObject == generateData.bindObject)
                 {
                     if (type.ToType() == typeof(GameObject)) { Writer($"{data.variableName} = gameObject;", 2); }
                     else { Writer($"{data.variableName} = GetComponent<{type.GetVisitString()}>();", 2); }
@@ -89,13 +88,13 @@ namespace BindTool
                     if (type.ToType() == typeof(GameObject))
                     {
                         string contnet =
-                            $"{data.variableName} = transform.Find(\"{CommonTools.GetWholePath(data.componentBindInfo.instanceObject.transform, tempData.bindObject)}\").gameObject;";
+                            $"{data.variableName} = transform.Find(\"{CommonTools.GetWholePath(data.componentBindInfo.instanceObject.transform, generateData.bindObject)}\").gameObject;";
                         Writer(contnet, 2);
                     }
                     else
                     {
                         string contnet =
-                            $"{data.variableName} = transform.Find(\"{CommonTools.GetWholePath(data.componentBindInfo.instanceObject.transform, tempData.bindObject)}\").GetComponent<{type.GetVisitString()}>();";
+                            $"{data.variableName} = transform.Find(\"{CommonTools.GetWholePath(data.componentBindInfo.instanceObject.transform, generateData.bindObject)}\").GetComponent<{type.GetVisitString()}>();";
                         Writer(contnet, 2);
                     }
                 }

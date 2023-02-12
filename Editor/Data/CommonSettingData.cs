@@ -10,10 +10,13 @@ namespace BindTool
     //[CreateAssetMenu(fileName = "CommonSettingData", menuName = "CommonSettingData", order = 0)]
     public class CommonSettingData : ScriptableObject
     {
+
         //ScriptSetting
         public bool isCreateScriptFolder;
         public string createScriptPath;
         public bool isCustomBind;
+        public string newScriptName;
+        public TypeString addTypeString;
 
         //PrefabSetting
         public bool isCreatePrefab;
@@ -35,8 +38,8 @@ namespace BindTool
         public CreateNameSetting selectCreateNameSetting;
         public List<CreateNameSetting> createNameSettingList;
 
-        //Temp Data
-        public TempGenerateData tempGenerateData;
+       
+
 
         #region Equals
 
@@ -53,13 +56,12 @@ namespace BindTool
                    isCreatePrefab == other.isCreatePrefab && isCreatePrefabFolder == other.isCreatePrefabFolder && createPrefabPath == other.createPrefabPath && isCreateLua == other.isCreateLua &&
                    isCreateLuaFolder == other.isCreateLuaFolder && createLuaPath == other.createLuaPath && Equals(selectScriptSetting, other.selectScriptSetting) &&
                    Equals(scriptSettingList, other.scriptSettingList) && Equals(selectAutoBindSetting, other.selectAutoBindSetting) && Equals(autoBindSettingList, other.autoBindSettingList) &&
-                   Equals(selectCreateNameSetting, other.selectCreateNameSetting) && Equals(createNameSettingList, other.createNameSettingList) && Equals(tempGenerateData, other.tempGenerateData);
+                   Equals(selectCreateNameSetting, other.selectCreateNameSetting) && Equals(createNameSettingList, other.createNameSettingList);
         }
 
         public override int GetHashCode()
         {
-            unchecked
-            {
+            unchecked {
                 int hashCode = base.GetHashCode();
                 hashCode = (hashCode * 397) ^ isCreateScriptFolder.GetHashCode();
                 hashCode = (hashCode * 397) ^ (createScriptPath != null ? createScriptPath.GetHashCode() : 0);
@@ -76,7 +78,6 @@ namespace BindTool
                 hashCode = (hashCode * 397) ^ (autoBindSettingList != null ? autoBindSettingList.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (selectCreateNameSetting != null ? selectCreateNameSetting.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (createNameSettingList != null ? createNameSettingList.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (tempGenerateData != null ? tempGenerateData.GetHashCode() : 0);
                 return hashCode;
             }
         }

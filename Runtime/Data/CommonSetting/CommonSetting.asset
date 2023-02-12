@@ -15,6 +15,11 @@ MonoBehaviour:
   isCreateScriptFolder: 1
   createScriptPath: Script
   isCustomBind: 1
+  newScriptName: Text
+  addTypeString:
+    typeName: Text
+    typeNameSpace: UnityEngine.UI
+    assemblyName: UnityEngine.UI
   isCreatePrefab: 1
   isCreatePrefabFolder: 1
   createPrefabPath: Prefab
@@ -33,26 +38,3 @@ MonoBehaviour:
     type: 2}
   createNameSettingList:
   - {fileID: 11400000, guid: 2aec32ab9ae390e46ad1c09b84cf1a2e, type: 2}
-  tempGenerateData:
-    isStartBuild: 0
-    newScriptName: Text
-    bindObject: {fileID: 0}
-    objectInfo:
-      typeString:
-        typeName: 
-        typeNameSpace: 
-        assemblyName: 
-      rootBindInfo:
-        name: 
-        typeStrings: []
-        index: 0
-        instanceObject: {fileID: 0}
-        prefabObject: {fileID: 0}
-        autoBindSetting: {fileID: 0}
-      gameObjectBindInfoList: []
-      dataBindInfoList: []
-    getBindDataMethodName: 
-    addTypeString:
-      typeName: 
-      typeNameSpace: 
-      assemblyName: 

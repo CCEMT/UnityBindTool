@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -16,6 +17,47 @@ namespace BindTool
 {
     public static class CommonTools
     {
+        public static CommonSettingData GetCommonSettingData()
+        {
+            string typeSearchString = $" t:{nameof(CommonSettingData)}";
+            string[] guids = AssetDatabase.FindAssets(typeSearchString);
+            foreach (string guid in guids) {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var preferences = AssetDatabase.LoadAssetAtPath<CommonSettingData>(path);
+                if (preferences != null) return preferences;
+            }
+            return null;
+        }
+
+        public static GenerateData GetGenerateData()
+        {
+            string typeSearchString = $" t:{nameof(GenerateData)}";
+            string[] guids = AssetDatabase.FindAssets(typeSearchString);
+            foreach (string guid in guids) {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var preferences = AssetDatabase.LoadAssetAtPath<GenerateData>(path);
+                if (preferences != null) return preferences;
+            }
+            return null;
+        }
+
+        public static GenerateData CreateGenerateData()
+        {
+            string typeSearchString = $" t:{nameof(CommonSettingData)}";
+            string[] guids = AssetDatabase.FindAssets(typeSearchString);
+            foreach (string guid in guids) {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                string createPath = new DirectoryInfo(path).Parent.ToString();
+                createPath += $"/{nameof(GenerateData)}.asset";
+                createPath = createPath.Substring(createPath.IndexOf("Assets", StringComparison.Ordinal));
+                GenerateData generateData = ScriptableObject.CreateInstance<GenerateData>();
+                AssetDatabase.CreateAsset(generateData, createPath);
+                AssetDatabase.Refresh();
+                return generateData;
+            }
+            return null;
+        }
+
         /// <summary>
         /// 获取预制体资源。
         /// </summary>
@@ -54,12 +96,13 @@ namespace BindTool
         {
             ObjectInfo objectInfo = null;
 
-            //反射获取ObjectInfo
             BindComponents bindComponents = bindObject.GetComponent<BindComponents>();
             if (bindComponents != null) {
                 objectInfo = new ObjectInfo();
                 objectInfo.typeString = new TypeString(bindComponents.bindRoot.GetType());
                 objectInfo.rootBindInfo = new ComponentBindInfo(bindObject);
+                objectInfo.gameObjectBindInfoList=new List<ComponentBindInfo>();
+                objectInfo.dataBindInfoList = new List<DataBindInfo>();
 
                 int amount = bindComponents.bindComponentList.Count;
                 for (int i = 0; i < amount; i++) {

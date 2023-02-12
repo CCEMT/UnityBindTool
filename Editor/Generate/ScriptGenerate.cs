@@ -12,99 +12,123 @@ namespace BindTool
 {
     public class ScriptGenerate
     {
-        public static void CSharpWrite(CommonSettingData commonSettingData, string scriptPath)
+        static void AddBindComponents(GenerateData generateData)
+        {
+            GameObject root = generateData.objectInfo.rootBindInfo.GetObject();
+            BindComponents bindComponents = root.GetComponent<BindComponents>();
+            if (bindComponents == null) { bindComponents = root.AddComponent<BindComponents>(); }
+            bindComponents.bindComponentList.Clear();
+
+            int componentAmount = generateData.objectInfo.gameObjectBindInfoList.Count;
+            for (int i = 0; i < componentAmount; i++) {
+                ComponentBindInfo componentBindInfo = generateData.objectInfo.gameObjectBindInfoList[i];
+                bindComponents.bindComponentList.Add(componentBindInfo.GetValue());
+            }
+
+            int dataAmount = generateData.objectInfo.dataBindInfoList.Count;
+            for (int i = 0; i < dataAmount; i++) {
+                DataBindInfo dataBindInfo = generateData.objectInfo.dataBindInfoList[i];
+                bindComponents.bindComponentList.Add(dataBindInfo.bindObject);
+            }
+
+            ComponentBindInfo bindComponentsInfo = new ComponentBindInfo(root);
+            bindComponentsInfo.SetIndex(new TypeString(typeof(BindComponents)));
+            bindComponentsInfo.name = root.name + nameof(BindComponents);
+            generateData.objectInfo.gameObjectBindInfoList.Add(bindComponentsInfo);
+        }
+
+        public static void CSharpWrite(CommonSettingData commonSettingData, GenerateData generateData, string scriptPath)
         {
             ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
-            TempGenerateData tempData = commonSettingData.tempGenerateData;
+            AddBindComponents(generateData);
 
             if (selectSettion.isGenerateNew) {
-                string scriptFile = scriptPath + $"{commonSettingData.tempGenerateData.newScriptName}.cs";
+                string scriptFile = scriptPath + $"{generateData.newScriptName}.cs";
 
                 if (selectSettion.isGeneratePartial) {
                     //创建空的主文件
                     if (File.Exists(scriptFile) == false) {
-                        bool isExist = TypeString.IsExist(tempData.newScriptName, selectSettion.useNamespace, ConstData.DefaultAssembly);
+                        bool isExist = TypeString.IsExist(generateData.newScriptName, selectSettion.useNamespace, ConstData.DefaultAssembly);
                         if (isExist) {
                             Debug.LogError("ScriptGenerateError:已经存在该脚本");
-                            commonSettingData.tempGenerateData.isStartBuild = false;
+                            generateData.isStartBuild = false;
                             return;
                         }
 
                         //创建
-                        GenerateCSharpScript(commonSettingData, scriptFile, tempData.newScriptName, false, true);
+                        GenerateCSharpScript(commonSettingData, generateData, scriptFile, generateData.newScriptName, false, true);
                     }
                     else {
                         //检查是否包含Partial关键字
                         string content = File.ReadAllText(scriptFile);
                         string filtration = content.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "");
-                        if (filtration.Contains($"partialclass{tempData.addTypeString.typeName}") == false) {
-                            int index = content.IndexOf(tempData.addTypeString.typeName, StringComparison.Ordinal);
+                        if (filtration.Contains($"partialclass{generateData.addTypeString.typeName}") == false) {
+                            int index = content.IndexOf(generateData.addTypeString.typeName, StringComparison.Ordinal);
                             string interval = string.Empty;
                             for (int i = index - 1; i >= 0; i--) {
                                 if (content[i].Equals('s')) { break; }
                                 else { interval += content[i].ToString(); }
                             }
-                            content = content.Replace($"class{interval}{tempData.addTypeString.typeName}", $"partial class {tempData.addTypeString.typeName}");
+                            content = content.Replace($"class{interval}{generateData.addTypeString.typeName}", $"partial class {generateData.addTypeString.typeName}");
                         }
                         StreamWriter sw = new StreamWriter(scriptFile, false);
                         sw.WriteLine(content);
                         sw.Close();
                     }
 
-                    string scriptPartialFile = scriptPath + $"{commonSettingData.tempGenerateData.newScriptName}.{selectSettion.partialName}.cs";
+                    string scriptPartialFile = scriptPath + $"{generateData.newScriptName}.{selectSettion.partialName}.cs";
                     //创建Partial并写入数据
                     if (File.Exists(scriptPartialFile)) {
-                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData);
+                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData, generateData);
                         File.Delete(scriptPartialFile);
                     }
-                    GenerateCSharpScript(commonSettingData, scriptPartialFile, tempData.newScriptName, true, true);
+                    GenerateCSharpScript(commonSettingData, generateData, scriptPartialFile, generateData.newScriptName, true, true);
                 }
                 else {
                     //创建文件并写入数据
                     if (File.Exists(scriptFile) == false) {
-                        bool isExist = TypeString.IsExist(tempData.newScriptName, selectSettion.useNamespace, ConstData.DefaultAssembly);
+                        bool isExist = TypeString.IsExist(generateData.newScriptName, selectSettion.useNamespace, ConstData.DefaultAssembly);
                         if (isExist) {
                             Debug.LogError("ScriptGenerateError:已经存在该脚本");
-                            commonSettingData.tempGenerateData.isStartBuild = false;
+                            generateData.isStartBuild = false;
                             return;
                         }
 
-                        GenerateCSharpScript(commonSettingData, scriptFile, tempData.newScriptName, true, false);
+                        GenerateCSharpScript(commonSettingData, generateData, scriptFile, generateData.newScriptName, true, false);
                     }
                     else {
                         //打开文件并更改数据
-                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptFile, commonSettingData);
-                        OpenCSharpFileAlterData(commonSettingData, scriptFile);
+                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptFile, commonSettingData, generateData);
+                        OpenCSharpFileAlterData(commonSettingData, generateData, scriptFile);
                     }
                 }
             }
             else {
                 if (selectSettion.isGeneratePartial) {
-                    string scriptPartialFile = scriptPath + $"{commonSettingData.tempGenerateData.newScriptName}.{selectSettion.partialName}.cs";
+                    string scriptPartialFile = scriptPath + $"{generateData.newScriptName}.{selectSettion.partialName}.cs";
                     //检查是否包含Partial关键字
                     //创建Partial并写入数据
 
                     if (File.Exists(scriptPartialFile)) {
-                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData);
+                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData, generateData);
                         File.Delete(scriptPartialFile);
                     }
-                    GenerateCSharpScript(commonSettingData, scriptPartialFile, tempData.objectInfo.typeString.typeName, true, true);
+                    GenerateCSharpScript(commonSettingData, generateData, scriptPartialFile, generateData.objectInfo.typeString.typeName, true, true);
                 }
                 else {
-                    string scriptPartialFile = scriptPath + $"{commonSettingData.tempGenerateData.newScriptName}.cs";
+                    string scriptPartialFile = scriptPath + $"{generateData.newScriptName}.cs";
                     //打开文件并更改数据
-                    if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData);
-                    OpenCSharpFileAlterData(commonSettingData, scriptPartialFile);
+                    if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData, generateData);
+                    OpenCSharpFileAlterData(commonSettingData, generateData, scriptPartialFile);
                 }
             }
         }
 
-        static void OpenCSharpFileAlterData(CommonSettingData commonSettingData, string path)
+        static void OpenCSharpFileAlterData(CommonSettingData commonSettingData, GenerateData generateData, string path)
         {
             ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
-            TempGenerateData tempData = commonSettingData.tempGenerateData;
 
-            if (selectSettion.isSavaOldScript) SavaOldScript(path, commonSettingData);
+            if (selectSettion.isSavaOldScript) SavaOldScript(path, commonSettingData, generateData);
 
             bool isSpecifyNamespace = File.ReadAllText(path).Contains("namespace");
 
@@ -139,10 +163,10 @@ namespace BindTool
                 for (int i = 0; i < lineAmount; i++) {
                     string line = contents[i];
                     if (classLine == -1) {
-                        if (line.Contains(tempData.addTypeString.typeName)) {
+                        if (line.Contains(generateData.addTypeString.typeName)) {
                             classLine = i;
-                            int index = line.IndexOf(tempData.addTypeString.typeName, StringComparison.Ordinal);
-                            index += tempData.addTypeString.typeName.Length;
+                            int index = line.IndexOf(generateData.addTypeString.typeName, StringComparison.Ordinal);
+                            index += generateData.addTypeString.typeName.Length;
                             int lineLength = line.Length;
                             for (int j = index; j < lineLength; j++) {
                                 if (line[j] == '{') {
@@ -176,10 +200,10 @@ namespace BindTool
                 for (int i = 0; i < deleteAmount + 1; i++) contents.RemoveAt(startLine);
             }
 
-            tempData.objectInfo.typeString = tempData.addTypeString;
+            generateData.objectInfo.typeString = generateData.addTypeString;
 
             //添加数据
-            List<string> addData = GenerateCSharpData.Generate(commonSettingData, isSpecifyNamespace);
+            List<string> addData = GenerateCSharpData.Generate(commonSettingData, generateData, isSpecifyNamespace);
             int addAmount = addData.Count;
             for (int i = 0; i < addAmount; i++) contents.Insert(startLine + i, addData[i]);
 
@@ -189,16 +213,15 @@ namespace BindTool
             sw.Close();
         }
 
-        static void SavaOldScript(string path, CommonSettingData commonSettingData)
+        static void SavaOldScript(string path, CommonSettingData commonSettingData, GenerateData generateData)
         {
             ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
-            TempGenerateData tempData = commonSettingData.tempGenerateData;
 
             string savaPath = Application.dataPath + "/" + selectSettion.savaOldScriptPath + "/";
 
             string directoryName = "";
-            if (tempData.addTypeString.IsEmpty() == false) { directoryName = tempData.addTypeString.typeName + "/"; }
-            else { directoryName = tempData.newScriptName + "/"; }
+            if (generateData.addTypeString.IsEmpty() == false) { directoryName = generateData.addTypeString.typeName + "/"; }
+            else { directoryName = generateData.newScriptName + "/"; }
 
             string directoryPath = savaPath + directoryName;
 
@@ -210,8 +233,8 @@ namespace BindTool
             FileInfo[] files = direction.GetFiles("*", SearchOption.AllDirectories);
 
             string fileName = "";
-            if (tempData.addTypeString.IsEmpty() == false) { fileName = tempData.addTypeString.typeName + ".txt"; }
-            else { fileName = tempData.newScriptName + "/"; }
+            if (generateData.addTypeString.IsEmpty() == false) { fileName = generateData.addTypeString.typeName + ".txt"; }
+            else { fileName = generateData.newScriptName + "/"; }
 
             List<string> nameList = new List<string>();
             int amount = files.Length;
@@ -223,7 +246,7 @@ namespace BindTool
             bool isCan = false;
             int number = 1;
             while (isCan == false) {
-                string tempName = tempData.addTypeString.typeName + number + ".txt";
+                string tempName = generateData.addTypeString.typeName + number + ".txt";
                 if (nameList.Contains(tempName) == false) {
                     isCan = true;
                     fileName = tempName;
@@ -237,14 +260,13 @@ namespace BindTool
             mainWriter.Close();
         }
 
-        static void GenerateCSharpScript(CommonSettingData commonSettingData, string path, string className, bool isGenerateData, bool isPartial)
+        static void GenerateCSharpScript(CommonSettingData commonSettingData, GenerateData generateData, string path, string className, bool isGenerateData, bool isPartial)
         {
             ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
-            TempGenerateData tempData = commonSettingData.tempGenerateData;
 
-            tempData.objectInfo.typeString.typeName = tempData.newScriptName;
-            tempData.objectInfo.typeString.typeNameSpace = selectSettion.useNamespace;
-            tempData.objectInfo.typeString.assemblyName = selectSettion.createScriptAssembly;
+            generateData.objectInfo.typeString.typeName = generateData.newScriptName;
+            generateData.objectInfo.typeString.typeNameSpace = selectSettion.useNamespace;
+            generateData.objectInfo.typeString.assemblyName = selectSettion.createScriptAssembly;
 
             StreamWriter mainWriter = File.CreateText(path);
 
@@ -261,7 +283,7 @@ namespace BindTool
             Writer("{", 0);
 
             if (isGenerateData) {
-                List<string> addList = GenerateCSharpData.Generate(commonSettingData, selectSettion.isSpecifyNamespace);
+                List<string> addList = GenerateCSharpData.Generate(commonSettingData, generateData, selectSettion.isSpecifyNamespace);
                 int addAmount = addList.Count;
                 for (int i = 0; i < addAmount; i++) {
                     string addline = addList[i];

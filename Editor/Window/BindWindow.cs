@@ -46,7 +46,7 @@ namespace BindTool
             errorList = new List<string>();
             _bindWindow.bindObject = Selection.objects.First() as GameObject;
 
-            commonSettingData = Resources.Load<CommonSettingData>(ConstData.CommonSettingName);
+            commonSettingData = CommonTools.GetCommonSettingData(); 
 
             if (commonSettingData.scriptSettingList.Contains(commonSettingData.selectScriptSetting) == false) commonSettingData.scriptSettingList.Add(commonSettingData.selectScriptSetting);
             if (commonSettingData.autoBindSettingList.Contains(commonSettingData.selectAutoBindSetting) == false) commonSettingData.autoBindSettingList.Add(commonSettingData.selectAutoBindSetting);
@@ -59,9 +59,8 @@ namespace BindTool
             objectInfo.rootBindInfo.instanceObject = bindObject;
             objectInfo.AgainGet();
 
-            commonSettingData.tempGenerateData = new TempGenerateData();
-            if (string.IsNullOrEmpty(objectInfo.typeString.typeName)) { commonSettingData.tempGenerateData.newScriptName = bindObject.name; }
-            else { commonSettingData.tempGenerateData.newScriptName = objectInfo.typeString.typeName; }
+            if (string.IsNullOrEmpty(objectInfo.typeString.typeName)) { commonSettingData.newScriptName = bindObject.name; }
+            else { commonSettingData.newScriptName = objectInfo.typeString.typeName; }
 
             scriptGuiStyle = new GUIStyle();
             scriptGuiStyle.normal.textColor = Color.green;

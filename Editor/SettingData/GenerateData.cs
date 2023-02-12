@@ -1,12 +1,15 @@
-﻿using System;
+﻿#region Using
+
 using UnityEngine;
+
+#endregion
 
 namespace BindTool
 {
-    [Serializable]
-    public class TempGenerateData
+    public class GenerateData : ScriptableObject
     {
         public bool isStartBuild;
+
         //新脚本的名称
         public string newScriptName;
 
