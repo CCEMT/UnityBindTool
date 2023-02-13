@@ -18,7 +18,7 @@ MonoBehaviour:
     typeName: MonoBehaviour
     typeNameSpace: UnityEngine
     assemblyName: UnityEngine.CoreModule
-  createScriptAssembly: Game
+  createScriptAssembly: Assembly-CSharp
   isGeneratePartial: 0
   partialName: 
   isSpecifyNamespace: 1
@@ -95,7 +95,7 @@ MonoBehaviour:
     temlateType:
       typeName: ButtonTemplate
       typeNameSpace: BindTool.Template
-      assemblyName: Assembly-CSharp-Editor
+      assemblyName: UnityBindTool.Editor
     temlateBaseType:
       typeName: MonoBehaviour
       typeNameSpace: UnityEngine

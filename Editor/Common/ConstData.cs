@@ -11,7 +11,7 @@
         public static string DefaultName = "Auto Generate";
         public static string DefaultBindMethodName = "GetBind";
 
-        public static string TemplateAssembly = "Assembly-CSharp-Editor";
+        public static string TemplateAssembly = "UnityBindTool.Editor";
         public static string TemplateNamespace = "BindTool.Template";
         public static string TemplateRegionName = "Template Method";
 

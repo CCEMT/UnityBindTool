@@ -36,10 +36,10 @@ namespace BindTool
         private const int TemplateShowAmount = 3;
 
         private int variableListMaxIndex;
-        private int variableListIndex=1;
+        private int variableListIndex = 1;
 
         private int templateListMaxIndex;
-        private int templateListIndex=1;
+        private int templateListIndex = 1;
 
         public void DrawScriptSettingGUI()
         {
@@ -185,7 +185,12 @@ namespace BindTool
                     {
                         GUILayout.Label("程序集名称");
 
-                        selectSetting.createScriptAssembly = GUILayout.TextField(selectSetting.createScriptAssembly);
+                        string tempScriptAssembly = GUILayout.TextField(selectSetting.createScriptAssembly);
+                        if (tempScriptAssembly != selectSetting.createScriptAssembly)
+                        {
+                            selectSetting.createScriptAssembly = tempScriptAssembly;
+                            isSavaSetting = true;
+                        }
                         if (GUILayout.Button("搜索", GUILayout.Width(50)))
                         {
                             SearchAssemblyWindow.ShowWindown((isSelect, assembly) => {

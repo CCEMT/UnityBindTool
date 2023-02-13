@@ -16,27 +16,23 @@ namespace BindTool
         {
             GameObject root = generateData.objectInfo.rootBindInfo.GetObject();
             BindComponents bindComponents = root.GetComponent<BindComponents>();
-            if (bindComponents == null) { bindComponents = root.AddComponent<BindComponents>(); }
-            bindComponents.bindComponentList.Clear();
-
-            int componentAmount = generateData.objectInfo.gameObjectBindInfoList.Count;
-            for (int i = 0; i < componentAmount; i++)
+            if (bindComponents == null)
             {
-                ComponentBindInfo componentBindInfo = generateData.objectInfo.gameObjectBindInfoList[i];
-                bindComponents.bindComponentList.Add(componentBindInfo.GetValue());
-            }
+                bindComponents = root.AddComponent<BindComponents>();
+                int componentAmount = generateData.objectInfo.gameObjectBindInfoList.Count;
+                for (int i = 0; i < componentAmount; i++)
+                {
+                    ComponentBindInfo componentBindInfo = generateData.objectInfo.gameObjectBindInfoList[i];
+                    bindComponents.bindComponentList.Add(componentBindInfo.GetValue());
+                }
 
-            int dataAmount = generateData.objectInfo.dataBindInfoList.Count;
-            for (int i = 0; i < dataAmount; i++)
-            {
-                DataBindInfo dataBindInfo = generateData.objectInfo.dataBindInfoList[i];
-                bindComponents.bindComponentList.Add(dataBindInfo.bindObject);
+                int dataAmount = generateData.objectInfo.dataBindInfoList.Count;
+                for (int i = 0; i < dataAmount; i++)
+                {
+                    DataBindInfo dataBindInfo = generateData.objectInfo.dataBindInfoList[i];
+                    bindComponents.bindComponentList.Add(dataBindInfo.bindObject);
+                }
             }
-
-            ComponentBindInfo bindComponentsInfo = new ComponentBindInfo(root);
-            bindComponentsInfo.SetIndex(new TypeString(typeof(BindComponents)));
-            bindComponentsInfo.name = root.name + nameof(BindComponents);
-            generateData.objectInfo.gameObjectBindInfoList.Add(bindComponentsInfo);
         }
 
         public static void CSharpWrite(CommonSettingData commonSettingData, GenerateData generateData, string scriptPath)
@@ -145,6 +141,8 @@ namespace BindTool
         static void OpenCSharpFileAlterData(CommonSettingData commonSettingData, GenerateData generateData, string path)
         {
             ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+
+            generateData.addTypeString = generateData.objectInfo.typeString;
 
             if (selectSettion.isSavaOldScript) SavaOldScript(path, commonSettingData, generateData);
 
@@ -355,19 +353,17 @@ namespace BindTool
         public static TypeString GenerateCSharpTemplateScript(TypeString targetType, string path)
         {
             string fullPath = $"{Application.dataPath}/{path}/{targetType.typeName}Template.cs";
-            if (Directory.Exists($"{Application.dataPath}/{path}")) { Debug.Log("模板脚本路径错误，请检查设置Setting-ScriptSetting-MethodGenerate-模板脚本保存路径"); }
+            if (Directory.Exists($"{Application.dataPath}/{path}") == false) { Debug.Log("模板脚本路径错误，请检查设置Setting-ScriptSetting-MethodGenerate-模板脚本保存路径"); }
             StreamWriter mainWriter = File.CreateText(fullPath);
 
             Writer("///该脚本为模板方法");
             Writer("///注意：");
-            Writer($"///需要生成的方法写入#region {ConstData.TemplateRegionName}");
             Writer("///生成方法使用到的类型必须为[命名空间].[类型名]，如果使用using引用命名空间生成时可能会生成失败");
 
             Writer($"namespace {ConstData.TemplateNamespace}");
             Writer("{");
 
             string inheritContent = "UnityEngine.MonoBehaviour";
-            Writer("[BindTool.ScriptTemplate]", 1);
             Writer($"public class {targetType.typeName}Template : {inheritContent}", 1);
             Writer("{", 1);
 

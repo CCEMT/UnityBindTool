@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using UnityBindTool;
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
@@ -21,7 +22,8 @@ namespace BindTool
         {
             string typeSearchString = $" t:{nameof(CommonSettingData)}";
             string[] guids = AssetDatabase.FindAssets(typeSearchString);
-            foreach (string guid in guids) {
+            foreach (string guid in guids)
+            {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 var preferences = AssetDatabase.LoadAssetAtPath<CommonSettingData>(path);
                 if (preferences != null) return preferences;
@@ -33,7 +35,8 @@ namespace BindTool
         {
             string typeSearchString = $" t:{nameof(GenerateData)}";
             string[] guids = AssetDatabase.FindAssets(typeSearchString);
-            foreach (string guid in guids) {
+            foreach (string guid in guids)
+            {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 var preferences = AssetDatabase.LoadAssetAtPath<GenerateData>(path);
                 if (preferences != null) return preferences;
@@ -45,7 +48,8 @@ namespace BindTool
         {
             string typeSearchString = $" t:{nameof(CommonSettingData)}";
             string[] guids = AssetDatabase.FindAssets(typeSearchString);
-            foreach (string guid in guids) {
+            foreach (string guid in guids)
+            {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 string createPath = new DirectoryInfo(path).Parent.ToString();
                 createPath += $"/{nameof(GenerateData)}.asset";
@@ -67,26 +71,27 @@ namespace BindTool
         {
             if (gameObject == null) return null;
             // Project中的Prefab是Asset不是Instance
-            if (PrefabUtility.IsPartOfPrefabAsset(gameObject)) {
+            if (PrefabUtility.IsPartOfPrefabAsset(gameObject))
+            {
                 // 预制体资源就是自身
                 return gameObject;
             }
 
-
             // PrefabMode中的GameObject既不是Instance也不是Asset
             PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(gameObject);
-            if (prefabStage != null) {
+            if (prefabStage != null)
+            {
                 // 预制体资源：prefabAsset = prefabStage.prefabContentsRoot
                 return prefabStage.prefabContentsRoot;
             }
 
             // Scene中的Prefab Instance是Instance不是Asset
-            if (PrefabUtility.IsPartOfPrefabInstance(gameObject)) {
+            if (PrefabUtility.IsPartOfPrefabInstance(gameObject))
+            {
                 // 获取预制体资源
                 GameObject prefabAsset = PrefabUtility.GetCorrespondingObjectFromOriginalSource(gameObject);
                 return prefabAsset;
             }
-
 
             // 不是预制体
             return null;
@@ -97,28 +102,41 @@ namespace BindTool
             ObjectInfo objectInfo = null;
 
             BindComponents bindComponents = bindObject.GetComponent<BindComponents>();
-            if (bindComponents != null) {
+            if (bindComponents != null)
+            {
                 objectInfo = new ObjectInfo();
                 objectInfo.typeString = new TypeString(bindComponents.bindRoot.GetType());
                 objectInfo.rootBindInfo = new ComponentBindInfo(bindObject);
-                objectInfo.gameObjectBindInfoList=new List<ComponentBindInfo>();
+                objectInfo.rootBindInfo.name = objectInfo.typeString.typeName;
+                objectInfo.gameObjectBindInfoList = new List<ComponentBindInfo>();
                 objectInfo.dataBindInfoList = new List<DataBindInfo>();
 
-                int amount = bindComponents.bindComponentList.Count;
-                for (int i = 0; i < amount; i++) {
-                    Object bindComponent = bindComponents.bindComponentList[i];
-                    if (bindComponent is GameObject == false && bindComponent.GetType().IsSubclassOf(typeof(Component)) == false) {
-                        ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindComponent);
-                        objectInfo.gameObjectBindInfoList.Add(componentBindInfo);
-                    }
-                    else {
+                Type type = bindComponents.bindRoot.GetType();
+                FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                for (int i = 0; i < fieldInfos.Length; i++)
+                {
+                    FieldInfo fieldInfo = fieldInfos[i];
+                    object attribute = fieldInfo.GetCustomAttribute(typeof(AutoGenerateFileldAttribute), true);
+                    if (attribute == null) continue;
+                    Object bindComponent = (Object) fieldInfo.GetValue(bindComponents.bindRoot);
+                    if (bindComponent is GameObject == false && bindComponent.GetType().IsSubclassOf(typeof(Component)) == false)
+                    {
                         DataBindInfo dataBindInfo = new DataBindInfo(bindComponent);
+                        dataBindInfo.name = fieldInfo.Name;
                         objectInfo.dataBindInfoList.Add(dataBindInfo);
+                    }
+                    else
+                    {
+                        ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindComponent);
+                        componentBindInfo.name = fieldInfo.Name;
+                        componentBindInfo.SetIndex(new TypeString(fieldInfo.FieldType));
+                        objectInfo.gameObjectBindInfoList.Add(componentBindInfo);
                     }
                 }
             }
 
-            if (objectInfo == null) {
+            if (objectInfo == null)
+            {
                 objectInfo = new ObjectInfo();
                 objectInfo.gameObjectBindInfoList = new List<ComponentBindInfo>();
                 objectInfo.dataBindInfoList = new List<DataBindInfo>();
@@ -132,7 +150,8 @@ namespace BindTool
         {
             string newName = GetNumberAlpha(content);
             int amount = createNameSetting.nameReplaceDataList.Count;
-            for (int i = 0; i < amount; i++) {
+            for (int i = 0; i < amount; i++)
+            {
                 NameReplaceData nameReplaceData = createNameSetting.nameReplaceDataList[i];
                 if (nameReplaceData.nameCheck.Check(newName, out string matchingContent)) newName = content.Replace(matchingContent, nameReplaceData.targetName);
             }
@@ -164,7 +183,8 @@ namespace BindTool
         {
             int amount = content.Length;
             string prefix = "";
-            for (int i = 0; i < amount; i++) {
+            for (int i = 0; i < amount; i++)
+            {
                 char c = content[i];
                 if ((c == '_' && i != 0) || (char.IsUpper(c) && i != 0)) { break; }
                 else { prefix += c.ToString(); }
@@ -176,7 +196,8 @@ namespace BindTool
         {
             int amount = content.Length;
             List<char> suffix = new List<char>();
-            for (int i = amount - 1; i >= 0; i--) {
+            for (int i = amount - 1; i >= 0; i--)
+            {
                 char c = content[i];
                 suffix.Add(c);
                 if (c == '_' || char.IsUpper(c)) break;
@@ -187,7 +208,8 @@ namespace BindTool
 
         public static string InitialUpper(string content)
         {
-            if (string.IsNullOrEmpty(content) == false) {
+            if (string.IsNullOrEmpty(content) == false)
+            {
                 char[] contents = content.ToCharArray();
                 contents[0] = char.ToUpper(contents[0]);
                 return new string(contents);
@@ -197,7 +219,8 @@ namespace BindTool
 
         public static string InitialLower(string content)
         {
-            if (string.IsNullOrEmpty(content) == false) {
+            if (string.IsNullOrEmpty(content) == false)
+            {
                 char[] contents = content.ToCharArray();
                 contents[0] = char.ToLower(contents[0]);
                 return new string(contents);
@@ -208,7 +231,8 @@ namespace BindTool
         public static string NameSettingByName(ComponentBindInfo componentBindInfo, NameSetting nameSetting)
         {
             string targetName = componentBindInfo.name;
-            switch (nameSetting.namingDispose) {
+            switch (nameSetting.namingDispose)
+            {
                 case ScriptNamingDispose.InitialLower:
                     targetName = InitialLower(targetName);
                     break;
@@ -223,7 +247,8 @@ namespace BindTool
                     break;
             }
 
-            if (nameSetting.isAddClassName) {
+            if (nameSetting.isAddClassName)
+            {
                 if (nameSetting.isFrontOrBehind) { targetName = componentBindInfo.GetTypeName() + componentBindInfo.name; }
                 else { targetName = componentBindInfo.name + componentBindInfo.GetTypeName(); }
             }
@@ -236,7 +261,8 @@ namespace BindTool
         public static string NameSettingByName(DataBindInfo dataBindInfo, NameSetting nameSetting)
         {
             string targetName = dataBindInfo.name;
-            switch (nameSetting.namingDispose) {
+            switch (nameSetting.namingDispose)
+            {
                 case ScriptNamingDispose.InitialLower:
                     targetName = InitialLower(targetName);
                     break;
@@ -251,7 +277,8 @@ namespace BindTool
                     break;
             }
 
-            if (nameSetting.isAddClassName) {
+            if (nameSetting.isAddClassName)
+            {
                 if (nameSetting.isFrontOrBehind) { targetName = dataBindInfo.typeString.typeName + dataBindInfo.name; }
                 else { targetName = dataBindInfo.name + dataBindInfo.typeString.typeName; }
             }
@@ -279,11 +306,13 @@ namespace BindTool
             List<Type> result = new List<Type>();
             Assembly[] assemblies = targetAppDomain.GetAssemblies();
             int assebliesAmount = assemblies.Length;
-            for (int i = 0; i < assebliesAmount; i++) {
+            for (int i = 0; i < assebliesAmount; i++)
+            {
                 Assembly assembly = assemblies[i];
                 Type[] types = assembly.GetTypes();
                 int typesAmount = types.Length;
-                for (int j = 0; j < typesAmount; j++) {
+                for (int j = 0; j < typesAmount; j++)
+                {
                     Type type = types[j];
                     if (type.IsSubclassOf(targetType)) result.Add(type);
                 }
@@ -298,12 +327,14 @@ namespace BindTool
             if (containerWinType == null) throw new MissingMemberException("Can't find internal type ContainerWindow. Maybe something has changed inside Unity");
             FieldInfo showModeField = containerWinType.GetField("m_ShowMode", BindingFlags.NonPublic | BindingFlags.Instance);
             PropertyInfo positionProperty = containerWinType.GetProperty("position", BindingFlags.Public | BindingFlags.Instance);
-            if (showModeField == null || positionProperty == null) {
+            if (showModeField == null || positionProperty == null)
+            {
                 throw new MissingFieldException("Can't find internal fields 'm_ShowMode' or 'position'. Maybe something has changed inside Unity");
             }
             Object[] windows = Resources.FindObjectsOfTypeAll(containerWinType);
             int amount = windows.Length;
-            for (int i = 0; i < amount; i++) {
+            for (int i = 0; i < amount; i++)
+            {
                 Object window = windows[i];
                 int showmode = (int) showModeField.GetValue(window);
                 if (showmode == 4) // main window
@@ -324,7 +355,8 @@ namespace BindTool
             pos.x = main.x + w;
             pos.y = main.y + h;
             try { aWin.position = pos; }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 Debug.Log("编译错误：请删除Library/ScriptAssemblies/Assembly-CSharp-Editor和BindTool,重新打开项目后导入BindTool");
                 Debug.Log(e);
             }
@@ -332,7 +364,8 @@ namespace BindTool
 
         public static string GetVisitString(VisitType valueTuple)
         {
-            switch (valueTuple) {
+            switch (valueTuple)
+            {
                 case VisitType.Public:
                     return "public";
                 case VisitType.Private:
@@ -347,7 +380,8 @@ namespace BindTool
 
         public static string GetRemoveString(RemoveType removeType)
         {
-            switch (removeType) {
+            switch (removeType)
+            {
                 case RemoveType.This:
                     return "解除自身绑定";
                 case RemoveType.Child:

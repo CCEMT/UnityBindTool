@@ -17,7 +17,7 @@ namespace BindTool
 
         private const int NameReqlaceShowAmount = 5;
         private int nameReqlaceListMaxIndex;
-        private int nameReqlaceListIndex = 0;
+        private int nameReqlaceListIndex = 1;
 
         public void DrawNameSettingGUI()
         {

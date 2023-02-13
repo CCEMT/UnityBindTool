@@ -25,7 +25,7 @@ namespace BindTool
             public DataBindInfo dataBindInfo;
         }
 
-        public static List<string> Generate(CommonSettingData commonSettingData,GenerateData generateData, bool isSpecifyNamespace)
+        public static List<string> Generate(CommonSettingData commonSettingData, GenerateData generateData, bool isSpecifyNamespace)
         {
             List<string> generateList = new List<string>();
 
@@ -35,6 +35,7 @@ namespace BindTool
 
             Writer($"///#region {ConstData.DefaultName}里的内容为自动生成，请勿去修改它", 1);
 
+            List<string> nameList = new List<string>();
             List<ComponentNameData> coomponentNameList = new List<ComponentNameData>();
             List<DataName> dataNameList = new List<DataName>();
             Dictionary<string, int> variableNameAmountDict = new Dictionary<string, int>();
@@ -143,7 +144,10 @@ namespace BindTool
                 {
                     ComponentNameData componentNameData = addComponentMethodList[j];
                     string methodName = CommonTools.NameSettingByName(componentNameData.componentBindInfo, selectSettion.methodNameSetting);
-                    if (methodNameAmountDict.ContainsKey(methodName))
+                    bool isCantainsComponentMethod = methodNameAmountDict.ContainsKey(methodName);
+                    if (isCantainsComponentMethod == false) { methodNameAmountDict.Add(methodName, 1); }
+
+                    if (isCantainsComponentMethod || nameList.Contains(methodName))
                     {
                         bool isCanName = false;
                         while (isCanName == false)
@@ -159,7 +163,7 @@ namespace BindTool
                                         if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
                                         return false;
                                     });
-                                    if (findNameData == null)
+                                    if (findNameData == null && nameList.Contains(targetName) == false)
                                     {
                                         methodName = targetName;
                                         isCanName = true;
@@ -172,8 +176,8 @@ namespace BindTool
                             }
                         }
                     }
-                    else { methodNameAmountDict.Add(methodName, 1); }
 
+                    nameList.Add(methodName);
                     methodNameList.Add(methodName);
 
                     Writer($"public  {variableData.variableType.GetVisitString()} Get{methodName}()", 1);
@@ -192,7 +196,10 @@ namespace BindTool
                 {
                     DataName dataName = addDataMethodList[j];
                     string methodName = CommonTools.NameSettingByName(dataName.dataBindInfo, selectSettion.methodNameSetting);
-                    if (methodNameAmountDict.ContainsKey(methodName))
+                    bool isCantainsDataMethod = methodNameAmountDict.ContainsKey(methodName);
+                    if (isCantainsDataMethod == false) { methodNameAmountDict.Add(methodName, 1); }
+
+                    if (isCantainsDataMethod || nameList.Contains(methodName))
                     {
                         bool isCanName = false;
                         while (isCanName == false)
@@ -210,7 +217,7 @@ namespace BindTool
                                         if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
                                         return false;
                                     });
-                                    if (findNameData == null)
+                                    if (findNameData == null && nameList.Contains(targetName) == false)
                                     {
                                         methodName = targetName;
                                         isCanName = true;
@@ -223,8 +230,8 @@ namespace BindTool
                                     break;
                             }
                     }
-                    else { methodNameAmountDict.Add(methodName, 1); }
 
+                    nameList.Add(methodName);
                     methodNameList.Add(methodName);
 
                     Writer($"public {variableData.variableType.GetVisitString()} Get{methodName}()", 1);
@@ -337,7 +344,10 @@ namespace BindTool
 
                         if (line.Contains(memberInfo.Name))
                         {
-                            if (methodNameAmountDict.ContainsKey(fullName))
+                            bool isCantainsTemplateMethod = methodNameAmountDict.ContainsKey(fullName);
+                            if (isCantainsTemplateMethod == false) { methodNameAmountDict.Add(fullName, 1); }
+
+                            if (isCantainsTemplateMethod || nameList.Contains(fullName))
                             {
                                 bool isCanName = false;
                                 while (isCanName == false)
@@ -355,7 +365,7 @@ namespace BindTool
                                                 if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
                                                 return false;
                                             });
-                                            if (findNameData == null)
+                                            if (findNameData == null && nameList.Contains(targetName) == false)
                                             {
                                                 fullName = targetName;
                                                 isCanName = true;
@@ -368,7 +378,8 @@ namespace BindTool
                                             break;
                                     }
                             }
-                            else { methodNameAmountDict.Add(fullName, 1); }
+
+                            nameList.Add(fullName);
 
                             line = line.Replace(memberInfo.Name, fullName);
                             methodNameList.Add(fullName);
@@ -381,7 +392,11 @@ namespace BindTool
 
             void AddVariable(BaseData baseData, string variableName, string propertyName, TypeString typeString)
             {
-                if (variableNameAmountDict.ContainsKey(variableName))
+                bool isCantainsVariable = variableNameAmountDict.ContainsKey(variableName);
+
+                if (isCantainsVariable == false) { variableNameAmountDict.Add(variableName, 1); }
+
+                if (isCantainsVariable || nameList.Contains(variableName))
                 {
                     bool isCanName = false;
                     while (isCanName == false)
@@ -396,7 +411,7 @@ namespace BindTool
                                     if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
                                     return false;
                                 });
-                                if (findNameData == null)
+                                if (findNameData == null && nameList.Contains(targetName) == false)
                                 {
                                     variableName = targetName;
                                     isCanName = true;
@@ -409,10 +424,11 @@ namespace BindTool
                         }
                     }
                 }
-                else { variableNameAmountDict.Add(variableName, 1); }
+
+                nameList.Add(variableName);
                 baseData.variableName = variableName;
 
-                string content = $"[UnityEngine.SerializeField]{CommonTools.GetVisitString(selectSettion.variableVisitType)} ";
+                string content = $"[UnityBindTool.AutoGenerateFileld][UnityEngine.SerializeField]{CommonTools.GetVisitString(selectSettion.variableVisitType)} ";
 
                 TypeString type = typeString;
                 content += type.GetVisitString();
@@ -421,7 +437,10 @@ namespace BindTool
 
                 if (selectSettion.isAddProperty)
                 {
-                    if (propertyNameAmountDict.ContainsKey(propertyName))
+                    bool isCantainsProperty = propertyNameAmountDict.ContainsKey(propertyName);
+                    if (isCantainsProperty == false) { propertyNameAmountDict.Add(propertyName, 1); }
+
+                    if (isCantainsProperty || nameList.Contains(propertyName))
                     {
                         bool isCanName = false;
                         while (isCanName == false)
@@ -436,7 +455,7 @@ namespace BindTool
                                         if (findData.variableName.Equals(targetName) || findData.propertyName.Equals(targetName)) return true;
                                         return false;
                                     });
-                                    if (findNameData == null)
+                                    if (findNameData == null && nameList.Contains(targetName) == false)
                                     {
                                         propertyName = targetName;
                                         isCanName = true;
@@ -449,8 +468,8 @@ namespace BindTool
                             }
                         }
                     }
-                    else { propertyNameAmountDict.Add(propertyName, 1); }
 
+                    nameList.Add(propertyName);
                     baseData.propertyName = propertyName;
 
                     string propertyContent = $"{CommonTools.GetVisitString(selectSettion.propertyVisitType)} ";

@@ -19,7 +19,8 @@ namespace BindTool
             CommonSettingData commonSettingData = CommonTools.GetCommonSettingData();
 
             string path = Application.dataPath + "/" + commonSettingData.createScriptPath + "/";
-            if (Directory.Exists(path) == false) {
+            if (Directory.Exists(path) == false)
+            {
                 Debug.LogError($"{path} 不是有效路径！");
                 return;
             }
@@ -34,14 +35,16 @@ namespace BindTool
             generateData.isStartBuild = true;
 
             //创建文件夹
-            if (commonSettingData.isCreateScriptFolder) {
+            if (commonSettingData.isCreateScriptFolder)
+            {
                 path += $"{generateData.newScriptName}/";
                 if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
             }
 
             Debug.Log("脚本生成路径：" + path);
             if (commonSettingData.isCustomBind) { ScriptGenerate.CSharpWrite(commonSettingData, generateData, path); }
-            else {
+            else
+            {
                 List<ComponentBindInfo> oldBindDataList = objectInfo.gameObjectBindInfoList;
 
                 objectInfo.gameObjectBindInfoList.Clear();
@@ -50,10 +53,12 @@ namespace BindTool
                 List<ComponentBindInfo> componentBindInfoList = new List<ComponentBindInfo>();
 
                 int amount = gameObjects.Length;
-                for (int i = 0; i < amount; i++) {
+                for (int i = 0; i < amount; i++)
+                {
                     Transform go = gameObjects[i];
                     int componentAmount = new ComponentBindInfo(go.gameObject).typeStrings.Length;
-                    for (int j = 0; j < componentAmount; j++) {
+                    for (int j = 0; j < componentAmount; j++)
+                    {
                         ComponentBindInfo info = new ComponentBindInfo(go.gameObject);
                         info.index = j;
                         componentBindInfoList.Add(info);
@@ -61,7 +66,8 @@ namespace BindTool
                     }
                 }
                 int infoAmount = componentBindInfoList.Count;
-                for (int i = 0; i < infoAmount; i++) {
+                for (int i = 0; i < infoAmount; i++)
+                {
                     ComponentBindInfo info = componentBindInfoList[i];
                     if (objectInfo.gameObjectBindInfoList.Contains(info) == false) objectInfo.gameObjectBindInfoList.Add(info);
                 }
@@ -86,7 +92,8 @@ namespace BindTool
 
             if (generateData == null) return;
             if (generateData.isStartBuild) { generateData.isStartBuild = false; }
-            else {
+            else
+            {
                 AssetDatabase.DeleteAsset(generateDataPath);
                 AssetDatabase.Refresh();
                 return;
@@ -97,13 +104,15 @@ namespace BindTool
             string path = Application.dataPath + "/" + commonSettingData.createPrefabPath;
 
             //检查路径是否有效
-            if (Directory.Exists(path) == false) {
+            if (Directory.Exists(path) == false)
+            {
                 Debug.LogError($"{path} 不是有效路径！");
                 return;
             }
 
             //创建文件夹
-            if (commonSettingData.isCreatePrefabFolder) {
+            if (commonSettingData.isCreatePrefabFolder)
+            {
                 path += $"/{bindObject.name}";
                 if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
             }
@@ -111,9 +120,25 @@ namespace BindTool
             path += $"/{bindObject.name}.prefab";
 
             BindComponents bindComponents = bindObject.GetComponent<BindComponents>();
+            bindComponents.bindComponentList.Clear();
+            int componentAmount = generateData.objectInfo.gameObjectBindInfoList.Count;
+            for (int i = 0; i < componentAmount; i++)
+            {
+                ComponentBindInfo componentBindInfo = generateData.objectInfo.gameObjectBindInfoList[i];
+                bindComponents.bindComponentList.Add(componentBindInfo.GetValue());
+            }
+
+            int dataAmount = generateData.objectInfo.dataBindInfoList.Count;
+            for (int i = 0; i < dataAmount; i++)
+            {
+                DataBindInfo dataBindInfo = generateData.objectInfo.dataBindInfoList[i];
+                bindComponents.bindComponentList.Add(dataBindInfo.bindObject);
+            }
+
             Type addType = generateData.objectInfo.typeString.ToType();
             Component component = null;
-            if (addType != null) {
+            if (addType != null)
+            {
                 component = generateData.bindObject.GetComponent(addType);
                 if (component == null) component = generateData.bindObject.AddComponent(addType);
                 bindComponents.bindRoot = component;
@@ -123,9 +148,10 @@ namespace BindTool
             }
             else { Debug.Log("添加类型为空"); }
 
-
-            if (commonSettingData.isCreatePrefab) {
+            if (commonSettingData.isCreatePrefab)
+            {
                 //创建预制体
+                path = path.Substring(path.IndexOf("Assets", StringComparison.Ordinal));
                 PrefabUtility.SaveAsPrefabAssetAndConnect(bindObject, path, InteractionMode.AutomatedAction);
                 Debug.Log("Create Prefab Finish.");
             }
