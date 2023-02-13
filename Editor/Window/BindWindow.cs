@@ -24,6 +24,7 @@ namespace BindTool
         private GUIStyle buttonGUIStyle;
         private GUIStyle settingStyle;
         private GUIStyle commonTitleStyle;
+        private GUIStyle tabIndexStyle;
 
         private int index;
         private bool isSavaSetting;
@@ -46,7 +47,7 @@ namespace BindTool
             errorList = new List<string>();
             _bindWindow.bindObject = Selection.objects.First() as GameObject;
 
-            commonSettingData = CommonTools.GetCommonSettingData(); 
+            commonSettingData = CommonTools.GetCommonSettingData();
 
             if (commonSettingData.scriptSettingList.Contains(commonSettingData.selectScriptSetting) == false) commonSettingData.scriptSettingList.Add(commonSettingData.selectScriptSetting);
             if (commonSettingData.autoBindSettingList.Contains(commonSettingData.selectAutoBindSetting) == false) commonSettingData.autoBindSettingList.Add(commonSettingData.selectAutoBindSetting);
@@ -90,6 +91,11 @@ namespace BindTool
             commonTitleStyle.normal.textColor = Color.white;
             commonTitleStyle.fontStyle = FontStyle.Bold;
             commonTitleStyle.fontSize = 14;
+
+            tabIndexStyle = new GUIStyle();
+            tabIndexStyle.normal.textColor = Color.white;
+            tabIndexStyle.fontSize = 14;
+            tabIndexStyle.alignment = TextAnchor.MiddleRight;
 
             isSavaSetting = true;
         }

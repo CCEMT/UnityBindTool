@@ -20,13 +20,15 @@ namespace BindTool
             bindComponents.bindComponentList.Clear();
 
             int componentAmount = generateData.objectInfo.gameObjectBindInfoList.Count;
-            for (int i = 0; i < componentAmount; i++) {
+            for (int i = 0; i < componentAmount; i++)
+            {
                 ComponentBindInfo componentBindInfo = generateData.objectInfo.gameObjectBindInfoList[i];
                 bindComponents.bindComponentList.Add(componentBindInfo.GetValue());
             }
 
             int dataAmount = generateData.objectInfo.dataBindInfoList.Count;
-            for (int i = 0; i < dataAmount; i++) {
+            for (int i = 0; i < dataAmount; i++)
+            {
                 DataBindInfo dataBindInfo = generateData.objectInfo.dataBindInfoList[i];
                 bindComponents.bindComponentList.Add(dataBindInfo.bindObject);
             }
@@ -42,14 +44,18 @@ namespace BindTool
             ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
             AddBindComponents(generateData);
 
-            if (selectSettion.isGenerateNew) {
+            if (selectSettion.isGenerateNew)
+            {
                 string scriptFile = scriptPath + $"{generateData.newScriptName}.cs";
 
-                if (selectSettion.isGeneratePartial) {
+                if (selectSettion.isGeneratePartial)
+                {
                     //创建空的主文件
-                    if (File.Exists(scriptFile) == false) {
+                    if (File.Exists(scriptFile) == false)
+                    {
                         bool isExist = TypeString.IsExist(generateData.newScriptName, selectSettion.useNamespace, ConstData.DefaultAssembly);
-                        if (isExist) {
+                        if (isExist)
+                        {
                             Debug.LogError("ScriptGenerateError:已经存在该脚本");
                             generateData.isStartBuild = false;
                             return;
@@ -58,14 +64,17 @@ namespace BindTool
                         //创建
                         GenerateCSharpScript(commonSettingData, generateData, scriptFile, generateData.newScriptName, false, true);
                     }
-                    else {
+                    else
+                    {
                         //检查是否包含Partial关键字
                         string content = File.ReadAllText(scriptFile);
                         string filtration = content.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "");
-                        if (filtration.Contains($"partialclass{generateData.addTypeString.typeName}") == false) {
+                        if (filtration.Contains($"partialclass{generateData.addTypeString.typeName}") == false)
+                        {
                             int index = content.IndexOf(generateData.addTypeString.typeName, StringComparison.Ordinal);
                             string interval = string.Empty;
-                            for (int i = index - 1; i >= 0; i--) {
+                            for (int i = index - 1; i >= 0; i--)
+                            {
                                 if (content[i].Equals('s')) { break; }
                                 else { interval += content[i].ToString(); }
                             }
@@ -78,17 +87,21 @@ namespace BindTool
 
                     string scriptPartialFile = scriptPath + $"{generateData.newScriptName}.{selectSettion.partialName}.cs";
                     //创建Partial并写入数据
-                    if (File.Exists(scriptPartialFile)) {
+                    if (File.Exists(scriptPartialFile))
+                    {
                         if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData, generateData);
                         File.Delete(scriptPartialFile);
                     }
                     GenerateCSharpScript(commonSettingData, generateData, scriptPartialFile, generateData.newScriptName, true, true);
                 }
-                else {
+                else
+                {
                     //创建文件并写入数据
-                    if (File.Exists(scriptFile) == false) {
+                    if (File.Exists(scriptFile) == false)
+                    {
                         bool isExist = TypeString.IsExist(generateData.newScriptName, selectSettion.useNamespace, ConstData.DefaultAssembly);
-                        if (isExist) {
+                        if (isExist)
+                        {
                             Debug.LogError("ScriptGenerateError:已经存在该脚本");
                             generateData.isStartBuild = false;
                             return;
@@ -96,26 +109,31 @@ namespace BindTool
 
                         GenerateCSharpScript(commonSettingData, generateData, scriptFile, generateData.newScriptName, true, false);
                     }
-                    else {
+                    else
+                    {
                         //打开文件并更改数据
                         if (selectSettion.isSavaOldScript) SavaOldScript(scriptFile, commonSettingData, generateData);
                         OpenCSharpFileAlterData(commonSettingData, generateData, scriptFile);
                     }
                 }
             }
-            else {
-                if (selectSettion.isGeneratePartial) {
+            else
+            {
+                if (selectSettion.isGeneratePartial)
+                {
                     string scriptPartialFile = scriptPath + $"{generateData.newScriptName}.{selectSettion.partialName}.cs";
                     //检查是否包含Partial关键字
                     //创建Partial并写入数据
 
-                    if (File.Exists(scriptPartialFile)) {
+                    if (File.Exists(scriptPartialFile))
+                    {
                         if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData, generateData);
                         File.Delete(scriptPartialFile);
                     }
                     GenerateCSharpScript(commonSettingData, generateData, scriptPartialFile, generateData.objectInfo.typeString.typeName, true, true);
                 }
-                else {
+                else
+                {
                     string scriptPartialFile = scriptPath + $"{generateData.newScriptName}.cs";
                     //打开文件并更改数据
                     if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData, generateData);
@@ -139,48 +157,63 @@ namespace BindTool
             int endLine = -1;
 
             int lineAmount = contents.Count;
-            for (int i = 0; i < lineAmount; i++) {
+            for (int i = 0; i < lineAmount; i++)
+            {
                 string line = contents[i];
-                if (startLine == -1) {
+                if (startLine == -1)
+                {
                     if (line.Contains($"#region {ConstData.DefaultName}")) startLine = i;
                 }
-                else {
+                else
+                {
                     if (line.Contains("#region Method")) endLine = -2;
 
-                    if (endLine == -2) {
+                    if (endLine == -2)
+                    {
                         if (line.Contains("#endregion")) endLine = -1;
                     }
-                    else if (endLine == -1) {
+                    else if (endLine == -1)
+                    {
                         if (line.Contains("#endregion")) endLine = i;
                     }
                     else { break; }
                 }
             }
-            if (startLine == -1 || endLine == -1) {
+            if (startLine == -1 || endLine == -1)
+            {
                 //未找到数据
                 startLine = -1;
                 int classLine = -1;
-                for (int i = 0; i < lineAmount; i++) {
+                for (int i = 0; i < lineAmount; i++)
+                {
                     string line = contents[i];
-                    if (classLine == -1) {
-                        if (line.Contains(generateData.addTypeString.typeName)) {
+                    if (classLine == -1)
+                    {
+                        if (line.Contains(generateData.addTypeString.typeName))
+                        {
                             classLine = i;
                             int index = line.IndexOf(generateData.addTypeString.typeName, StringComparison.Ordinal);
                             index += generateData.addTypeString.typeName.Length;
                             int lineLength = line.Length;
-                            for (int j = index; j < lineLength; j++) {
-                                if (line[j] == '{') {
+                            for (int j = index; j < lineLength; j++)
+                            {
+                                if (line[j] == '{')
+                                {
                                     startLine = i + 1;
                                     break;
                                 }
                             }
                         }
                     }
-                    else {
-                        if (startLine == -1) {
+                    else
+                    {
+                        if (startLine == -1)
+                        {
                             int lineLength = line.Length;
-                            for (int j = 0; j < lineLength; j++) {
-                                if (line[j] == '{') {
+                            for (int j = 0; j < lineLength; j++)
+                            {
+                                if (line[j] == '{')
+                                {
                                     startLine = i + 1;
                                     break;
                                 }
@@ -189,12 +222,14 @@ namespace BindTool
                         else { break; }
                     }
                 }
-                if (startLine == -1) {
+                if (startLine == -1)
+                {
                     Debug.Log("文件格式错误");
                     return;
                 }
             }
-            else {
+            else
+            {
                 //删除数据
                 int deleteAmount = endLine - startLine;
                 for (int i = 0; i < deleteAmount + 1; i++) contents.RemoveAt(startLine);
@@ -238,16 +273,19 @@ namespace BindTool
 
             List<string> nameList = new List<string>();
             int amount = files.Length;
-            for (int i = 0; i < amount; i++) {
+            for (int i = 0; i < amount; i++)
+            {
                 if (files[i].Name.EndsWith(".meta")) continue;
                 nameList.Add(files[i].Name);
             }
 
             bool isCan = false;
             int number = 1;
-            while (isCan == false) {
+            while (isCan == false)
+            {
                 string tempName = generateData.addTypeString.typeName + number + ".txt";
-                if (nameList.Contains(tempName) == false) {
+                if (nameList.Contains(tempName) == false)
+                {
                     isCan = true;
                     fileName = tempName;
                 }
@@ -270,7 +308,8 @@ namespace BindTool
 
             StreamWriter mainWriter = File.CreateText(path);
 
-            if (selectSettion.isSpecifyNamespace) {
+            if (selectSettion.isSpecifyNamespace)
+            {
                 Writer($"namespace {selectSettion.useNamespace}");
                 Writer("{");
             }
@@ -282,10 +321,12 @@ namespace BindTool
             Writer($"public {partialString} class {className} : {inheritContent}", 0);
             Writer("{", 0);
 
-            if (isGenerateData) {
+            if (isGenerateData)
+            {
                 List<string> addList = GenerateCSharpData.Generate(commonSettingData, generateData, selectSettion.isSpecifyNamespace);
                 int addAmount = addList.Count;
-                for (int i = 0; i < addAmount; i++) {
+                for (int i = 0; i < addAmount; i++)
+                {
                     string addline = addList[i];
                     mainWriter.WriteLine(addline);
                 }
@@ -314,7 +355,7 @@ namespace BindTool
         public static TypeString GenerateCSharpTemplateScript(TypeString targetType, string path)
         {
             string fullPath = $"{Application.dataPath}/{path}/{targetType.typeName}Template.cs";
-
+            if (Directory.Exists($"{Application.dataPath}/{path}")) { Debug.Log("模板脚本路径错误，请检查设置Setting-ScriptSetting-MethodGenerate-模板脚本保存路径"); }
             StreamWriter mainWriter = File.CreateText(fullPath);
 
             Writer("///该脚本为模板方法");
@@ -326,7 +367,7 @@ namespace BindTool
             Writer("{");
 
             string inheritContent = "UnityEngine.MonoBehaviour";
-            Writer("[BindTool.ScriptTemplate]");
+            Writer("[BindTool.ScriptTemplate]", 1);
             Writer($"public class {targetType.typeName}Template : {inheritContent}", 1);
             Writer("{", 1);
 
@@ -376,7 +417,8 @@ namespace BindTool
             addLine.Add($"///需要生成的方法写入#region {ConstData.TemplateRegionName}");
             addLine.Add("///生成方法使用到的类型必须为[命名空间].[类型名]，如果使用using引用命名空间生成时可能会生成失败");
 
-            for (int i = 0; i < lineAmount; i++) {
+            for (int i = 0; i < lineAmount; i++)
+            {
                 string line = contents[i];
                 if (line.Contains("using")) { addLine.Add(line); }
                 else if (line.Contains("namespace")) break;
@@ -395,16 +437,21 @@ namespace BindTool
             int startLine = -1;
             int endLine = -1;
 
-            for (int i = 0; i < lineAmount; i++) {
+            for (int i = 0; i < lineAmount; i++)
+            {
                 string line = contents[i];
-                if (startLine == -1) {
-                    if (line.Contains($"#region {ConstData.TemplateRegionName}")) {
+                if (startLine == -1)
+                {
+                    if (line.Contains($"#region {ConstData.TemplateRegionName}"))
+                    {
                         startLine = i;
                         addLine.Add(line);
                     }
                 }
-                else {
-                    if (endLine == -1) {
+                else
+                {
+                    if (endLine == -1)
+                    {
                         addLine.Add(line);
                         if (line.Contains("#endregion")) endLine = i;
                     }

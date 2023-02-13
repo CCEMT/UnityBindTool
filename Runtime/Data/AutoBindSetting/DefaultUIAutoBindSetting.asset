@@ -100,12 +100,6 @@ MonoBehaviour:
   isBindComponent: 1
   isBindAllComponent: 0
   streamingBindDataList:
-  - sequence: 0
-    isElse: 0
-    typeString:
-      typeName: RectTransform
-      typeNameSpace: UnityEngine
-      assemblyName: UnityEngine.CoreModule
   - sequence: 1
     isElse: 0
     typeString:
@@ -124,3 +118,9 @@ MonoBehaviour:
       typeName: Button
       typeNameSpace: UnityEngine.UI
       assemblyName: UnityEngine.UI
+  - sequence: 0
+    isElse: 0
+    typeString:
+      typeName: RectTransform
+      typeNameSpace: UnityEngine
+      assemblyName: UnityEngine.CoreModule

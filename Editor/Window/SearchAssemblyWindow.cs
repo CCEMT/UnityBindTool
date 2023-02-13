@@ -59,36 +59,43 @@ public class SearchAssemblyWindow : EditorWindow
     void WindownShow()
     {
         GUILayout.BeginVertical("box");
-        GUILayout.Label("Select Type：");
-        GUI.SetNextControlName("Input");
-        string tempString = GUILayout.TextField(inputString, "SearchTextField");
-        if (tempString.Equals(inputString) == false) {
-            inputString = tempString;
-            GetSelectList();
+        {
+            GUILayout.Label("Select Type：");
+            GUI.SetNextControlName("Input");
+            string tempString = GUILayout.TextField(inputString, "SearchTextField");
+            if (tempString.Equals(inputString) == false)
+            {
+                inputString = tempString;
+                GetSelectList();
+            }
+            GUI.FocusControl("Input");
         }
-        GUI.FocusControl("Input");
         GUILayout.EndHorizontal();
 
         float height = 525f;
 
         GUILayout.BeginVertical("box");
-        typeSelectScrollPosition1 = EditorGUILayout.BeginScrollView(typeSelectScrollPosition1, false, false, GUILayout.ExpandWidth(true), GUILayout.Height(height));
+        {
+            typeSelectScrollPosition1 = EditorGUILayout.BeginScrollView(typeSelectScrollPosition1, false, false, GUILayout.ExpandWidth(true), GUILayout.Height(height));
 
-        for (int i = 0; i < selectAmount; i++) {
-            if (selectIndex == i) GUI.color = Color.green;
-            GUILayout.BeginVertical("box");
-
-            Assembly assembly = selectList[i];
-            if (GUILayout.Button($"{assembly.GetName().Name}", GUILayout.Width(457.5f))) {
-                Close();
-                callBack?.Invoke(true, assembly.GetName().Name);
+            for (int i = 0; i < selectAmount; i++)
+            {
+                if (selectIndex == i) GUI.color = Color.green;
+                GUILayout.BeginVertical("box");
+                {
+                    Assembly assembly = selectList[i];
+                    if (GUILayout.Button($"{assembly.GetName().Name}", GUILayout.Width(457.5f)))
+                    {
+                        Close();
+                        callBack?.Invoke(true, assembly.GetName().Name);
+                    }
+                }
+                GUILayout.EndHorizontal();
+                GUI.color = Color.white;
             }
 
-            GUILayout.EndHorizontal();
-            GUI.color = Color.white;
+            EditorGUILayout.EndScrollView();
         }
-
-        EditorGUILayout.EndScrollView();
         GUILayout.EndHorizontal();
     }
 

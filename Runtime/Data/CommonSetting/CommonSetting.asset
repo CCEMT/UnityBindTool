@@ -15,7 +15,7 @@ MonoBehaviour:
   isCreateScriptFolder: 1
   createScriptPath: Script
   isCustomBind: 1
-  newScriptName: Text
+  newScriptName: TestPanel
   addTypeString:
     typeName: Text
     typeNameSpace: UnityEngine.UI

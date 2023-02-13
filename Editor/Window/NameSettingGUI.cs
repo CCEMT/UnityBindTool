@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -9,86 +10,90 @@ namespace BindTool
     public partial class BindWindow
     {
         private string nameCreateInput = "";
-        private Vector2 nameCreateScrollPosition;
 
         private int nameReqlaceAmount;
         private List<NameReplaceData> selectNameReplaceDataList;
         private int selectNameReqlaceAmount;
+
+        private const int NameReqlaceShowAmount = 5;
+        private int nameReqlaceListMaxIndex;
+        private int nameReqlaceListIndex = 0;
 
         public void DrawNameSettingGUI()
         {
             GUILayout.Label("NameSetting", settingStyle);
 
             GUILayout.BeginVertical("box");
-
-            EditorGUILayout.BeginHorizontal();
-
-            if (GUILayout.Button(commonSettingData.selectCreateNameSetting.programName))
             {
-                GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
-
-                int amount = commonSettingData.createNameSettingList.Count;
-                for (int i = 0; i < amount; i++)
+                EditorGUILayout.BeginHorizontal();
                 {
-                    int scriptIndex = i;
-                    menu.AddItem(new GUIContent(commonSettingData.createNameSettingList[i].programName), false,
-                        () => {
-                            commonSettingData.selectCreateNameSetting = commonSettingData.createNameSettingList[scriptIndex];
-                            isSavaSetting = true;
-                        });
-                }
-                menu.ShowAsContext();
-            }
-
-            GUI.color = Color.green;
-            if (GUILayout.Button("新建", GUILayout.Width(100)))
-            {
-                string targetPath = EditorUtility.OpenFolderPanel("选择NameSetting保存路径", Application.dataPath, null);
-                if (string.IsNullOrEmpty(targetPath) == false)
-                {
-                    targetPath = targetPath.Substring(Application.dataPath.Length + 1, targetPath.Length - Application.dataPath.Length - 1);
-                    string path = "Assets/" + targetPath;
-                    ScriptSetting scriptSetting = CreateInstance<ScriptSetting>();
-                    commonSettingData.selectScriptSetting = scriptSetting;
-                    commonSettingData.scriptSettingList.Add(scriptSetting);
-
-                    CreateNameSetting createNameSetting = CreateInstance<CreateNameSetting>();
-                    commonSettingData.selectCreateNameSetting = createNameSetting;
-                    commonSettingData.createNameSettingList.Add(createNameSetting);
-                    createNameSetting.programName = ConstData.DefaultCreateNameSettingName;
-
-                    int number = 1;
-                    string assteName = "CreateNameSetting";
-                    string fullPath = path + $"/{assteName}.asset";
-                    while (File.Exists(fullPath))
+                    if (GUILayout.Button(commonSettingData.selectCreateNameSetting.programName))
                     {
-                        assteName = "CreateNameSetting" + number;
-                        fullPath = path + $"/{assteName}.asset";
-                        number++;
+                        GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
+
+                        int amount = commonSettingData.createNameSettingList.Count;
+                        for (int i = 0; i < amount; i++)
+                        {
+                            int scriptIndex = i;
+                            menu.AddItem(new GUIContent(commonSettingData.createNameSettingList[i].programName), false,
+                                () => {
+                                    commonSettingData.selectCreateNameSetting = commonSettingData.createNameSettingList[scriptIndex];
+                                    isSavaSetting = true;
+                                });
+                        }
+                        menu.ShowAsContext();
                     }
-                    scriptSetting.programName = assteName;
 
-                    AssetDatabase.CreateAsset(scriptSetting, fullPath);
+                    GUI.color = Color.green;
+                    if (GUILayout.Button("新建", GUILayout.Width(100)))
+                    {
+                        string targetPath = EditorUtility.OpenFolderPanel("选择NameSetting保存路径", Application.dataPath, null);
+                        if (string.IsNullOrEmpty(targetPath) == false)
+                        {
+                            targetPath = targetPath.Substring(Application.dataPath.Length + 1, targetPath.Length - Application.dataPath.Length - 1);
+                            string path = "Assets/" + targetPath;
+                            ScriptSetting scriptSetting = CreateInstance<ScriptSetting>();
+                            commonSettingData.selectScriptSetting = scriptSetting;
+                            commonSettingData.scriptSettingList.Add(scriptSetting);
 
-                    isSavaSetting = true;
+                            CreateNameSetting createNameSetting = CreateInstance<CreateNameSetting>();
+                            commonSettingData.selectCreateNameSetting = createNameSetting;
+                            commonSettingData.createNameSettingList.Add(createNameSetting);
+                            createNameSetting.programName = ConstData.DefaultCreateNameSettingName;
+
+                            int number = 1;
+                            string assteName = "CreateNameSetting";
+                            string fullPath = path + $"/{assteName}.asset";
+                            while (File.Exists(fullPath))
+                            {
+                                assteName = "CreateNameSetting" + number;
+                                fullPath = path + $"/{assteName}.asset";
+                                number++;
+                            }
+                            scriptSetting.programName = assteName;
+
+                            AssetDatabase.CreateAsset(scriptSetting, fullPath);
+
+                            isSavaSetting = true;
+                        }
+                    }
+                    GUI.color = Color.red;
+                    if (GUILayout.Button("删除", GUILayout.Width(100)))
+                    {
+                        if (commonSettingData.createNameSettingList.Count > 1)
+                        {
+                            commonSettingData.createNameSettingList.Remove(commonSettingData.selectCreateNameSetting);
+                            AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(commonSettingData.selectCreateNameSetting));
+                            commonSettingData.selectCreateNameSetting = commonSettingData.createNameSettingList.First();
+                            isSavaSetting = true;
+                        }
+                    }
+
+                    GUI.color = Color.white;
                 }
+                EditorGUILayout.EndHorizontal();
             }
-            GUI.color = Color.red;
-            if (GUILayout.Button("删除", GUILayout.Width(100)))
-            {
-                if (commonSettingData.createNameSettingList.Count > 1)
-                {
-                    commonSettingData.createNameSettingList.Remove(commonSettingData.selectCreateNameSetting);
-                    AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(commonSettingData.selectCreateNameSetting));
-                    commonSettingData.selectCreateNameSetting = commonSettingData.createNameSettingList.First();
-                    isSavaSetting = true;
-                }
-            }
-
-            GUI.color = Color.white;
-
-            EditorGUILayout.EndHorizontal();
-            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
 
             CreateNameList();
         }
@@ -96,113 +101,155 @@ namespace BindTool
         void CreateNameList()
         {
             GUILayout.BeginVertical("box");
-
-            CreateNameSetting selectSetting = commonSettingData.selectCreateNameSetting;
-            if (nameReqlaceAmount != selectSetting.nameReplaceDataList.Count)
             {
-                nameReqlaceAmount = selectSetting.nameReplaceDataList.Count;
-                GetSelectCreateNameList();
-            }
-
-            bool tempIsGenerateName = GUILayout.Toggle(selectSetting.isBindAutoGenerateName, "绑定时是否自动生成名称");
-            if (tempIsGenerateName != selectSetting.isBindAutoGenerateName)
-            {
-                selectSetting.isBindAutoGenerateName = tempIsGenerateName;
-                isSavaSetting = true;
-            }
-
-            EditorGUI.BeginDisabledGroup(selectSetting.isBindAutoGenerateName == false);
-
-            string tempString = GUILayout.TextField(nameCreateInput, "SearchTextField");
-            if (tempString.Equals(nameCreateInput) == false)
-            {
-                nameCreateInput = tempString;
-                GetSelectCreateNameList();
-            }
-
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("名称替换列表");
-            if (GUILayout.Button("添加"))
-            {
-                selectSetting.nameReplaceDataList.Add(new NameReplaceData());
-                isSavaSetting = true;
-            }
-            EditorGUILayout.EndHorizontal();
-
-            GUILayout.BeginVertical("box");
-            nameCreateScrollPosition = EditorGUILayout.BeginScrollView(nameCreateScrollPosition, false, false, GUILayout.ExpandWidth(true), GUILayout.Height(300));
-
-            for (int i = 0; i < selectNameReqlaceAmount; i++)
-            {
-                GUILayout.BeginVertical("frameBox");
-                EditorGUILayout.BeginHorizontal();
-
-                NameReplaceData nameReplaceData = selectNameReplaceDataList[i];
-
-                EditorGUILayout.BeginVertical();
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label("检查名称");
-                string tempCheckName = GUILayout.TextField(nameReplaceData.nameCheck.name, GUILayout.MinWidth(50));
-                if (tempCheckName != nameReplaceData.nameCheck.name)
+                CreateNameSetting selectSetting = commonSettingData.selectCreateNameSetting;
+                if (nameReqlaceAmount != selectSetting.nameReplaceDataList.Count)
                 {
-                    nameReplaceData.nameCheck.name = tempCheckName;
+                    nameReqlaceAmount = selectSetting.nameReplaceDataList.Count;
+                    GetSelectCreateNameList();
+                }
+
+                bool tempIsGenerateName = GUILayout.Toggle(selectSetting.isBindAutoGenerateName, "绑定时是否自动生成名称");
+                if (tempIsGenerateName != selectSetting.isBindAutoGenerateName)
+                {
+                    selectSetting.isBindAutoGenerateName = tempIsGenerateName;
                     isSavaSetting = true;
                 }
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label("替换名称");
-                string tempTargetName = GUILayout.TextField(nameReplaceData.targetName, GUILayout.MinWidth(50));
-                if (tempTargetName != nameReplaceData.targetName)
-                {
-                    nameReplaceData.targetName = tempTargetName;
-                    isSavaSetting = true;
-                }
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.EndVertical();
 
-                EditorGUILayout.BeginVertical();
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label("区分大小写");
-                bool tempIsCaseSensitive = GUILayout.Toggle(nameReplaceData.nameCheck.nameRule.isCaseSensitive, "");
-                if (tempIsCaseSensitive != nameReplaceData.nameCheck.nameRule.isCaseSensitive)
+                EditorGUI.BeginDisabledGroup(selectSetting.isBindAutoGenerateName == false);
                 {
-                    nameReplaceData.nameCheck.nameRule.isCaseSensitive = tempIsCaseSensitive;
-                    isSavaSetting = true;
-                }
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label("匹配规则");
-                NameMatchingRule tempnNameMatchingRule = (NameMatchingRule) EditorGUILayout.EnumPopup(nameReplaceData.nameCheck.nameRule.nameMatchingRule, GUILayout.Width(100));
-                if (tempnNameMatchingRule != nameReplaceData.nameCheck.nameRule.nameMatchingRule)
-                {
-                    nameReplaceData.nameCheck.nameRule.nameMatchingRule = tempnNameMatchingRule;
-                    isSavaSetting = true;
-                }
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.EndVertical();
+                    string tempString = GUILayout.TextField(nameCreateInput, "SearchTextField");
+                    if (tempString.Equals(nameCreateInput) == false)
+                    {
+                        nameCreateInput = tempString;
+                        GetSelectCreateNameList();
+                    }
 
-                EditorGUILayout.BeginVertical();
-                if (GUILayout.Button("操作", GUILayout.Width(50))) { }
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        GUILayout.Label("名称替换列表");
+                        if (GUILayout.Button("添加"))
+                        {
+                            selectSetting.nameReplaceDataList.Add(new NameReplaceData());
+                            isSavaSetting = true;
+                        }
+                    }
+                    EditorGUILayout.EndHorizontal();
 
-                GUI.color = Color.red;
-                if (GUILayout.Button("删除", GUILayout.Width(50)))
-                {
-                    selectSetting.nameReplaceDataList.Remove(nameReplaceData);
-                    isSavaSetting = true;
+                    if (this.selectNameReqlaceAmount > 0)
+                    {
+                        GUILayout.BeginVertical("box", GUILayout.Height(275f));
+                        {
+                            for (int i = 0; i < NameReqlaceShowAmount; i++)
+                            {
+                                int showIndex = (this.nameReqlaceListIndex - 1) * NameReqlaceShowAmount + i;
+                                if (showIndex >= selectNameReqlaceAmount) { break; }
+                                GUILayout.BeginVertical("frameBox");
+                                {
+                                    EditorGUILayout.BeginHorizontal();
+                                    {
+                                        NameReplaceData nameReplaceData = selectNameReplaceDataList[showIndex];
+
+                                        EditorGUILayout.BeginVertical();
+                                        {
+                                            EditorGUILayout.BeginHorizontal();
+                                            {
+                                                GUILayout.Label("检查名称");
+                                                string tempCheckName = GUILayout.TextField(nameReplaceData.nameCheck.name, GUILayout.MinWidth(50));
+                                                if (tempCheckName != nameReplaceData.nameCheck.name)
+                                                {
+                                                    nameReplaceData.nameCheck.name = tempCheckName;
+                                                    isSavaSetting = true;
+                                                }
+                                            }
+                                            EditorGUILayout.EndHorizontal();
+
+                                            EditorGUILayout.BeginHorizontal();
+                                            {
+                                                GUILayout.Label("替换名称");
+                                                string tempTargetName = GUILayout.TextField(nameReplaceData.targetName, GUILayout.MinWidth(50));
+                                                if (tempTargetName != nameReplaceData.targetName)
+                                                {
+                                                    nameReplaceData.targetName = tempTargetName;
+                                                    isSavaSetting = true;
+                                                }
+                                            }
+                                            EditorGUILayout.EndHorizontal();
+                                        }
+                                        EditorGUILayout.EndVertical();
+
+                                        EditorGUILayout.BeginVertical();
+                                        {
+                                            EditorGUILayout.BeginHorizontal();
+                                            {
+                                                GUILayout.Label("区分大小写");
+                                                bool tempIsCaseSensitive = GUILayout.Toggle(nameReplaceData.nameCheck.nameRule.isCaseSensitive, "");
+                                                if (tempIsCaseSensitive != nameReplaceData.nameCheck.nameRule.isCaseSensitive)
+                                                {
+                                                    nameReplaceData.nameCheck.nameRule.isCaseSensitive = tempIsCaseSensitive;
+                                                    isSavaSetting = true;
+                                                }
+                                            }
+                                            EditorGUILayout.EndHorizontal();
+
+                                            EditorGUILayout.BeginHorizontal();
+                                            {
+                                                GUILayout.Label("匹配规则");
+                                                NameMatchingRule tempnNameMatchingRule =
+                                                    (NameMatchingRule) EditorGUILayout.EnumPopup(nameReplaceData.nameCheck.nameRule.nameMatchingRule, GUILayout.Width(100));
+                                                if (tempnNameMatchingRule != nameReplaceData.nameCheck.nameRule.nameMatchingRule)
+                                                {
+                                                    nameReplaceData.nameCheck.nameRule.nameMatchingRule = tempnNameMatchingRule;
+                                                    isSavaSetting = true;
+                                                }
+                                            }
+                                            EditorGUILayout.EndHorizontal();
+                                        }
+                                        EditorGUILayout.EndVertical();
+
+                                        EditorGUILayout.BeginVertical();
+                                        {
+                                            if (GUILayout.Button("操作", GUILayout.Width(50))) { }
+
+                                            GUI.color = Color.red;
+                                            if (GUILayout.Button("删除", GUILayout.Width(50)))
+                                            {
+                                                selectSetting.nameReplaceDataList.Remove(nameReplaceData);
+                                                isSavaSetting = true;
+                                            }
+                                            GUI.color = Color.white;
+                                        }
+                                        EditorGUILayout.EndVertical();
+                                    }
+                                    EditorGUILayout.EndHorizontal();
+                                }
+                                GUILayout.EndHorizontal();
+                            }
+                        }
+                        GUILayout.EndVertical();
+
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Label($"{this.nameReqlaceListIndex}/{this.nameReqlaceListMaxIndex}", tabIndexStyle);
+                            GUILayout.Space(10);
+                            if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationLeft", GUILayout.Width(30), GUILayout.Height(20)))
+                            {
+                                nameReqlaceListIndex--;
+                                this.nameReqlaceListIndex = Mathf.Clamp(nameReqlaceListIndex, 1, this.nameReqlaceListMaxIndex);
+                            }
+                            if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationRight", GUILayout.Width(30), GUILayout.Height(20)))
+                            {
+                                nameReqlaceListIndex++;
+                                this.nameReqlaceListIndex = Mathf.Clamp(nameReqlaceListIndex, 1, this.nameReqlaceListMaxIndex);
+                            }
+                        }
+                        GUILayout.EndHorizontal();
+                    }
+
                 }
-                GUI.color = Color.white;
-                EditorGUILayout.EndVertical();
-
-                EditorGUILayout.EndHorizontal();
-                GUILayout.EndHorizontal();
+                EditorGUI.EndDisabledGroup();
             }
-
-            EditorGUILayout.EndScrollView();
-            GUILayout.EndHorizontal();
-
-            EditorGUI.EndDisabledGroup();
-
-            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
         }
 
         void GetSelectCreateNameList()
@@ -220,6 +267,9 @@ namespace BindTool
             }
 
             selectNameReqlaceAmount = selectNameReplaceDataList.Count;
+
+            this.nameReqlaceListMaxIndex = (int) Math.Ceiling(this.selectNameReqlaceAmount / (double) NameReqlaceShowAmount);
+            this.nameReqlaceListIndex = Mathf.Clamp(nameReqlaceListIndex, 1, this.nameReqlaceListMaxIndex);
         }
     }
 }
