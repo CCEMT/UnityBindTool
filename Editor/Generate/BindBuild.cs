@@ -151,7 +151,7 @@ namespace BindTool
             if (commonSettingData.isCreatePrefab)
             {
                 //创建预制体
-                path = path.Substring(path.IndexOf("Assets", StringComparison.Ordinal));
+                if (File.Exists(path)) { path = path.Substring(path.IndexOf("Assets", StringComparison.Ordinal)); }
                 PrefabUtility.SaveAsPrefabAssetAndConnect(bindObject, path, InteractionMode.AutomatedAction);
                 Debug.Log("Create Prefab Finish.");
             }
