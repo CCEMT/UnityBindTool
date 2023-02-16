@@ -5,8 +5,11 @@ using UnityEngine;
 
 #endregion
 
-public class BindComponents : MonoBehaviour
+namespace BindTool
 {
-    public Object bindRoot;
-    public List<UnityEngine.Object> bindComponentList = new List<UnityEngine.Object>();
+    public class BindComponents : MonoBehaviour
+    {
+        public Object bindRoot;
+        public List<Object> bindComponentList = new List<Object>();
+    }
 }

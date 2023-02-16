@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using UnityBindTool;
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
