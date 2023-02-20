@@ -428,7 +428,7 @@ namespace BindTool
                 nameList.Add(variableName);
                 baseData.variableName = variableName;
 
-                string content = $"[UnityBindTool.AutoGenerateFileld][UnityEngine.SerializeField]{CommonTools.GetVisitString(selectSettion.variableVisitType)} ";
+                string content = $"[BindTool.AutoGenerateFileld][UnityEngine.SerializeField]{CommonTools.GetVisitString(selectSettion.variableVisitType)} ";
 
                 TypeString type = typeString;
                 content += type.GetVisitString();
