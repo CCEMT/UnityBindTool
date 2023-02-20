@@ -24,9 +24,11 @@ namespace BindTool
 
         public bool GameObjectEquals(object obj)
         {
-            if (obj != null) {
+            if (obj != null)
+            {
                 GameObject targetObject = obj as GameObject;
-                if (targetObject != null) {
+                if (targetObject != null)
+                {
                     if (targetObject == instanceObject) { return true; }
                     else if (targetObject == prefabObject) return true;
                 }
@@ -49,7 +51,8 @@ namespace BindTool
 
         public override int GetHashCode()
         {
-            unchecked {
+            unchecked
+            {
                 int hashCode = name != null ? name.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (typeStrings != null ? typeStrings.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ index;
@@ -83,7 +86,10 @@ namespace BindTool
             Type gameObjecType = typeof(GameObject);
             if (type == gameObjecType) return GetObject();
 
-            return GetObject().GetComponent(type);
+            Component component = prefabObject.GetComponent(type);
+            if (component == null) { component = instanceObject.GetComponent(type); }
+
+            return component;
         }
 
         public TypeString GetTypeString()
@@ -99,8 +105,10 @@ namespace BindTool
 
             int amount = typeStrings.Length;
             index = -1;
-            for (int i = 0; i < amount; i++) {
-                if (typeStrings[i].Equals(currenTypeString)) {
+            for (int i = 0; i < amount; i++)
+            {
+                if (typeStrings[i].Equals(currenTypeString))
+                {
                     index = i;
                     return true;
                 }
@@ -117,8 +125,10 @@ namespace BindTool
         public int SetIndex(TypeString typeString)
         {
             int amount = typeStrings.Length;
-            for (int i = 0; i < amount; i++) {
-                if (typeStrings[i].ToType() == typeString.ToType()) {
+            for (int i = 0; i < amount; i++)
+            {
+                if (typeStrings[i].ToType() == typeString.ToType())
+                {
                     index = i;
                     return i;
                 }
@@ -128,18 +138,22 @@ namespace BindTool
 
         public ComponentBindInfo(Object ob)
         {
-            if (ob != null) {
-                if (ob is GameObject go) {
+            if (ob != null)
+            {
+                if (ob is GameObject go)
+                {
                     prefabObject = CommonTools.GetPrefabAsset(go);
                     instanceObject = go;
                     AddComponentsTypes(go);
                 }
-                else if (ob is Component co) {
+                else if (ob is Component co)
+                {
                     prefabObject = CommonTools.GetPrefabAsset(co.gameObject);
                     instanceObject = co.gameObject;
                     AddComponentsTypes(co.gameObject);
                 }
-                else {
+                else
+                {
                     Type t = ob.GetType();
                     typeStrings = new TypeString[1] {new TypeString(t)};
                     index = 0;
@@ -156,7 +170,8 @@ namespace BindTool
             typeStringList.Add(gameObjectTypeString);
 
             Component[] cs = go.GetComponents(typeof(Component));
-            foreach (Component t in cs) {
+            foreach (Component t in cs)
+            {
                 if (t == null) continue;
                 Type type = t.GetType();
                 TypeString typeString = new TypeString(type);
