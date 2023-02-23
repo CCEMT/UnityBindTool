@@ -8,7 +8,8 @@ namespace BindTool
     {
         public string programName;
         public bool isBindAutoGenerateName;
-        public List<NameReplaceData> nameReplaceDataList;
+        public List<NameReplaceData> variableNameReplaceDataList;
+        public List<NameReplaceData> propertyNameReplaceDataList;
 
         #region Equals
 
@@ -21,7 +22,7 @@ namespace BindTool
 
         protected bool Equals(CreateNameSetting other)
         {
-            return base.Equals(other) && programName == other.programName && isBindAutoGenerateName == other.isBindAutoGenerateName && Equals(nameReplaceDataList, other.nameReplaceDataList);
+            return base.Equals(other) && programName == other.programName && isBindAutoGenerateName == other.isBindAutoGenerateName && Equals(this.variableNameReplaceDataList, other.variableNameReplaceDataList);
         }
 
         public override int GetHashCode()
@@ -31,7 +32,7 @@ namespace BindTool
                 int hashCode = base.GetHashCode();
                 hashCode = (hashCode * 397) ^ (programName != null ? programName.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ isBindAutoGenerateName.GetHashCode();
-                hashCode = (hashCode * 397) ^ (nameReplaceDataList != null ? nameReplaceDataList.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.variableNameReplaceDataList != null ? this.variableNameReplaceDataList.GetHashCode() : 0);
                 return hashCode;
             }
         }

@@ -86,7 +86,8 @@ namespace BindTool
             Type gameObjecType = typeof(GameObject);
             if (type == gameObjecType) return GetObject();
 
-            Component component = prefabObject.GetComponent(type);
+            Component component = null;
+            if (this.prefabObject != null) { component = prefabObject.GetComponent(type); }
             if (component == null) { component = instanceObject.GetComponent(type); }
 
             return component;

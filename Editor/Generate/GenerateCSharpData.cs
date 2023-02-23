@@ -33,7 +33,7 @@ namespace BindTool
 
             Writer($"#region {ConstData.DefaultName}", 1);
 
-            Writer($"///#region {ConstData.DefaultName}里的内容为自动生成，请勿去修改它", 1);
+            Writer($"///#region {ConstData.DefaultName} #endregion里的内容为自动生成，请勿去修改它", 1);
 
             List<string> nameList = new List<string>();
             List<ComponentNameData> coomponentNameList = new List<ComponentNameData>();
@@ -46,24 +46,26 @@ namespace BindTool
             int componentBindAmount = generateData.objectInfo.gameObjectBindInfoList.Count;
             for (int i = 0; i < componentBindAmount; i++)
             {
-                ComponentBindInfo data = generateData.objectInfo.gameObjectBindInfoList[i];
-                string propertyName = CommonTools.NameSettingByName(data, selectSettion.propertyNameSetting);
-                string variableName = CommonTools.NameSettingByName(data, selectSettion.nameSetting);
+                ComponentBindInfo componentInfo = generateData.objectInfo.gameObjectBindInfoList[i];
+                string variableName = componentInfo.name;
+                string propertyName = CommonTools.SetPropertyName(variableName, commonSettingData.selectCreateNameSetting);
+                propertyName = CommonTools.NameSettingByName(propertyName, componentInfo, selectSettion.propertyNameSetting);
                 ComponentNameData componentNameData = new ComponentNameData();
-                componentNameData.componentBindInfo = data;
-                AddVariable(componentNameData, variableName, propertyName, data.GetTypeString());
+                componentNameData.componentBindInfo = componentInfo;
+                AddVariable(componentNameData, variableName, propertyName, componentInfo.GetTypeString());
                 coomponentNameList.Add(componentNameData);
             }
 
             int dataBindAmount = generateData.objectInfo.dataBindInfoList.Count;
             for (int i = 0; i < dataBindAmount; i++)
             {
-                DataBindInfo dataBindInfo = generateData.objectInfo.dataBindInfoList[i];
-                string variableName = CommonTools.NameSettingByName(dataBindInfo, selectSettion.nameSetting);
-                string propertyName = CommonTools.NameSettingByName(dataBindInfo, selectSettion.propertyNameSetting);
+                DataBindInfo dataInfo = generateData.objectInfo.dataBindInfoList[i];
+                string variableName = dataInfo.name;
+                string propertyName = CommonTools.SetPropertyName(variableName, commonSettingData.selectCreateNameSetting);
+                propertyName = CommonTools.NameSettingByName(propertyName, dataInfo, selectSettion.propertyNameSetting);
                 DataName dataName = new DataName();
-                dataName.dataBindInfo = dataBindInfo;
-                AddVariable(dataName, variableName, propertyName, dataBindInfo.typeString);
+                dataName.dataBindInfo = dataInfo;
+                AddVariable(dataName, variableName, propertyName, dataInfo.typeString);
                 dataNameList.Add(dataName);
             }
 
@@ -71,7 +73,7 @@ namespace BindTool
 
             string bindMethodName = ConstData.DefaultBindMethodName;
             generateData.getBindDataMethodName = bindMethodName;
-            Writer($"public  void {bindMethodName}()", 1);
+            Writer($"public void {bindMethodName}()", 1);
             Writer("{", 1);
 
             int componentAmount = coomponentNameList.Count;

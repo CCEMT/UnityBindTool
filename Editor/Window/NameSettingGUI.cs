@@ -12,8 +12,11 @@ namespace BindTool
         private string nameCreateInput = "";
 
         private int nameReqlaceAmount;
+        private List<NameReplaceData> editorNameReplaceDataList;
         private List<NameReplaceData> selectNameReplaceDataList;
         private int selectNameReqlaceAmount;
+
+        private int nameSettingIndex;
 
         private const int NameReqlaceShowAmount = 5;
         private int nameReqlaceListMaxIndex;
@@ -21,24 +24,24 @@ namespace BindTool
 
         public void DrawNameSettingGUI()
         {
-            GUILayout.Label("NameSetting", settingStyle);
+            GUILayout.Label("NameSetting", this.settingStyle);
 
             GUILayout.BeginVertical("box");
             {
                 EditorGUILayout.BeginHorizontal();
                 {
-                    if (GUILayout.Button(commonSettingData.selectCreateNameSetting.programName))
+                    if (GUILayout.Button(this.commonSettingData.selectCreateNameSetting.programName))
                     {
                         GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
 
-                        int amount = commonSettingData.createNameSettingList.Count;
+                        int amount = this.commonSettingData.createNameSettingList.Count;
                         for (int i = 0; i < amount; i++)
                         {
                             int scriptIndex = i;
-                            menu.AddItem(new GUIContent(commonSettingData.createNameSettingList[i].programName), false,
+                            menu.AddItem(new GUIContent(this.commonSettingData.createNameSettingList[i].programName), false,
                                 () => {
-                                    commonSettingData.selectCreateNameSetting = commonSettingData.createNameSettingList[scriptIndex];
-                                    isSavaSetting = true;
+                                    this.commonSettingData.selectCreateNameSetting = this.commonSettingData.createNameSettingList[scriptIndex];
+                                    this.isSavaSetting = true;
                                 });
                         }
                         menu.ShowAsContext();
@@ -53,12 +56,12 @@ namespace BindTool
                             targetPath = targetPath.Substring(Application.dataPath.Length + 1, targetPath.Length - Application.dataPath.Length - 1);
                             string path = "Assets/" + targetPath;
                             ScriptSetting scriptSetting = CreateInstance<ScriptSetting>();
-                            commonSettingData.selectScriptSetting = scriptSetting;
-                            commonSettingData.scriptSettingList.Add(scriptSetting);
+                            this.commonSettingData.selectScriptSetting = scriptSetting;
+                            this.commonSettingData.scriptSettingList.Add(scriptSetting);
 
                             CreateNameSetting createNameSetting = CreateInstance<CreateNameSetting>();
-                            commonSettingData.selectCreateNameSetting = createNameSetting;
-                            commonSettingData.createNameSettingList.Add(createNameSetting);
+                            this.commonSettingData.selectCreateNameSetting = createNameSetting;
+                            this.commonSettingData.createNameSettingList.Add(createNameSetting);
                             createNameSetting.programName = ConstData.DefaultCreateNameSettingName;
 
                             int number = 1;
@@ -74,18 +77,18 @@ namespace BindTool
 
                             AssetDatabase.CreateAsset(scriptSetting, fullPath);
 
-                            isSavaSetting = true;
+                            this.isSavaSetting = true;
                         }
                     }
                     GUI.color = Color.red;
                     if (GUILayout.Button("删除", GUILayout.Width(100)))
                     {
-                        if (commonSettingData.createNameSettingList.Count > 1)
+                        if (this.commonSettingData.createNameSettingList.Count > 1)
                         {
-                            commonSettingData.createNameSettingList.Remove(commonSettingData.selectCreateNameSetting);
-                            AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(commonSettingData.selectCreateNameSetting));
-                            commonSettingData.selectCreateNameSetting = commonSettingData.createNameSettingList.First();
-                            isSavaSetting = true;
+                            this.commonSettingData.createNameSettingList.Remove(this.commonSettingData.selectCreateNameSetting);
+                            AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(this.commonSettingData.selectCreateNameSetting));
+                            this.commonSettingData.selectCreateNameSetting = this.commonSettingData.createNameSettingList.First();
+                            this.isSavaSetting = true;
                         }
                     }
 
@@ -102,26 +105,40 @@ namespace BindTool
         {
             GUILayout.BeginVertical("box");
             {
-                CreateNameSetting selectSetting = commonSettingData.selectCreateNameSetting;
-                if (nameReqlaceAmount != selectSetting.nameReplaceDataList.Count)
+                CreateNameSetting selectSetting = this.commonSettingData.selectCreateNameSetting;
+
+                int tempIndex = GUILayout.Toolbar(this.nameSettingIndex, new string[] {"Variable", "Property"});
+                if (tempIndex != this.nameSettingIndex)
                 {
-                    nameReqlaceAmount = selectSetting.nameReplaceDataList.Count;
+                    this.nameSettingIndex = tempIndex;
+                    GUI.FocusControl(null);
+                }
+
+                if (this.nameSettingIndex == 0) { this.editorNameReplaceDataList = selectSetting.variableNameReplaceDataList; }
+                else { this.editorNameReplaceDataList = selectSetting.propertyNameReplaceDataList; }
+
+                if (this.nameReqlaceAmount != this.editorNameReplaceDataList.Count)
+                {
+                    this.nameReqlaceAmount = this.editorNameReplaceDataList.Count;
                     GetSelectCreateNameList();
                 }
 
-                bool tempIsGenerateName = GUILayout.Toggle(selectSetting.isBindAutoGenerateName, "绑定时是否自动生成名称");
-                if (tempIsGenerateName != selectSetting.isBindAutoGenerateName)
+                if (this.nameSettingIndex == 0)
                 {
-                    selectSetting.isBindAutoGenerateName = tempIsGenerateName;
-                    isSavaSetting = true;
+                    bool tempIsGenerateName = GUILayout.Toggle(selectSetting.isBindAutoGenerateName, "绑定时是否自动生成名称");
+                    if (tempIsGenerateName != selectSetting.isBindAutoGenerateName)
+                    {
+                        selectSetting.isBindAutoGenerateName = tempIsGenerateName;
+                        this.isSavaSetting = true;
+                    }
                 }
 
                 EditorGUI.BeginDisabledGroup(selectSetting.isBindAutoGenerateName == false);
                 {
-                    string tempString = GUILayout.TextField(nameCreateInput, "SearchTextField");
-                    if (tempString.Equals(nameCreateInput) == false)
+                    string tempString = GUILayout.TextField(this.nameCreateInput, "SearchTextField");
+                    if (tempString.Equals(this.nameCreateInput) == false)
                     {
-                        nameCreateInput = tempString;
+                        this.nameCreateInput = tempString;
                         GetSelectCreateNameList();
                     }
 
@@ -130,8 +147,8 @@ namespace BindTool
                         GUILayout.Label("名称替换列表");
                         if (GUILayout.Button("添加"))
                         {
-                            selectSetting.nameReplaceDataList.Add(new NameReplaceData());
-                            isSavaSetting = true;
+                            this.editorNameReplaceDataList.Add(new NameReplaceData());
+                            this.isSavaSetting = true;
                         }
                     }
                     EditorGUILayout.EndHorizontal();
@@ -143,12 +160,12 @@ namespace BindTool
                             for (int i = 0; i < NameReqlaceShowAmount; i++)
                             {
                                 int showIndex = (this.nameReqlaceListIndex - 1) * NameReqlaceShowAmount + i;
-                                if (showIndex >= selectNameReqlaceAmount) { break; }
+                                if (showIndex >= this.selectNameReqlaceAmount) { break; }
                                 GUILayout.BeginVertical("frameBox");
                                 {
                                     EditorGUILayout.BeginHorizontal();
                                     {
-                                        NameReplaceData nameReplaceData = selectNameReplaceDataList[showIndex];
+                                        NameReplaceData nameReplaceData = this.selectNameReplaceDataList[showIndex];
 
                                         EditorGUILayout.BeginVertical();
                                         {
@@ -159,7 +176,7 @@ namespace BindTool
                                                 if (tempCheckName != nameReplaceData.nameCheck.name)
                                                 {
                                                     nameReplaceData.nameCheck.name = tempCheckName;
-                                                    isSavaSetting = true;
+                                                    this.isSavaSetting = true;
                                                 }
                                             }
                                             EditorGUILayout.EndHorizontal();
@@ -171,7 +188,7 @@ namespace BindTool
                                                 if (tempTargetName != nameReplaceData.targetName)
                                                 {
                                                     nameReplaceData.targetName = tempTargetName;
-                                                    isSavaSetting = true;
+                                                    this.isSavaSetting = true;
                                                 }
                                             }
                                             EditorGUILayout.EndHorizontal();
@@ -187,7 +204,7 @@ namespace BindTool
                                                 if (tempIsCaseSensitive != nameReplaceData.nameCheck.nameRule.isCaseSensitive)
                                                 {
                                                     nameReplaceData.nameCheck.nameRule.isCaseSensitive = tempIsCaseSensitive;
-                                                    isSavaSetting = true;
+                                                    this.isSavaSetting = true;
                                                 }
                                             }
                                             EditorGUILayout.EndHorizontal();
@@ -200,7 +217,7 @@ namespace BindTool
                                                 if (tempnNameMatchingRule != nameReplaceData.nameCheck.nameRule.nameMatchingRule)
                                                 {
                                                     nameReplaceData.nameCheck.nameRule.nameMatchingRule = tempnNameMatchingRule;
-                                                    isSavaSetting = true;
+                                                    this.isSavaSetting = true;
                                                 }
                                             }
                                             EditorGUILayout.EndHorizontal();
@@ -214,8 +231,8 @@ namespace BindTool
                                             GUI.color = Color.red;
                                             if (GUILayout.Button("删除", GUILayout.Width(50)))
                                             {
-                                                selectSetting.nameReplaceDataList.Remove(nameReplaceData);
-                                                isSavaSetting = true;
+                                                this.editorNameReplaceDataList.Remove(nameReplaceData);
+                                                this.isSavaSetting = true;
                                             }
                                             GUI.color = Color.white;
                                         }
@@ -230,17 +247,17 @@ namespace BindTool
 
                         GUILayout.BeginHorizontal();
                         {
-                            GUILayout.Label($"{this.nameReqlaceListIndex}/{this.nameReqlaceListMaxIndex}", tabIndexStyle);
+                            GUILayout.Label($"{this.nameReqlaceListIndex}/{this.nameReqlaceListMaxIndex}", this.tabIndexStyle);
                             GUILayout.Space(10);
                             if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationLeft", GUILayout.Width(30), GUILayout.Height(20)))
                             {
-                                nameReqlaceListIndex--;
-                                this.nameReqlaceListIndex = Mathf.Clamp(nameReqlaceListIndex, 1, this.nameReqlaceListMaxIndex);
+                                this.nameReqlaceListIndex--;
+                                this.nameReqlaceListIndex = Mathf.Clamp(this.nameReqlaceListIndex, 1, this.nameReqlaceListMaxIndex);
                             }
                             if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationRight", GUILayout.Width(30), GUILayout.Height(20)))
                             {
-                                nameReqlaceListIndex++;
-                                this.nameReqlaceListIndex = Mathf.Clamp(nameReqlaceListIndex, 1, this.nameReqlaceListMaxIndex);
+                                this.nameReqlaceListIndex++;
+                                this.nameReqlaceListIndex = Mathf.Clamp(this.nameReqlaceListIndex, 1, this.nameReqlaceListMaxIndex);
                             }
                         }
                         GUILayout.EndHorizontal();
@@ -254,22 +271,22 @@ namespace BindTool
 
         void GetSelectCreateNameList()
         {
-            selectNameReplaceDataList = new List<NameReplaceData>();
+            this.selectNameReplaceDataList = new List<NameReplaceData>();
 
-            int nameReplaceAmount = commonSettingData.selectCreateNameSetting.nameReplaceDataList.Count;
+            int nameReplaceAmount = this.editorNameReplaceDataList.Count;
             for (int i = 0; i < nameReplaceAmount; i++)
             {
-                NameReplaceData nameReplaceData = commonSettingData.selectCreateNameSetting.nameReplaceDataList[i];
-                if (CommonTools.Search(nameReplaceData.targetName, nameCreateInput) || CommonTools.Search(nameReplaceData.nameCheck.name, nameCreateInput))
+                NameReplaceData nameReplaceData = this.editorNameReplaceDataList[i];
+                if (CommonTools.Search(nameReplaceData.targetName, this.nameCreateInput) || CommonTools.Search(nameReplaceData.nameCheck.name, this.nameCreateInput))
                 {
-                    selectNameReplaceDataList.Add(nameReplaceData);
+                    this.selectNameReplaceDataList.Add(nameReplaceData);
                 }
             }
 
-            selectNameReqlaceAmount = selectNameReplaceDataList.Count;
+            this.selectNameReqlaceAmount = this.selectNameReplaceDataList.Count;
 
             this.nameReqlaceListMaxIndex = (int) Math.Ceiling(this.selectNameReqlaceAmount / (double) NameReqlaceShowAmount);
-            this.nameReqlaceListIndex = Mathf.Clamp(nameReqlaceListIndex, 1, this.nameReqlaceListMaxIndex);
+            this.nameReqlaceListIndex = Mathf.Clamp(this.nameReqlaceListIndex, 1, this.nameReqlaceListMaxIndex);
         }
     }
 }

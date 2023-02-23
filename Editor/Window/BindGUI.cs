@@ -39,22 +39,22 @@ namespace BindTool
 
         void DrawBindGUI()
         {
-            bool tempIsCustomBind = GUILayout.Toggle(commonSettingData.isCustomBind, "是否自定义绑定（不勾选则全部绑定）");
-            if (commonSettingData.isCustomBind != tempIsCustomBind)
+            bool tempIsCustomBind = GUILayout.Toggle(this.commonSettingData.isCustomBind, "是否自定义绑定（不勾选则全部绑定）");
+            if (this.commonSettingData.isCustomBind != tempIsCustomBind)
             {
-                commonSettingData.isCustomBind = tempIsCustomBind;
-                isSavaSetting = true;
+                this.commonSettingData.isCustomBind = tempIsCustomBind;
+                this.isSavaSetting = true;
             }
 
-            EditorGUI.BeginDisabledGroup(commonSettingData.isCustomBind == false);
+            EditorGUI.BeginDisabledGroup(this.commonSettingData.isCustomBind == false);
             {
                 BindInfo();
                 BindArea();
 
-                if (componentBindAmount != objectInfo.gameObjectBindInfoList.Count || dataBindAmount != objectInfo.dataBindInfoList.Count)
+                if (this.componentBindAmount != this.objectInfo.gameObjectBindInfoList.Count || this.dataBindAmount != this.objectInfo.dataBindInfoList.Count)
                 {
-                    componentBindAmount = objectInfo.gameObjectBindInfoList.Count;
-                    dataBindAmount = objectInfo.dataBindInfoList.Count;
+                    this.componentBindAmount = this.objectInfo.gameObjectBindInfoList.Count;
+                    this.dataBindAmount = this.objectInfo.dataBindInfoList.Count;
                     GetBindSelectList();
                 }
                 BindList();
@@ -66,44 +66,45 @@ namespace BindTool
         {
             string addErrorInfo = "错误：附加模式下选择的类型必须继承MonoBehaviour！";
 
-            if (commonSettingData.selectScriptSetting.isGenerateNew == false)
+            if (this.commonSettingData.selectScriptSetting.isGenerateNew == false)
             {
                 EditorGUILayout.BeginHorizontal();
                 {
 
                     GUILayout.Label("绑定的组件");
 
-                    if (objectInfo.rootBindInfo.GetTypeName() == nameof(GameObject))
+                    if (this.objectInfo.rootBindInfo.GetTypeName() == nameof(GameObject))
                     {
-                        EditorGUILayout.ObjectField(objectInfo.rootBindInfo.instanceObject, objectInfo.rootBindInfo.GetValue().GetType(), true);
+                        EditorGUILayout.ObjectField(this.objectInfo.rootBindInfo.instanceObject, this.objectInfo.rootBindInfo.GetValue().GetType(), true);
                     }
                     else
                     {
-                        EditorGUILayout.ObjectField(objectInfo.rootBindInfo.instanceObject.GetComponent(objectInfo.rootBindInfo.GetTypeName()), objectInfo.rootBindInfo.GetTypeString().ToType(), true);
+                        EditorGUILayout.ObjectField(this.objectInfo.rootBindInfo.instanceObject.GetComponent(this.objectInfo.rootBindInfo.GetTypeName()),
+                            this.objectInfo.rootBindInfo.GetTypeString().ToType(), true);
                     }
 
-                    int tempRootBindInfoIndex = EditorGUILayout.Popup(objectInfo.rootBindInfo.index, objectInfo.rootBindInfo.GetTypeStrings());
-                    if (tempRootBindInfoIndex != objectInfo.rootBindInfo.index)
+                    int tempRootBindInfoIndex = EditorGUILayout.Popup(this.objectInfo.rootBindInfo.index, this.objectInfo.rootBindInfo.GetTypeStrings());
+                    if (tempRootBindInfoIndex != this.objectInfo.rootBindInfo.index)
                     {
-                        objectInfo.rootBindInfo.index = tempRootBindInfoIndex;
-                        isSavaSetting = true;
+                        this.objectInfo.rootBindInfo.index = tempRootBindInfoIndex;
+                        this.isSavaSetting = true;
                     }
 
                     if (GUILayout.Button("生成", GUILayout.Width(50)))
                     {
-                        commonSettingData.selectScriptSetting.isGenerateNew = true;
-                        isSavaSetting = true;
+                        this.commonSettingData.selectScriptSetting.isGenerateNew = true;
+                        this.isSavaSetting = true;
                     }
                 }
                 EditorGUILayout.EndHorizontal();
 
                 Type monoType = typeof(MonoBehaviour);
-                Type type = objectInfo.rootBindInfo.GetTypeString().ToType();
+                Type type = this.objectInfo.rootBindInfo.GetTypeString().ToType();
 
                 if (monoType.IsAssignableFrom(type) == false)
                 {
                     GUI.color = Color.red;
-                    if (errorList.Contains(addErrorInfo) == false) errorList.Add(addErrorInfo);
+                    if (this.errorList.Contains(addErrorInfo) == false) this.errorList.Add(addErrorInfo);
                     GUILayout.BeginVertical("box");
                     GUILayout.Label(addErrorInfo);
                     GUILayout.EndHorizontal();
@@ -111,26 +112,26 @@ namespace BindTool
                 }
                 else
                 {
-                    if (errorList.Contains(addErrorInfo)) errorList.Remove(addErrorInfo);
+                    if (this.errorList.Contains(addErrorInfo)) this.errorList.Remove(addErrorInfo);
                 }
-                commonSettingData.addTypeString = objectInfo.rootBindInfo.GetTypeString();
+                this.commonSettingData.addTypeString = this.objectInfo.rootBindInfo.GetTypeString();
             }
             else
             {
-                if (errorList.Contains(addErrorInfo)) errorList.Remove(addErrorInfo);
+                if (this.errorList.Contains(addErrorInfo)) this.errorList.Remove(addErrorInfo);
                 EditorGUILayout.BeginHorizontal();
                 {
                     GUILayout.Label("生成脚本的名称：");
-                    string content = GUILayout.TextField(commonSettingData.newScriptName);
-                    commonSettingData.newScriptName = CommonTools.GetNumberAlpha(content);
-                    if (GUILayout.Button("设置为物体名")) commonSettingData.newScriptName = CommonTools.GetNumberAlpha(bindObject.name);
-                    if (GUILayout.Button("附加", GUILayout.Width(50))) commonSettingData.selectScriptSetting.isGenerateNew = false;
+                    string content = GUILayout.TextField(this.commonSettingData.newScriptName);
+                    this.commonSettingData.newScriptName = CommonTools.GetNumberAlpha(content);
+                    if (GUILayout.Button("设置为物体名")) this.commonSettingData.newScriptName = CommonTools.GetNumberAlpha(this.bindObject.name);
+                    if (GUILayout.Button("附加", GUILayout.Width(50))) this.commonSettingData.selectScriptSetting.isGenerateNew = false;
                 }
                 EditorGUILayout.EndHorizontal();
 
                 string directoryName = "";
-                if (commonSettingData.isCreateScriptFolder) directoryName = commonSettingData.newScriptName + "/";
-                string path = $"{Application.dataPath}/{commonSettingData.createScriptPath}/{directoryName}{commonSettingData.newScriptName}.cs";
+                if (this.commonSettingData.isCreateScriptFolder) directoryName = this.commonSettingData.newScriptName + "/";
+                string path = $"{Application.dataPath}/{this.commonSettingData.createScriptPath}/{directoryName}{this.commonSettingData.newScriptName}.cs";
                 if (File.Exists(path))
                 {
                     GUILayout.BeginVertical("box");
@@ -144,18 +145,20 @@ namespace BindTool
                 GUI.color = Color.green;
                 if (GUILayout.Button("全部自动绑定", GUILayout.Width(250)))
                 {
-                    Transform[] gameObjects = bindObject.GetComponentsInChildren<Transform>(true);
+                    Transform[] gameObjects = this.bindObject.GetComponentsInChildren<Transform>(true);
                     int amount = gameObjects.Length;
                     for (int i = 0; i < amount; i++)
                     {
                         Transform go = gameObjects[i];
-                        ComponentBindInfo info = objectInfo.AutoBind(go, commonSettingData.selectAutoBindSetting);
+                        ComponentBindInfo info = this.objectInfo.AutoBind(go, this.commonSettingData.selectAutoBindSetting);
                         if (info != null)
                         {
-                            if (commonSettingData.selectCreateNameSetting.isBindAutoGenerateName) info.name = CommonTools.SetName(info.instanceObject.name, commonSettingData.selectCreateNameSetting);
+                            if (this.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
+                                info.name = CommonTools.SetVariableName(info.instanceObject.name, this.commonSettingData.selectCreateNameSetting);
+                            info.name = CommonTools.NameSettingByName(info, this.commonSettingData.selectScriptSetting.nameSetting);
                         }
                     }
-                    isSavaSetting = true;
+                    this.isSavaSetting = true;
                 }
 
                 GUI.color = Color.red;
@@ -165,8 +168,8 @@ namespace BindTool
                     GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
                     menu.AddItem(new GUIContent("取消解除"), false, () => { });
                     menu.AddItem(new GUIContent("确认解除"), false, () => {
-                        objectInfo.gameObjectBindInfoList.Clear();
-                        isSavaSetting = true;
+                        this.objectInfo.gameObjectBindInfoList.Clear();
+                        this.isSavaSetting = true;
                     }); //向菜单中添加菜单项
 
                     menu.ShowAsContext(); //显示菜单
@@ -213,12 +216,13 @@ namespace BindTool
                                     {
                                         int infoIndex = i;
                                         menu.AddItem(new GUIContent(componentBindInfo.typeStrings[i].typeName), false, () => {
-                                            objectInfo.Bind(componentBindInfo, infoIndex);
-                                            if (commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
+                                            this.objectInfo.Bind(componentBindInfo, infoIndex);
+                                            if (this.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
                                             {
-                                                componentBindInfo.name = CommonTools.SetName(componentBindInfo.instanceObject.name, commonSettingData.selectCreateNameSetting);
+                                                componentBindInfo.name = CommonTools.SetVariableName(componentBindInfo.instanceObject.name, this.commonSettingData.selectCreateNameSetting);
                                             }
-                                            isSavaSetting = true;
+                                            componentBindInfo.name = CommonTools.NameSettingByName(componentBindInfo, this.commonSettingData.selectScriptSetting.nameSetting);
+                                            this.isSavaSetting = true;
                                         });
                                     }
                                     menu.ShowAsContext(); //显示菜单
@@ -226,8 +230,12 @@ namespace BindTool
                                 else
                                 {
                                     DataBindInfo dataBindInfo = new DataBindInfo(selectObject);
-                                    dataBindInfo.name = CommonTools.SetName(dataBindInfo.bindObject.name, commonSettingData.selectCreateNameSetting);
-                                    if (dataBindInfo.typeString.assemblyName.Equals("Assembly-CSharp-Editor") == false) { objectInfo.dataBindInfoList.Add(dataBindInfo); }
+                                    if (this.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
+                                    {
+                                        dataBindInfo.name = CommonTools.SetVariableName(dataBindInfo.bindObject.name, this.commonSettingData.selectCreateNameSetting);
+                                    }
+                                    dataBindInfo.name = CommonTools.NameSettingByName(dataBindInfo, this.commonSettingData.selectScriptSetting.nameSetting);
+                                    if (dataBindInfo.typeString.assemblyName.Equals("Assembly-CSharp-Editor") == false) { this.objectInfo.dataBindInfoList.Add(dataBindInfo); }
                                     else { Debug.Log("禁止绑定编辑器中的数据"); }
                                 }
                             }
@@ -250,8 +258,12 @@ namespace BindTool
                                     else
                                     {
                                         DataBindInfo dataBindInfo = new DataBindInfo(selectObject);
-                                        dataBindInfo.name = CommonTools.SetName(dataBindInfo.bindObject.name, commonSettingData.selectCreateNameSetting);
-                                        if (dataBindInfo.typeString.assemblyName.Equals("Assembly-CSharp-Editor") == false) { objectInfo.dataBindInfoList.Add(dataBindInfo); }
+                                        if (this.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
+                                        {
+                                            dataBindInfo.name = CommonTools.SetVariableName(dataBindInfo.bindObject.name, this.commonSettingData.selectCreateNameSetting);
+                                        }
+                                        dataBindInfo.name = CommonTools.NameSettingByName(dataBindInfo, this.commonSettingData.selectScriptSetting.nameSetting);
+                                        if (dataBindInfo.typeString.assemblyName.Equals("Assembly-CSharp-Editor") == false) { this.objectInfo.dataBindInfoList.Add(dataBindInfo); }
                                         else { Debug.Log("禁止绑定编辑器中的数据"); }
                                     }
                                 }
@@ -263,13 +275,14 @@ namespace BindTool
                                     for (int j = 0; j < bindComponentAmount; j++)
                                     {
                                         ComponentBindInfo info = bindList[j];
-                                        objectInfo.AutoBind(info, commonSettingData.selectAutoBindSetting);
-                                        if (commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
+                                        this.objectInfo.AutoBind(info, this.commonSettingData.selectAutoBindSetting);
+                                        if (this.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
                                         {
-                                            info.name = CommonTools.SetName(info.instanceObject.name, commonSettingData.selectCreateNameSetting);
+                                            info.name = CommonTools.SetVariableName(info.instanceObject.name, this.commonSettingData.selectCreateNameSetting);
                                         }
+                                        info.name = CommonTools.NameSettingByName(info, this.commonSettingData.selectScriptSetting.nameSetting);
                                     }
-                                    isSavaSetting = true;
+                                    this.isSavaSetting = true;
                                 });
 
                                 int typeAmount = bindTypeList.Count;
@@ -286,15 +299,16 @@ namespace BindTool
                                             {
                                                 if (info.typeStrings[k].Equals(typeString))
                                                 {
-                                                    objectInfo.Bind(info, k);
-                                                    if (commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
+                                                    this.objectInfo.Bind(info, k);
+                                                    if (this.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
                                                     {
-                                                        info.name = CommonTools.SetName(info.instanceObject.name, commonSettingData.selectCreateNameSetting);
+                                                        info.name = CommonTools.SetVariableName(info.instanceObject.name, this.commonSettingData.selectCreateNameSetting);
                                                     }
+                                                    info.name = CommonTools.NameSettingByName(info, this.commonSettingData.selectScriptSetting.nameSetting);
                                                 }
                                             }
                                         }
-                                        isSavaSetting = true;
+                                        this.isSavaSetting = true;
                                     });
                                 }
                                 menu.ShowAsContext(); //显示菜单
@@ -317,20 +331,20 @@ namespace BindTool
                 EditorGUILayout.BeginHorizontal();
                 {
                     GUILayout.Label("Search Item：");
-                    searchType = (SearchType) EditorGUILayout.EnumPopup(searchType, GUILayout.Width(150));
+                    this.searchType = (SearchType) EditorGUILayout.EnumPopup(this.searchType, GUILayout.Width(150));
 
                     if (GUILayout.Button("Reset", GUILayout.Width(50)))
                     {
-                        bindInputString = "";
+                        this.bindInputString = "";
                         GetBindSelectList();
                     }
                 }
                 EditorGUILayout.EndHorizontal();
 
-                string tempString = GUILayout.TextField(bindInputString, "SearchTextField");
-                if (tempString.Equals(bindInputString) == false)
+                string tempString = GUILayout.TextField(this.bindInputString, "SearchTextField");
+                if (tempString.Equals(this.bindInputString) == false)
                 {
-                    bindInputString = tempString;
+                    this.bindInputString = tempString;
                     GetBindSelectList();
                 }
 
@@ -353,16 +367,16 @@ namespace BindTool
                             EditorGUILayout.BeginHorizontal("frameBox");
                             {
                                 EditorGUILayout.BeginVertical();
-                                ComponentBindInfo componentBindInfo = selectComponentList[showIndex];
-                                int itemIndex = objectInfo.gameObjectBindInfoList.IndexOf(componentBindInfo);
+                                ComponentBindInfo componentBindInfo = this.selectComponentList[showIndex];
+                                int itemIndex = this.objectInfo.gameObjectBindInfoList.IndexOf(componentBindInfo);
 
                                 if (itemIndex == -1) GetBindSelectList();
 
                                 int tempComponentBindInfoIndex = EditorGUILayout.Popup(componentBindInfo.index, componentBindInfo.GetTypeStrings());
                                 if (tempComponentBindInfoIndex != componentBindInfo.index)
                                 {
-                                    objectInfo.gameObjectBindInfoList[itemIndex].index = tempComponentBindInfoIndex;
-                                    isSavaSetting = true;
+                                    this.objectInfo.gameObjectBindInfoList[itemIndex].index = tempComponentBindInfoIndex;
+                                    this.isSavaSetting = true;
                                 }
                                 if (componentBindInfo.GetTypeName() == nameof(GameObject))
                                 {
@@ -378,8 +392,8 @@ namespace BindTool
                                 string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(componentBindInfo.name));
                                 if (tempComponentBindInfoName != componentBindInfo.name)
                                 {
-                                    objectInfo.gameObjectBindInfoList[itemIndex].name = tempComponentBindInfoName;
-                                    isSavaSetting = true;
+                                    this.objectInfo.gameObjectBindInfoList[itemIndex].name = tempComponentBindInfoName;
+                                    this.isSavaSetting = true;
                                 }
 
                                 EditorGUILayout.EndVertical();
@@ -390,9 +404,15 @@ namespace BindTool
                                 {
                                     GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
                                     menu.AddItem(new GUIContent("设置默认名"), false, () => {
-                                        objectInfo.gameObjectBindInfoList[itemIndex].name =
-                                            CommonTools.SetName(componentBindInfo.instanceObject.name, commonSettingData.selectCreateNameSetting);
-                                        isSavaSetting = true;
+
+                                        componentBindInfo.name = componentBindInfo.instanceObject.name;
+                                        if (this.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
+                                        {
+                                            componentBindInfo.name = CommonTools.SetVariableName(componentBindInfo.instanceObject.name, this.commonSettingData.selectCreateNameSetting);
+                                        }
+                                        componentBindInfo.name = CommonTools.NameSettingByName(componentBindInfo, this.commonSettingData.selectScriptSetting.nameSetting);
+
+                                        this.isSavaSetting = true;
                                     });
 
                                     menu.ShowAsContext(); //显示菜单
@@ -401,8 +421,8 @@ namespace BindTool
                                 GUI.color = Color.red;
                                 if (GUILayout.Button("删除", GUILayout.Width(100)))
                                 {
-                                    objectInfo.gameObjectBindInfoList.RemoveAt(itemIndex);
-                                    isSavaSetting = true;
+                                    this.objectInfo.gameObjectBindInfoList.RemoveAt(itemIndex);
+                                    this.isSavaSetting = true;
                                     break;
                                 }
                                 GUI.color = Color.white;
@@ -415,8 +435,8 @@ namespace BindTool
                         {
                             //显示选择的数据
                             showIndex -= this.selectComponentAmount;
-                            DataBindInfo dataBindInfo = selectDataList[showIndex];
-                            int itemIndex = objectInfo.dataBindInfoList.IndexOf(dataBindInfo);
+                            DataBindInfo dataInfo = this.selectDataList[showIndex];
+                            int itemIndex = this.objectInfo.dataBindInfoList.IndexOf(dataInfo);
 
                             if (itemIndex == -1) GetBindSelectList();
 
@@ -424,9 +444,9 @@ namespace BindTool
                             {
                                 EditorGUILayout.BeginVertical();
                                 {
-                                    GUILayout.Label(dataBindInfo.typeString.typeName);
+                                    GUILayout.Label(dataInfo.typeString.typeName);
 
-                                    EditorGUILayout.ObjectField(dataBindInfo.bindObject, dataBindInfo.typeString.ToType(), true);
+                                    EditorGUILayout.ObjectField(dataInfo.bindObject, dataInfo.typeString.ToType(), true);
 
                                 }
                                 EditorGUILayout.EndVertical();
@@ -434,11 +454,11 @@ namespace BindTool
                                 EditorGUILayout.BeginVertical();
                                 {
                                     GUILayout.Label("变量名");
-                                    string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(dataBindInfo.name));
-                                    if (tempComponentBindInfoName != dataBindInfo.name)
+                                    string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(dataInfo.name));
+                                    if (tempComponentBindInfoName != dataInfo.name)
                                     {
-                                        objectInfo.dataBindInfoList[itemIndex].name = tempComponentBindInfoName;
-                                        isSavaSetting = true;
+                                        this.objectInfo.dataBindInfoList[itemIndex].name = tempComponentBindInfoName;
+                                        this.isSavaSetting = true;
                                     }
                                 }
                                 EditorGUILayout.EndVertical();
@@ -450,8 +470,14 @@ namespace BindTool
                                     {
                                         GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
                                         menu.AddItem(new GUIContent("设置默认名"), false, () => {
-                                            objectInfo.dataBindInfoList[itemIndex].name = CommonTools.SetName(dataBindInfo.bindObject.name, commonSettingData.selectCreateNameSetting);
-                                            isSavaSetting = true;
+                                            dataInfo.name = dataInfo.bindObject.name;
+                                            if (this.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
+                                            {
+                                                dataInfo.name = CommonTools.SetVariableName(dataInfo.bindObject.name, this.commonSettingData.selectCreateNameSetting);
+                                            }
+                                            dataInfo.name = CommonTools.NameSettingByName(dataInfo, this.commonSettingData.selectScriptSetting.nameSetting);
+
+                                            this.isSavaSetting = true;
                                         });
 
                                         menu.ShowAsContext(); //显示菜单
@@ -460,8 +486,8 @@ namespace BindTool
                                     GUI.color = Color.red;
                                     if (GUILayout.Button("删除", GUILayout.Width(100)))
                                     {
-                                        objectInfo.dataBindInfoList.RemoveAt(itemIndex);
-                                        isSavaSetting = true;
+                                        this.objectInfo.dataBindInfoList.RemoveAt(itemIndex);
+                                        this.isSavaSetting = true;
                                         break;
                                     }
                                     GUI.color = Color.white;
@@ -499,86 +525,91 @@ namespace BindTool
 
         void GetBindSelectList()
         {
-            selectComponentList = new List<ComponentBindInfo>();
-            int bindComponentAmount = objectInfo.gameObjectBindInfoList.Count;
-            selectDataList = new List<DataBindInfo>();
-            int bindDataAmount = objectInfo.dataBindInfoList.Count;
-            switch (searchType)
+            this.selectComponentList = new List<ComponentBindInfo>();
+            int bindComponentAmount = this.objectInfo.gameObjectBindInfoList.Count;
+            this.selectDataList = new List<DataBindInfo>();
+            int bindDataAmount = this.objectInfo.dataBindInfoList.Count;
+            switch (this.searchType)
             {
                 case SearchType.All:
                     for (int i = 0; i < bindComponentAmount; i++)
                     {
-                        ComponentBindInfo info = objectInfo.gameObjectBindInfoList[i];
-                        if (CommonTools.Search(info.GetTypeName(), bindInputString)
-                            || CommonTools.Search(info.GetObject().name, bindInputString)
-                            || CommonTools.Search(info.name, bindInputString)) { selectComponentList.Add(info); }
+                        ComponentBindInfo info = this.objectInfo.gameObjectBindInfoList[i];
+                        if (CommonTools.Search(info.GetTypeName(), this.bindInputString)
+                            || CommonTools.Search(info.GetObject().name, this.bindInputString)
+                            || CommonTools.Search(info.name, this.bindInputString)) { this.selectComponentList.Add(info); }
                     }
                     for (int i = 0; i < bindDataAmount; i++)
                     {
-                        DataBindInfo info = objectInfo.dataBindInfoList[i];
-                        if (CommonTools.Search(info.typeString.typeName, bindInputString)
-                            || CommonTools.Search(info.bindObject.name, bindInputString)
-                            || CommonTools.Search(info.name, bindInputString)) { selectDataList.Add(info); }
+                        DataBindInfo info = this.objectInfo.dataBindInfoList[i];
+                        if (CommonTools.Search(info.typeString.typeName, this.bindInputString)
+                            || CommonTools.Search(info.bindObject.name, this.bindInputString)
+                            || CommonTools.Search(info.name, this.bindInputString)) { this.selectDataList.Add(info); }
                     }
                     break;
                 case SearchType.TypeName:
                     for (int i = 0; i < bindComponentAmount; i++)
                     {
-                        ComponentBindInfo info = objectInfo.gameObjectBindInfoList[i];
-                        if (CommonTools.Search(info.GetTypeName(), bindInputString)) selectComponentList.Add(info);
+                        ComponentBindInfo info = this.objectInfo.gameObjectBindInfoList[i];
+                        if (CommonTools.Search(info.GetTypeName(), this.bindInputString)) this.selectComponentList.Add(info);
                     }
                     for (int i = 0; i < bindDataAmount; i++)
                     {
-                        DataBindInfo info = objectInfo.dataBindInfoList[i];
-                        if (CommonTools.Search(info.typeString.typeName, bindInputString)) selectDataList.Add(info);
+                        DataBindInfo info = this.objectInfo.dataBindInfoList[i];
+                        if (CommonTools.Search(info.typeString.typeName, this.bindInputString)) this.selectDataList.Add(info);
                     }
                     break;
                 case SearchType.GameObjectName:
                     for (int i = 0; i < bindComponentAmount; i++)
                     {
-                        ComponentBindInfo info = objectInfo.gameObjectBindInfoList[i];
-                        if (CommonTools.Search(info.GetObject().name, bindInputString)) selectComponentList.Add(info);
+                        ComponentBindInfo info = this.objectInfo.gameObjectBindInfoList[i];
+                        if (CommonTools.Search(info.GetObject().name, this.bindInputString)) this.selectComponentList.Add(info);
                     }
                     for (int i = 0; i < bindDataAmount; i++)
                     {
-                        DataBindInfo info = objectInfo.dataBindInfoList[i];
-                        if (CommonTools.Search(info.bindObject.name, bindInputString)) selectDataList.Add(info);
+                        DataBindInfo info = this.objectInfo.dataBindInfoList[i];
+                        if (CommonTools.Search(info.bindObject.name, this.bindInputString)) this.selectDataList.Add(info);
                     }
                     break;
                 case SearchType.VariableName:
                     for (int i = 0; i < bindComponentAmount; i++)
                     {
-                        ComponentBindInfo info = objectInfo.gameObjectBindInfoList[i];
-                        if (CommonTools.Search(info.name, bindInputString)) selectComponentList.Add(info);
+                        ComponentBindInfo info = this.objectInfo.gameObjectBindInfoList[i];
+                        if (CommonTools.Search(info.name, this.bindInputString)) this.selectComponentList.Add(info);
                     }
                     for (int i = 0; i < bindDataAmount; i++)
                     {
-                        DataBindInfo info = objectInfo.dataBindInfoList[i];
-                        if (CommonTools.Search(info.name, bindInputString)) selectDataList.Add(info);
+                        DataBindInfo info = this.objectInfo.dataBindInfoList[i];
+                        if (CommonTools.Search(info.name, this.bindInputString)) this.selectDataList.Add(info);
                     }
                     break;
             }
 
-            selectComponentAmount = selectComponentList.Count;
-            selectDataAmount = objectInfo.dataBindInfoList.Count;
+            this.selectComponentAmount = this.selectComponentList.Count;
+            this.selectDataAmount = this.objectInfo.dataBindInfoList.Count;
 
             this.bindListMaxIndex = (int) Math.Ceiling((this.selectComponentAmount + this.selectDataAmount) / (double) BindListShowAmount);
-            this.bindListIndex = Mathf.Clamp(bindListIndex, 1, this.bindListMaxIndex);
+            this.bindListIndex = Mathf.Clamp(this.bindListIndex, 1, this.bindListMaxIndex);
         }
 
         void BindComponent(GameObject bindObject, int index)
         {
             ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindObject);
-            objectInfo.Bind(componentBindInfo, index);
+            this.objectInfo.Bind(componentBindInfo, index);
             if (_bindWindow.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName) componentBindInfo.name = CommonTools.GetNumberAlpha(componentBindInfo.instanceObject.name);
+            if (this.commonSettingData.selectCreateNameSetting.isBindAutoGenerateName)
+            {
+                componentBindInfo.name = CommonTools.SetVariableName(componentBindInfo.instanceObject.name, this.commonSettingData.selectCreateNameSetting);
+            }
+            componentBindInfo.name = CommonTools.NameSettingByName(componentBindInfo, this.commonSettingData.selectScriptSetting.nameSetting);
             _bindWindow.isSavaSetting = true;
         }
 
         void SelectBindInfo(int index)
         {
-            selectComponentList = new List<ComponentBindInfo>();
-            selectComponentList.Add(objectInfo.gameObjectBindInfoList[index]);
-            selectComponentAmount = 1;
+            this.selectComponentList = new List<ComponentBindInfo>();
+            this.selectComponentList.Add(this.objectInfo.gameObjectBindInfoList[index]);
+            this.selectComponentAmount = 1;
 
             this.bindListMaxIndex = 1;
             this.bindListIndex = 1;
@@ -589,11 +620,11 @@ namespace BindTool
             switch (removeType)
             {
                 case RemoveType.This:
-                    int thisBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
+                    int thisBindInfoAmount = this.objectInfo.gameObjectBindInfoList.Count;
                     for (int i = thisBindInfoAmount - 1; i >= 0; i--)
                     {
-                        ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[i];
-                        if (componentBindInfo.instanceObject == removeObject) objectInfo.gameObjectBindInfoList.RemoveAt(i);
+                        ComponentBindInfo componentBindInfo = this.objectInfo.gameObjectBindInfoList[i];
+                        if (componentBindInfo.instanceObject == removeObject) this.objectInfo.gameObjectBindInfoList.RemoveAt(i);
                     }
                     break;
                 case RemoveType.Child:
@@ -605,11 +636,11 @@ namespace BindTool
                         Transform transform = transforms[i];
                         if (transform.gameObject != removeObject)
                         {
-                            int childBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
+                            int childBindInfoAmount = this.objectInfo.gameObjectBindInfoList.Count;
                             for (int j = childBindInfoAmount - 1; j >= 0; j--)
                             {
-                                ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[j];
-                                if (componentBindInfo.instanceObject == transform.gameObject) objectInfo.gameObjectBindInfoList.RemoveAt(j);
+                                ComponentBindInfo componentBindInfo = this.objectInfo.gameObjectBindInfoList[j];
+                                if (componentBindInfo.instanceObject == transform.gameObject) this.objectInfo.gameObjectBindInfoList.RemoveAt(j);
                             }
                         }
                     }
@@ -622,18 +653,18 @@ namespace BindTool
                     for (int i = 0; i < amount; i++)
                     {
                         Transform transform = transforms[i];
-                        int childBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
+                        int childBindInfoAmount = this.objectInfo.gameObjectBindInfoList.Count;
                         for (int j = childBindInfoAmount - 1; j >= 0; j--)
                         {
-                            ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[j];
-                            if (componentBindInfo.instanceObject == transform.gameObject) objectInfo.gameObjectBindInfoList.RemoveAt(j);
+                            ComponentBindInfo componentBindInfo = this.objectInfo.gameObjectBindInfoList[j];
+                            if (componentBindInfo.instanceObject == transform.gameObject) this.objectInfo.gameObjectBindInfoList.RemoveAt(j);
                         }
                     }
                     break;
                 }
             }
 
-            isSavaSetting = true;
+            this.isSavaSetting = true;
         }
     }
 }

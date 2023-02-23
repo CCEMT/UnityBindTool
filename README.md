@@ -10,6 +10,8 @@
 
 图文介绍：https://zhuanlan.zhihu.com/p/567010400
 
+版本：Unity2019.4.40+
+
 ## 快速构建
 
 1、右键需要绑定物体，选择BindWindown
@@ -108,6 +110,7 @@ ScriptSetting，AutonBindSetting，CreateSetting的设置分别独立
 
 ```csharp
 #region Template Method
+	//在此编写模板方法
 #endregion
 ```
 
@@ -145,17 +148,17 @@ ScriptSetting，AutonBindSetting，CreateSetting的设置分别独立
 
 * 名称替换列表：将检查名称与默认名称（通常为物体名）进行匹配，匹配成功后替换成指定名称
 
-例：物体名为btn但代码中想要Button
+应用场景：物体名为btn但代码中的命名想为Button
 
 创建名称设置搜索栏规则：检查名称，替换名称
 
 ## 其他
 
-绑定数据后会将数据生成到region里面，不要去修改它和它里面的内容，每次生成只会替换#region里面的数据，尽量代码中不要出现
-重复的#region。
+绑定数据后会将数据生成到region里面，不要去修改它和它里面的内容，每次生成只会替换#region里面的数据
 
 ```csharp
 #region Auto Generate
+	//生成信息
 #endregion
 ```
 

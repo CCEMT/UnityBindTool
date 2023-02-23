@@ -101,37 +101,43 @@ namespace BindTool
             ObjectInfo objectInfo = null;
 
             BindComponents bindComponents = bindObject.GetComponent<BindComponents>();
+
             if (bindComponents != null)
             {
-                objectInfo = new ObjectInfo();
-                objectInfo.typeString = new TypeString(bindComponents.bindRoot.GetType());
-                objectInfo.rootBindInfo = new ComponentBindInfo(bindObject);
-                objectInfo.rootBindInfo.name = objectInfo.typeString.typeName;
-                objectInfo.gameObjectBindInfoList = new List<ComponentBindInfo>();
-                objectInfo.dataBindInfoList = new List<DataBindInfo>();
-
-                Type type = bindComponents.bindRoot.GetType();
-                FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                for (int i = 0; i < fieldInfos.Length; i++)
+                if (bindComponents.bindRoot == null) { Object.DestroyImmediate(bindComponents); }
+                else
                 {
-                    FieldInfo fieldInfo = fieldInfos[i];
-                    object attribute = fieldInfo.GetCustomAttribute(typeof(AutoGenerateFileldAttribute), true);
-                    if (attribute == null) continue;
-                    Object bindComponent = (Object) fieldInfo.GetValue(bindComponents.bindRoot);
-                    if (bindComponent is GameObject == false && bindComponent.GetType().IsSubclassOf(typeof(Component)) == false)
+                    objectInfo = new ObjectInfo();
+                    objectInfo.typeString = new TypeString(bindComponents.bindRoot.GetType());
+                    objectInfo.rootBindInfo = new ComponentBindInfo(bindObject);
+                    objectInfo.rootBindInfo.name = objectInfo.typeString.typeName;
+                    objectInfo.gameObjectBindInfoList = new List<ComponentBindInfo>();
+                    objectInfo.dataBindInfoList = new List<DataBindInfo>();
+
+                    Type type = bindComponents.bindRoot.GetType();
+                    FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    for (int i = 0; i < fieldInfos.Length; i++)
                     {
-                        DataBindInfo dataBindInfo = new DataBindInfo(bindComponent);
-                        dataBindInfo.name = fieldInfo.Name;
-                        objectInfo.dataBindInfoList.Add(dataBindInfo);
-                    }
-                    else
-                    {
-                        ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindComponent);
-                        componentBindInfo.name = fieldInfo.Name;
-                        componentBindInfo.SetIndex(new TypeString(fieldInfo.FieldType));
-                        objectInfo.gameObjectBindInfoList.Add(componentBindInfo);
+                        FieldInfo fieldInfo = fieldInfos[i];
+                        object attribute = fieldInfo.GetCustomAttribute(typeof(AutoGenerateFileldAttribute), true);
+                        if (attribute == null) continue;
+                        Object bindComponent = (Object) fieldInfo.GetValue(bindComponents.bindRoot);
+                        if (bindComponent is GameObject == false && bindComponent.GetType().IsSubclassOf(typeof(Component)) == false)
+                        {
+                            DataBindInfo dataBindInfo = new DataBindInfo(bindComponent);
+                            dataBindInfo.name = fieldInfo.Name;
+                            objectInfo.dataBindInfoList.Add(dataBindInfo);
+                        }
+                        else
+                        {
+                            ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindComponent);
+                            componentBindInfo.name = fieldInfo.Name;
+                            componentBindInfo.SetIndex(new TypeString(fieldInfo.FieldType));
+                            objectInfo.gameObjectBindInfoList.Add(componentBindInfo);
+                        }
                     }
                 }
+
             }
 
             if (objectInfo == null)
@@ -145,13 +151,26 @@ namespace BindTool
             return objectInfo;
         }
 
-        public static string SetName(string content, CreateNameSetting createNameSetting)
+        public static string SetVariableName(string content, CreateNameSetting createNameSetting)
         {
             string newName = GetNumberAlpha(content);
-            int amount = createNameSetting.nameReplaceDataList.Count;
+            int amount = createNameSetting.variableNameReplaceDataList.Count;
             for (int i = 0; i < amount; i++)
             {
-                NameReplaceData nameReplaceData = createNameSetting.nameReplaceDataList[i];
+                NameReplaceData nameReplaceData = createNameSetting.variableNameReplaceDataList[i];
+                if (nameReplaceData.nameCheck.Check(newName, out string matchingContent)) newName = content.Replace(matchingContent, nameReplaceData.targetName);
+            }
+
+            return newName;
+        }
+
+        public static string SetPropertyName(string content, CreateNameSetting createNameSetting)
+        {
+            string newName = GetNumberAlpha(content);
+            int amount = createNameSetting.propertyNameReplaceDataList.Count;
+            for (int i = 0; i < amount; i++)
+            {
+                NameReplaceData nameReplaceData = createNameSetting.propertyNameReplaceDataList[i];
                 if (nameReplaceData.nameCheck.Check(newName, out string matchingContent)) newName = content.Replace(matchingContent, nameReplaceData.targetName);
             }
 
@@ -229,7 +248,11 @@ namespace BindTool
 
         public static string NameSettingByName(ComponentBindInfo componentBindInfo, NameSetting nameSetting)
         {
-            string targetName = componentBindInfo.name;
+            return NameSettingByName(componentBindInfo.name, componentBindInfo, nameSetting);
+        }
+
+        public static string NameSettingByName(string targetName, ComponentBindInfo componentBindInfo, NameSetting nameSetting)
+        {
             switch (nameSetting.namingDispose)
             {
                 case ScriptNamingDispose.InitialLower:
@@ -259,7 +282,11 @@ namespace BindTool
 
         public static string NameSettingByName(DataBindInfo dataBindInfo, NameSetting nameSetting)
         {
-            string targetName = dataBindInfo.name;
+            return NameSettingByName(dataBindInfo.name, dataBindInfo, nameSetting);
+        }
+
+        public static string NameSettingByName(string targetName, DataBindInfo dataBindInfo, NameSetting nameSetting)
+        {
             switch (nameSetting.namingDispose)
             {
                 case ScriptNamingDispose.InitialLower:
