@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   programName: DefaultUICreateNameSetting
   isBindAutoGenerateName: 1
-  nameReplaceDataList: []
+  variableNameReplaceDataList: []
+  propertyNameReplaceDataList: []

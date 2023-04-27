@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 #endregion
 
@@ -16,7 +17,7 @@ namespace BindTool
         public string createScriptPath;
         public bool isCustomBind;
         public string newScriptName;
-        public TypeString addTypeString;
+        public TypeString mergeTypeString;
 
         //PrefabSetting
         public bool isCreatePrefab;

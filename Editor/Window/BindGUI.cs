@@ -114,7 +114,7 @@ namespace BindTool
                 {
                     if (this.errorList.Contains(addErrorInfo)) this.errorList.Remove(addErrorInfo);
                 }
-                this.commonSettingData.addTypeString = this.objectInfo.rootBindInfo.GetTypeString();
+                this.commonSettingData.mergeTypeString = this.objectInfo.rootBindInfo.GetTypeString();
             }
             else
             {

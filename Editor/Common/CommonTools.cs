@@ -2,12 +2,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEditor;
-using UnityEditor.Experimental.SceneManagement;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -26,37 +25,6 @@ namespace BindTool
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 var preferences = AssetDatabase.LoadAssetAtPath<CommonSettingData>(path);
                 if (preferences != null) return preferences;
-            }
-            return null;
-        }
-
-        public static GenerateData GetGenerateData()
-        {
-            string typeSearchString = $" t:{nameof(GenerateData)}";
-            string[] guids = AssetDatabase.FindAssets(typeSearchString);
-            foreach (string guid in guids)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                var preferences = AssetDatabase.LoadAssetAtPath<GenerateData>(path);
-                if (preferences != null) return preferences;
-            }
-            return null;
-        }
-
-        public static GenerateData CreateGenerateData()
-        {
-            string typeSearchString = $" t:{nameof(CommonSettingData)}";
-            string[] guids = AssetDatabase.FindAssets(typeSearchString);
-            foreach (string guid in guids)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                string createPath = new DirectoryInfo(path).Parent.ToString();
-                createPath += $"/{nameof(GenerateData)}.asset";
-                createPath = createPath.Substring(createPath.IndexOf("Assets", StringComparison.Ordinal));
-                GenerateData generateData = ScriptableObject.CreateInstance<GenerateData>();
-                AssetDatabase.CreateAsset(generateData, createPath);
-                AssetDatabase.Refresh();
-                return generateData;
             }
             return null;
         }
@@ -119,8 +87,8 @@ namespace BindTool
                     for (int i = 0; i < fieldInfos.Length; i++)
                     {
                         FieldInfo fieldInfo = fieldInfos[i];
-                        object attribute = fieldInfo.GetCustomAttribute(typeof(AutoGenerateFileldAttribute), true);
-                        if (attribute == null) continue;
+                        AutoGenerateAttribute attribute = (AutoGenerateAttribute) fieldInfo.GetCustomAttribute(typeof(AutoGenerateAttribute), true);
+                        if (attribute == null || attribute.autoGenerateType != AutoGenerateType.OriginalField) continue;
                         Object bindComponent = (Object) fieldInfo.GetValue(bindComponents.bindRoot);
                         if (bindComponent is GameObject == false && bindComponent.GetType().IsSubclassOf(typeof(Component)) == false)
                         {
@@ -433,6 +401,20 @@ namespace BindTool
             string inputNumber = GetNumber(input);
             if (checkNumber.Contains(inputNumber)) return true;
             return false;
+        }
+
+        public static string GetFolderPath(DefaultAsset folder)
+        {
+            string path = AssetDatabase.GetAssetPath(folder);
+            path = path.Substring(6);
+            return path;
+        }
+        
+        public static string GetObjectPath(Object target)
+        {
+            string path = AssetDatabase.GetAssetPath(target);
+            path = path.Substring(7);
+            return path;
         }
     }
 }

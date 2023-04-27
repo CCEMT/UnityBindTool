@@ -13,28 +13,25 @@ MonoBehaviour:
   m_Name: CommonSetting
   m_EditorClassIdentifier: 
   isCreateScriptFolder: 1
-  createScriptPath: Script
+  createScriptPath: Script/GenerateScripts
   isCustomBind: 1
-  newScriptName: TestPanel
-  addTypeString:
-    typeName: Text
-    typeNameSpace: UnityEngine.UI
-    assemblyName: UnityEngine.UI
+  newScriptName: Root
+  mergeTypeString:
+    typeName: 
+    typeNameSpace: 
+    assemblyName: 
   isCreatePrefab: 1
   isCreatePrefabFolder: 1
-  createPrefabPath: Prefab
+  createPrefabPath: Files/GeneratePrefabs
   isCreateLua: 0
   isCreateLuaFolder: 0
   createLuaPath: Lua
-  selectScriptSetting: {fileID: 11400000, guid: 7b1fe43ea26618e498cd87de59c92cf2,
-    type: 2}
+  selectScriptSetting: {fileID: 11400000, guid: 7b1fe43ea26618e498cd87de59c92cf2, type: 2}
   scriptSettingList:
   - {fileID: 11400000, guid: 7b1fe43ea26618e498cd87de59c92cf2, type: 2}
-  selectAutoBindSetting: {fileID: 11400000, guid: fa9bd50778ebe364b996800c50cb25ad,
-    type: 2}
+  selectAutoBindSetting: {fileID: 11400000, guid: fa9bd50778ebe364b996800c50cb25ad, type: 2}
   autoBindSettingList:
   - {fileID: 11400000, guid: fa9bd50778ebe364b996800c50cb25ad, type: 2}
-  selectCreateNameSetting: {fileID: 11400000, guid: 2aec32ab9ae390e46ad1c09b84cf1a2e,
-    type: 2}
+  selectCreateNameSetting: {fileID: 11400000, guid: 2aec32ab9ae390e46ad1c09b84cf1a2e, type: 2}
   createNameSettingList:
   - {fileID: 11400000, guid: 2aec32ab9ae390e46ad1c09b84cf1a2e, type: 2}

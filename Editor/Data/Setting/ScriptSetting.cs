@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 #endregion
@@ -44,13 +45,13 @@ namespace BindTool
         public NameSetting propertyNameSetting;
 
         public bool isSavaOldScript; //是否保存旧脚本
-        public string savaOldScriptPath; //保存路径
+        public DefaultAsset oldScriptFolderPath;
 
         public NameSetting methodNameSetting;
         public List<VariableData> variableList;
         public List<TemplateData> templateDataList;
 
-        public string templateScriptSavaPath; //模板脚本保存路径
+        public DefaultAsset templateScriptSavaFolderPath;
 
         #region Equals
 
@@ -63,37 +64,40 @@ namespace BindTool
 
         protected bool Equals(ScriptSetting other)
         {
-            return programName == other.programName && isGenerateNew == other.isGenerateNew && inheritClass.Equals(other.inheritClass) && isGeneratePartial == other.isGeneratePartial &&
-                   partialName == other.partialName && isSpecifyNamespace == other.isSpecifyNamespace && useNamespace == other.useNamespace && variableVisitType == other.variableVisitType &&
-                   nameSetting.Equals(other.nameSetting) && isAddProperty == other.isAddProperty && propertyVisitType == other.propertyVisitType && propertyType == other.propertyType &&
-                   propertyNameSetting.Equals(other.propertyNameSetting) && isSavaOldScript == other.isSavaOldScript && savaOldScriptPath == other.savaOldScriptPath &&
-                   methodNameSetting.Equals(other.methodNameSetting) && Equals(variableList, other.variableList) && Equals(templateDataList, other.templateDataList);
+            return base.Equals(other) && this.programName == other.programName && this.isGenerateNew == other.isGenerateNew && this.inheritClass.Equals(other.inheritClass) &&
+                   this.createScriptAssembly == other.createScriptAssembly && this.isGeneratePartial == other.isGeneratePartial && this.partialName == other.partialName &&
+                   this.isSpecifyNamespace == other.isSpecifyNamespace && this.useNamespace == other.useNamespace && this.variableVisitType == other.variableVisitType &&
+                   this.nameSetting.Equals(other.nameSetting) && this.isAddProperty == other.isAddProperty && this.propertyVisitType == other.propertyVisitType &&
+                   this.propertyType == other.propertyType && this.propertyNameSetting.Equals(other.propertyNameSetting) && this.isSavaOldScript == other.isSavaOldScript &&
+                   Equals(this.oldScriptFolderPath, other.oldScriptFolderPath) && this.methodNameSetting.Equals(other.methodNameSetting) && Equals(this.variableList, other.variableList) &&
+                   Equals(this.templateDataList, other.templateDataList) && Equals(this.templateScriptSavaFolderPath, other.templateScriptSavaFolderPath);
         }
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                int hashCode = programName != null ? programName.GetHashCode() : 0;
-                hashCode = (hashCode * 397) ^ isGenerateNew.GetHashCode();
-                hashCode = (hashCode * 397) ^ inheritClass.GetHashCode();
-                hashCode = (hashCode * 397) ^ isGeneratePartial.GetHashCode();
-                hashCode = (hashCode * 397) ^ (partialName != null ? partialName.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ isSpecifyNamespace.GetHashCode();
-                hashCode = (hashCode * 397) ^ (useNamespace != null ? useNamespace.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (int) variableVisitType;
-                hashCode = (hashCode * 397) ^ nameSetting.GetHashCode();
-                hashCode = (hashCode * 397) ^ isAddProperty.GetHashCode();
-                hashCode = (hashCode * 397) ^ (int) propertyVisitType;
-                hashCode = (hashCode * 397) ^ (int) propertyType;
-                hashCode = (hashCode * 397) ^ propertyNameSetting.GetHashCode();
-                hashCode = (hashCode * 397) ^ isSavaOldScript.GetHashCode();
-                hashCode = (hashCode * 397) ^ (savaOldScriptPath != null ? savaOldScriptPath.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ methodNameSetting.GetHashCode();
-                hashCode = (hashCode * 397) ^ (variableList != null ? variableList.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (templateDataList != null ? templateDataList.GetHashCode() : 0);
-                return hashCode;
-            }
+            HashCode hashCode = new HashCode();
+            hashCode.Add(base.GetHashCode());
+            hashCode.Add(this.programName);
+            hashCode.Add(this.isGenerateNew);
+            hashCode.Add(this.inheritClass);
+            hashCode.Add(this.createScriptAssembly);
+            hashCode.Add(this.isGeneratePartial);
+            hashCode.Add(this.partialName);
+            hashCode.Add(this.isSpecifyNamespace);
+            hashCode.Add(this.useNamespace);
+            hashCode.Add((int) this.variableVisitType);
+            hashCode.Add(this.nameSetting);
+            hashCode.Add(this.isAddProperty);
+            hashCode.Add((int) this.propertyVisitType);
+            hashCode.Add((int) this.propertyType);
+            hashCode.Add(this.propertyNameSetting);
+            hashCode.Add(this.isSavaOldScript);
+            hashCode.Add(this.oldScriptFolderPath);
+            hashCode.Add(this.methodNameSetting);
+            hashCode.Add(this.variableList);
+            hashCode.Add(this.templateDataList);
+            hashCode.Add(this.templateScriptSavaFolderPath);
+            return hashCode.ToHashCode();
         }
 
         #endregion

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 #endregion
@@ -198,8 +199,8 @@ namespace BindTool
         {
             ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
 
-            generateData.addTypeString = generateData.objectInfo.typeString;
-            if (generateData.bindObject.GetComponent(generateData.addTypeString.ToType()) == null) { generateData.bindObject.AddComponent(generateData.addTypeString.ToType()); }
+            generateData.mergeTypeString = generateData.objectInfo.typeString;
+            if (generateData.bindObject.GetComponent(generateData.mergeTypeString.ToType()) == null) { generateData.bindObject.AddComponent(generateData.mergeTypeString.ToType()); }
 
             if (selectSettion.isSavaOldScript) SavaOldScript(path, commonSettingData, generateData);
 
@@ -248,7 +249,7 @@ namespace BindTool
                 for (int i = 0; i < deleteAmount + 1; i++) contents.RemoveAt(startLine);
             }
 
-            generateData.objectInfo.typeString = generateData.addTypeString;
+            generateData.objectInfo.typeString = generateData.mergeTypeString;
 
             //在开始行插入数据
             List<string> addData = GenerateCSharpData.Generate(commonSettingData, generateData, isSpecifyNamespace);
@@ -273,11 +274,11 @@ namespace BindTool
                 string line = contents[i];
                 if (classLine == -1)
                 {
-                    if (line.Contains(generateData.addTypeString.typeName))
+                    if (line.Contains(generateData.mergeTypeString.typeName))
                     {
                         classLine = i;
-                        int index = line.IndexOf(generateData.addTypeString.typeName, StringComparison.Ordinal);
-                        index += generateData.addTypeString.typeName.Length;
+                        int index = line.IndexOf(generateData.mergeTypeString.typeName, StringComparison.Ordinal);
+                        index += generateData.mergeTypeString.typeName.Length;
                         int lineLength = line.Length;
                         for (int j = index; j < lineLength; j++)
                         {
@@ -329,10 +330,11 @@ namespace BindTool
         {
             ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
 
-            string savaPath = Application.dataPath + "/" + selectSettion.savaOldScriptPath + "/";
+            string assetPath = CommonTools.GetFolderPath(selectSettion.oldScriptFolderPath);
+            string savaPath = Application.dataPath + assetPath + "/";
 
             string directoryName = "";
-            if (generateData.addTypeString.IsEmpty() == false) { directoryName = generateData.addTypeString.typeName + "/"; }
+            if (generateData.mergeTypeString.IsEmpty() == false) { directoryName = generateData.mergeTypeString.typeName + "/"; }
             else { directoryName = generateData.newScriptName + "/"; }
 
             string directoryPath = savaPath + directoryName;
@@ -345,7 +347,7 @@ namespace BindTool
             FileInfo[] files = direction.GetFiles("*", SearchOption.AllDirectories);
 
             string fileName = "";
-            if (generateData.addTypeString.IsEmpty() == false) { fileName = generateData.addTypeString.typeName + ".txt"; }
+            if (generateData.mergeTypeString.IsEmpty() == false) { fileName = generateData.mergeTypeString.typeName + ".txt"; }
             else { fileName = generateData.newScriptName + "/"; }
 
             List<string> nameList = new List<string>();
@@ -360,7 +362,7 @@ namespace BindTool
             int number = 1;
             while (isCan == false)
             {
-                string tempName = generateData.addTypeString.typeName + number + ".txt";
+                string tempName = generateData.mergeTypeString.typeName + number + ".txt";
                 if (nameList.Contains(tempName) == false)
                 {
                     isCan = true;

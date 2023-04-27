@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -53,7 +54,7 @@ namespace BindTool
                     }
                 }
                 EditorGUILayout.EndHorizontal();
-
+               
                 string path = Application.dataPath + "/" + commonSettingData.createScriptPath;
 
                 string errorInfo = "错误：脚本保存路径错误，请重新选择路径！";
@@ -89,8 +90,28 @@ namespace BindTool
                 }
             }
             GUILayout.EndHorizontal();
-        }
+            Rect scriptRect = GUILayoutUtility.GetLastRect();
+            Event e = Event.current;
+            switch (e.type)
+            {
+                case EventType.DragUpdated:
+                case EventType.DragPerform:
+                    if (scriptRect.Contains(e.mousePosition))
+                    {
+                        DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                        if (e.type == EventType.DragPerform)
+                        {
+                            DragAndDrop.AcceptDrag();
 
+                            Object target = DragAndDrop.objectReferences.First();
+                            commonSettingData.createScriptPath = CommonTools.GetObjectPath(target);
+                        }
+                        e.Use();
+                    }
+                    break;
+            }
+        }
+        
         void CreatePrefabInfoSet()
         {
             GUILayout.Label("Prefab", prefabGuiStyle);
@@ -129,7 +150,7 @@ namespace BindTool
                     }
                 }
                 EditorGUILayout.EndHorizontal();
-
+              
                 string path = Application.dataPath + "/" + commonSettingData.createPrefabPath;
                 string errorInfo = "错误：预制体保存路径错误，请重新选择路径！";
                 if (Directory.Exists(path) == false)
@@ -165,6 +186,26 @@ namespace BindTool
                 }
             }
             GUILayout.EndHorizontal();
+            Rect prefabRect = GUILayoutUtility.GetLastRect();
+            Event e = Event.current;
+            switch (e.type)
+            {
+                case EventType.DragUpdated:
+                case EventType.DragPerform:
+                    if (prefabRect.Contains(e.mousePosition))
+                    {
+                        DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                        if (e.type == EventType.DragPerform)
+                        {
+                            DragAndDrop.AcceptDrag();
+
+                            Object target = DragAndDrop.objectReferences.First();
+                            commonSettingData.createPrefabPath = CommonTools.GetObjectPath(target);
+                        }
+                        e.Use();
+                    }
+                    break;
+            }
         }
 
         void CreateLuaInfoSet()
@@ -249,7 +290,7 @@ namespace BindTool
         {
             if (GUILayout.Button("Copy CSharp Code"))
             {
-                GenerateData generateData = CreateInstance<GenerateData>();
+                GenerateData generateData = new GenerateData();
                 generateData.bindObject = bindObject;
                 generateData.objectInfo = objectInfo;
                 GUIUtility.systemCopyBuffer = string.Join("\n", GenerateCSharpData.Generate(commonSettingData, generateData, false));

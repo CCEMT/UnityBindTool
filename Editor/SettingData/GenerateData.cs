@@ -1,12 +1,14 @@
 ﻿#region Using
 
+using System;
 using UnityEngine;
 
 #endregion
 
 namespace BindTool
 {
-    public class GenerateData : ScriptableObject
+    [Serializable]
+    public class GenerateData
     {
         //是否Build
         public bool isStartBuild;
@@ -16,6 +18,7 @@ namespace BindTool
 
         //绑定的物体
         public GameObject bindObject;
+
         //绑定信息
         public ObjectInfo objectInfo;
 
@@ -23,6 +26,6 @@ namespace BindTool
         public string getBindDataMethodName;
 
         //绑定的脚本类型
-        public TypeString addTypeString;
+        public TypeString mergeTypeString;
     }
 }

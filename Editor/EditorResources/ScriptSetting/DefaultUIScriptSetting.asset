@@ -46,7 +46,7 @@ MonoBehaviour:
     isAddBehind: 0
     behindName: 
   isSavaOldScript: 1
-  savaOldScriptPath: UnityBindTool/SavaOldScript
+  oldScriptFolderPath: {fileID: 102900000, guid: 924f928df3d31eb4cb46dfab75d84ddd, type: 3}
   methodNameSetting:
     namingDispose: 2
     repetitionNameDispose: 0
@@ -100,4 +100,4 @@ MonoBehaviour:
       typeName: MonoBehaviour
       typeNameSpace: UnityEngine
       assemblyName: UnityEngine.CoreModule
-  templateScriptSavaPath: UnityBindTool/Editor/ScriptTemplate
+  templateScriptSavaFolderPath: {fileID: 102900000, guid: e01998ddcdd0d0e4e82548ce36ca2712, type: 3}

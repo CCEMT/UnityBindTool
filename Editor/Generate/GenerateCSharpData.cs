@@ -248,11 +248,14 @@ namespace BindTool
                 }
             }
 
+            string folderPath = AssetDatabase.GetAssetPath(selectSettion.templateScriptSavaFolderPath);
+            folderPath = folderPath.Substring(6);
+
             int templateAmount = selectSettion.templateDataList.Count;
             for (int i = 0; i < templateAmount; i++)
             {
                 TemplateData templateData = selectSettion.templateDataList[i];
-                string fullPath = $"{Application.dataPath}/{selectSettion.templateScriptSavaPath}/{templateData.temlateType.typeName}.cs";
+                string fullPath = $"{Application.dataPath}/{folderPath}/{templateData.temlateType.typeName}.cs";
                 List<string> contents = File.ReadAllLines(fullPath).ToList();
                 List<string> addLine = new List<string>();
 
@@ -430,7 +433,7 @@ namespace BindTool
                 nameList.Add(variableName);
                 baseData.variableName = variableName;
 
-                string content = $"[BindTool.AutoGenerateFileld][UnityEngine.SerializeField]{CommonTools.GetVisitString(selectSettion.variableVisitType)} ";
+                string content = $"[BindTool.{nameof(AutoGenerateAttribute)}({nameof(AutoGenerateType.OriginalField)})][UnityEngine.SerializeField]{CommonTools.GetVisitString(selectSettion.variableVisitType)} ";
 
                 TypeString type = typeString;
                 content += type.GetVisitString();

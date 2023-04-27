@@ -234,29 +234,20 @@ namespace BindTool
                     {
                         EditorGUILayout.BeginHorizontal();
                         {
-                            GUILayout.Label("路径：", GUILayout.MinWidth(50));
-                            string tempOldSavaPath = GUILayout.TextArea(selectSetting.savaOldScriptPath, GUILayout.MaxWidth(500));
-                            if (tempOldSavaPath != selectSetting.savaOldScriptPath)
+                            GUILayout.Label("路径文件夹：", GUILayout.MinWidth(50));
+
+                            DefaultAsset tempPath = (DefaultAsset) EditorGUILayout.ObjectField(selectSetting.oldScriptFolderPath, typeof(DefaultAsset), true);
+                            if (tempPath != selectSetting.oldScriptFolderPath)
                             {
-                                selectSetting.savaOldScriptPath = tempOldSavaPath;
+                                selectSetting.oldScriptFolderPath = tempPath;
                                 isSavaSetting = true;
                             }
 
-                            if (GUILayout.Button("浏览", GUILayout.MinWidth(50)))
-                            {
-                                string targetPath = EditorUtility.OpenFolderPanel("选择代码保存路径", Application.dataPath, null);
-                                if (string.IsNullOrEmpty(targetPath) == false)
-                                {
-                                    targetPath = targetPath.Substring(Application.dataPath.Length + 1, targetPath.Length - Application.dataPath.Length - 1);
-                                    selectSetting.savaOldScriptPath = targetPath;
-                                    isSavaSetting = true;
-                                }
-                            }
                         }
                         EditorGUILayout.EndHorizontal();
-                        string errorInfo = "错误：旧脚本保存路径为空或不存在";
-                        string path = Application.dataPath + "/" + selectSetting.savaOldScriptPath;
-                        if (string.IsNullOrEmpty(selectSetting.savaOldScriptPath) || Directory.Exists(path) == false)
+
+                        string errorInfo = "错误：旧脚本保存路径为空路径";
+                        if (selectSetting.oldScriptFolderPath == null)
                         {
                             if (errorList.Contains(errorInfo) == false) errorList.Add(errorInfo);
                             GUI.color = Color.red;
@@ -683,7 +674,8 @@ namespace BindTool
                                         TemplateData templateData = new TemplateData();
                                         templateData.targetType = templateSelectType;
 
-                                        TypeString templateType = ScriptGenerate.GenerateCSharpTemplateScript(templateData.targetType, selectSetting.templateScriptSavaPath);
+                                        string path = CommonTools.GetFolderPath(selectSetting.templateScriptSavaFolderPath);
+                                        TypeString templateType = ScriptGenerate.GenerateCSharpTemplateScript(templateData.targetType,path);
                                         templateData.temlateType = templateType;
                                         templateData.temlateBaseType = new TypeString(typeof(MonoBehaviour));
                                         selectSetting.templateDataList.Add(templateData);
@@ -719,7 +711,8 @@ namespace BindTool
                                                 GUI.color = Color.white;
                                                 if (GUILayout.Button("打开脚本"))
                                                 {
-                                                    string fullPath = $"Assets/{selectSetting.templateScriptSavaPath}/{templateData.temlateType.typeName}.cs";
+                                                    string path = CommonTools.GetFolderPath(selectSetting.templateScriptSavaFolderPath);
+                                                    string fullPath = $"Assets/{path}/{templateData.temlateType.typeName}.cs";
                                                     Object script = AssetDatabase.LoadAssetAtPath<Object>(fullPath);
                                                     if (script != null) AssetDatabase.OpenAsset(script);
                                                 }
@@ -735,7 +728,8 @@ namespace BindTool
                                                         if (isSelect)
                                                         {
                                                             templateData.temlateBaseType = type;
-                                                            ScriptGenerate.AlterCSharpTemplateBase(templateData, selectSetting.templateScriptSavaPath);
+                                                            string path = CommonTools.GetFolderPath(selectSetting.templateScriptSavaFolderPath);
+                                                            ScriptGenerate.AlterCSharpTemplateBase(templateData,path);
                                                             isSavaSetting = true;
                                                             AssetDatabase.SaveAssets();
                                                             AssetDatabase.Refresh();
@@ -747,7 +741,8 @@ namespace BindTool
                                                 GUI.color = Color.red;
                                                 if (GUILayout.Button("删除"))
                                                 {
-                                                    string fullPath = $"{Application.dataPath}/{selectSetting.templateScriptSavaPath}/{templateData.temlateType.typeName}.cs";
+                                                    string path = CommonTools.GetFolderPath(selectSetting.templateScriptSavaFolderPath);
+                                                    string fullPath = $"{Application.dataPath}/{path}/{templateData.temlateType.typeName}.cs";
                                                     if (File.Exists(fullPath)) File.Delete(fullPath);
                                                     selectSetting.templateDataList.Remove(templateData);
                                                     isSavaSetting = true;
@@ -888,33 +883,28 @@ namespace BindTool
                 EditorGUILayout.BeginHorizontal();
                 {
                     GUILayout.Label("模板脚本保存路径：", GUILayout.MinWidth(100));
-                    string tempTemplateScriptSavaPath = GUILayout.TextArea(selectSetting.templateScriptSavaPath, GUILayout.MaxWidth(300));
-                    if (tempTemplateScriptSavaPath != selectSetting.templateScriptSavaPath)
+                    DefaultAsset tempPath = (DefaultAsset) EditorGUILayout.ObjectField(selectSetting.templateScriptSavaFolderPath, typeof(DefaultAsset), true);
+                    if (tempPath != selectSetting.templateScriptSavaFolderPath)
                     {
-                        selectSetting.templateScriptSavaPath = tempTemplateScriptSavaPath;
+                        selectSetting.templateScriptSavaFolderPath = tempPath;
                         isSavaSetting = true;
-                    }
-
-                    if (GUILayout.Button("浏览", GUILayout.MinWidth(50)))
-                    {
-                        string targetPath = EditorUtility.OpenFolderPanel("选择模板脚本保存路径", Application.dataPath, null);
-                        if (string.IsNullOrEmpty(targetPath) == false)
-                        {
-                            targetPath = targetPath.Substring(Application.dataPath.Length + 1, targetPath.Length - Application.dataPath.Length - 1);
-                            selectSetting.templateScriptSavaPath = targetPath;
-                            isSavaSetting = true;
-                        }
                     }
                 }
                 EditorGUILayout.EndHorizontal();
-                string path = Application.dataPath + "/" + selectSetting.templateScriptSavaPath;
-                if (string.IsNullOrEmpty(selectSetting.templateScriptSavaPath) || Directory.Exists(path) == false)
+                
+                string errorInfo = "错误：模板脚本路径为空";
+                if (selectSetting.templateScriptSavaFolderPath == null)
                 {
-                    GUI.color = Color.yellow;
+                    if (errorList.Contains(errorInfo) == false) errorList.Add(errorInfo);
+                    GUI.color = Color.red;
                     GUILayout.BeginVertical("box");
-                    GUILayout.Label("警告：保存路径为空或不存在");
+                    GUILayout.Label(errorInfo);
                     GUILayout.EndHorizontal();
                     GUI.color = Color.white;
+                }
+                else
+                {
+                    if (errorList.Contains(errorInfo)) errorList.Remove(errorInfo);
                 }
             }
             GUILayout.EndVertical();

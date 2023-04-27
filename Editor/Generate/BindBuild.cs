@@ -14,6 +14,8 @@ namespace BindTool
 {
     public class BindBuild
     {
+        public const string BuildGenerateDataKey = "BuildGenerateDataKey";
+
         public static void Build(GameObject bindObject, ObjectInfo objectInfo)
         {
             CommonSettingData commonSettingData = CommonTools.GetCommonSettingData();
@@ -25,11 +27,11 @@ namespace BindTool
                 return;
             }
 
-            GenerateData generateData = CommonTools.CreateGenerateData();
+            GenerateData generateData = new GenerateData();
 
             //保存临时数据
             generateData.newScriptName = commonSettingData.newScriptName;
-            generateData.addTypeString = commonSettingData.addTypeString;
+            generateData.mergeTypeString = commonSettingData.mergeTypeString;
             generateData.bindObject = bindObject;
             generateData.objectInfo = objectInfo;
             generateData.isStartBuild = true;
@@ -75,6 +77,7 @@ namespace BindTool
                 ScriptGenerate.CSharpWrite(commonSettingData, generateData, path);
                 objectInfo.gameObjectBindInfoList = oldBindDataList;
             }
+            EditorPrefs.SetString(BuildGenerateDataKey, JsonUtility.ToJson(generateData));
             Debug.Log("Create ScriptSetting Finish.");
         }
 
@@ -86,16 +89,15 @@ namespace BindTool
 
         static void CreatePrefab()
         {
+            if (EditorPrefs.HasKey(BuildGenerateDataKey) == false) { return; }
             CommonSettingData commonSettingData = CommonTools.GetCommonSettingData();
-            GenerateData generateData = CommonTools.GetGenerateData();
-            string generateDataPath = AssetDatabase.GetAssetPath(generateData);
+            GenerateData generateData = JsonUtility.FromJson<GenerateData>(EditorPrefs.GetString(BuildGenerateDataKey));
 
             if (generateData == null) return;
             if (generateData.isStartBuild) { generateData.isStartBuild = false; }
             else
             {
-                AssetDatabase.DeleteAsset(generateDataPath);
-                AssetDatabase.Refresh();
+                EditorPrefs.DeleteKey(BuildGenerateDataKey);
                 return;
             }
 
@@ -156,7 +158,7 @@ namespace BindTool
                 Debug.Log("Create Prefab Finish.");
             }
 
-            AssetDatabase.DeleteAsset(generateDataPath);
+            EditorPrefs.DeleteKey(BuildGenerateDataKey);
             AssetDatabase.Refresh();
         }
     }
