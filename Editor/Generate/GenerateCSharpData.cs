@@ -25,15 +25,15 @@ namespace BindTool
             public DataBindInfo dataBindInfo;
         }
 
-        public static List<string> Generate(CommonSettingData commonSettingData, GenerateData generateData, bool isSpecifyNamespace)
+        public static List<string> Generate(MainSetting mainSetting, GenerateData generateData)
         {
             List<string> generateList = new List<string>();
 
-            ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+            ScriptSetting selectSettion = mainSetting.selectScriptSetting;
 
-            Writer($"#region {ConstData.DefaultName}", 1);
+            Writer($"#region {CommonConst.DefaultName}", 1);
 
-            Writer($"///#region {ConstData.DefaultName} #endregion里的内容为自动生成，请勿去修改它", 1);
+            Writer($"///#region {CommonConst.DefaultName} #endregion里的内容为自动生成，请勿去修改它", 1);
 
             List<string> nameList = new List<string>();
             List<ComponentNameData> coomponentNameList = new List<ComponentNameData>();
@@ -48,7 +48,7 @@ namespace BindTool
             {
                 ComponentBindInfo componentInfo = generateData.objectInfo.gameObjectBindInfoList[i];
                 string variableName = componentInfo.name;
-                string propertyName = CommonTools.SetPropertyName(variableName, commonSettingData.selectCreateNameSetting);
+                string propertyName = CommonTools.SetPropertyName(variableName, mainSetting.selectCreateNameSetting);
                 propertyName = CommonTools.NameSettingByName(propertyName, componentInfo, selectSettion.propertyNameSetting);
                 ComponentNameData componentNameData = new ComponentNameData();
                 componentNameData.componentBindInfo = componentInfo;
@@ -61,7 +61,7 @@ namespace BindTool
             {
                 DataBindInfo dataInfo = generateData.objectInfo.dataBindInfoList[i];
                 string variableName = dataInfo.name;
-                string propertyName = CommonTools.SetPropertyName(variableName, commonSettingData.selectCreateNameSetting);
+                string propertyName = CommonTools.SetPropertyName(variableName, mainSetting.selectCreateNameSetting);
                 propertyName = CommonTools.NameSettingByName(propertyName, dataInfo, selectSettion.propertyNameSetting);
                 DataName dataName = new DataName();
                 dataName.dataBindInfo = dataInfo;
@@ -71,7 +71,7 @@ namespace BindTool
 
             generateList.Add("");
 
-            string bindMethodName = ConstData.DefaultBindMethodName;
+            string bindMethodName = CommonConst.DefaultBindMethodName;
             generateData.getBindDataMethodName = bindMethodName;
             Writer($"public void {bindMethodName}()", 1);
             Writer("{", 1);
@@ -268,7 +268,7 @@ namespace BindTool
                     string line = contents[j];
                     if (startLine == -1)
                     {
-                        if (line.Contains($"#region {ConstData.TemplateRegionName}")) startLine = j;
+                        if (line.Contains($"#region {CommonConst.TemplateRegionName}")) startLine = j;
                     }
                     else
                     {
@@ -320,7 +320,7 @@ namespace BindTool
 
             string CreateTab(int level)
             {
-                if (isSpecifyNamespace) level++;
+                if (mainSetting.selectScriptSetting.isSpecifyNamespace) level++;
                 string content = "";
                 for (int i = 0; i < level; i++) content += "\t";
                 return content;

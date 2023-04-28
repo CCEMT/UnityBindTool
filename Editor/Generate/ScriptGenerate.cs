@@ -36,9 +36,9 @@ namespace BindTool
             }
         }
 
-        public static void CSharpWrite(CommonSettingData commonSettingData, GenerateData generateData, string scriptPath)
+        public static void CSharpWrite(MainSetting mainSetting, GenerateData generateData, string scriptPath)
         {
-            ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+            ScriptSetting selectSettion = mainSetting.selectScriptSetting;
             AddBindComponents(generateData);
 
             //是否创建新脚本
@@ -50,36 +50,36 @@ namespace BindTool
                 if (selectSettion.isGeneratePartial)
                 {
                     //创建主文件
-                    CreatePartialMainFile(scriptFile, commonSettingData, generateData);
+                    CreatePartialMainFile(scriptFile, mainSetting, generateData);
 
                     string scriptPartialFile = scriptPath + $"{generateData.newScriptName}.{selectSettion.partialName}.cs";
                     //创建Partial并写入数据
                     if (File.Exists(scriptPartialFile))
                     {
-                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData, generateData);
+                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, mainSetting, generateData);
                         File.Delete(scriptPartialFile);
                     }
-                    GenerateCSharpScript(commonSettingData, generateData, scriptPartialFile, generateData.newScriptName, true, true);
+                    GenerateCSharpScript(mainSetting, generateData, scriptPartialFile, generateData.newScriptName, true, true);
                 }
                 else
                 {
                     //创建文件并写入数据
                     if (File.Exists(scriptFile) == false)
                     {
-                        bool isExist = TypeString.IsExist(generateData.newScriptName, selectSettion.useNamespace, ConstData.DefaultAssembly);
+                        bool isExist = TypeString.IsExist(generateData.newScriptName, selectSettion.useNamespace, CommonConst.DefaultAssembly);
                         if (isExist)
                         {
                             Debug.LogError("生成为新文件时错误 类型冲突:" + generateData.newScriptName);
                             generateData.isStartBuild = false;
                             return;
                         }
-                        GenerateCSharpScript(commonSettingData, generateData, scriptFile, generateData.newScriptName, true, false);
+                        GenerateCSharpScript(mainSetting, generateData, scriptFile, generateData.newScriptName, true, false);
                     }
                     else
                     {
                         //打开文件并更改数据
-                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptFile, commonSettingData, generateData);
-                        OpenCSharpFileAlterData(commonSettingData, generateData, scriptFile);
+                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptFile, mainSetting, generateData);
+                        OpenCSharpFileAlterData(mainSetting, generateData, scriptFile);
                     }
                 }
             }
@@ -93,24 +93,24 @@ namespace BindTool
 
                     if (File.Exists(scriptPartialFile))
                     {
-                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData, generateData);
+                        if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, mainSetting, generateData);
                         File.Delete(scriptPartialFile);
                     }
-                    GenerateCSharpScript(commonSettingData, generateData, scriptPartialFile, generateData.objectInfo.typeString.typeName, true, true);
+                    GenerateCSharpScript(mainSetting, generateData, scriptPartialFile, generateData.objectInfo.typeString.typeName, true, true);
                 }
                 else
                 {
                     string scriptPartialFile = scriptPath + $"{generateData.newScriptName}.cs";
                     //打开文件并更改数据
-                    if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, commonSettingData, generateData);
-                    OpenCSharpFileAlterData(commonSettingData, generateData, scriptPartialFile);
+                    if (selectSettion.isSavaOldScript) SavaOldScript(scriptPartialFile, mainSetting, generateData);
+                    OpenCSharpFileAlterData(mainSetting, generateData, scriptPartialFile);
                 }
             }
         }
 
-        static void CreatePartialMainFile(string scriptFile, CommonSettingData commonSettingData, GenerateData generateData)
+        static void CreatePartialMainFile(string scriptFile, MainSetting mainSetting, GenerateData generateData)
         {
-            ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+            ScriptSetting selectSettion = mainSetting.selectScriptSetting;
             if (File.Exists(scriptFile) == false)
             {
                 bool isExist = TypeString.IsExist(generateData.newScriptName, selectSettion.useNamespace, selectSettion.createScriptAssembly);
@@ -121,7 +121,7 @@ namespace BindTool
                     return;
                 }
                 //创建空主文件
-                GenerateCSharpScript(commonSettingData, generateData, scriptFile, generateData.newScriptName, false, true);
+                GenerateCSharpScript(mainSetting, generateData, scriptFile, generateData.newScriptName, false, true);
             }
             else
             {
@@ -134,7 +134,7 @@ namespace BindTool
                 {
                     //如果包含则 将 class [ClassName]替换为partial class [ClassName]
                     //Error 该操作可能会出现问题 将其保存以便找回原数据
-                    if (selectSettion.isSavaOldScript) SavaOldScript(scriptFile, commonSettingData, generateData);
+                    if (selectSettion.isSavaOldScript) SavaOldScript(scriptFile, mainSetting, generateData);
 
                     int index = content.IndexOf(generateData.newScriptName, StringComparison.Ordinal);
                     string interval = string.Empty;
@@ -149,9 +149,9 @@ namespace BindTool
                 sw.WriteLine(content);
                 sw.Close();
 
-                if (content.Contains($"#region {ConstData.DefaultName}"))
+                if (content.Contains($"#region {CommonConst.DefaultName}"))
                 {
-                    if (selectSettion.isSavaOldScript) SavaOldScript(scriptFile, commonSettingData, generateData);
+                    if (selectSettion.isSavaOldScript) SavaOldScript(scriptFile, mainSetting, generateData);
                     List<string> contents = File.ReadAllLines(scriptFile).ToList();
                     //包含自动生成数据
                     int startLine = -1;
@@ -163,7 +163,7 @@ namespace BindTool
                         string line = contents[i];
                         if (startLine == -1)
                         {
-                            if (line.Contains($"#region {ConstData.DefaultName}")) startLine = i;
+                            if (line.Contains($"#region {CommonConst.DefaultName}")) startLine = i;
                         }
                         else
                         {
@@ -195,14 +195,14 @@ namespace BindTool
             }
         }
 
-        static void OpenCSharpFileAlterData(CommonSettingData commonSettingData, GenerateData generateData, string path)
+        static void OpenCSharpFileAlterData(MainSetting mainSetting, GenerateData generateData, string path)
         {
-            ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+            ScriptSetting selectSettion = mainSetting.selectScriptSetting;
 
             generateData.mergeTypeString = generateData.objectInfo.typeString;
             if (generateData.bindObject.GetComponent(generateData.mergeTypeString.ToType()) == null) { generateData.bindObject.AddComponent(generateData.mergeTypeString.ToType()); }
 
-            if (selectSettion.isSavaOldScript) SavaOldScript(path, commonSettingData, generateData);
+            if (selectSettion.isSavaOldScript) SavaOldScript(path, mainSetting, generateData);
 
             bool isSpecifyNamespace = File.ReadAllText(path).Contains("namespace");
 
@@ -219,7 +219,7 @@ namespace BindTool
                 string line = contents[i];
                 if (startLine == -1)
                 {
-                    if (line.Contains($"#region {ConstData.DefaultName}")) startLine = i;
+                    if (line.Contains($"#region {CommonConst.DefaultName}")) startLine = i;
                 }
                 else
                 {
@@ -252,7 +252,7 @@ namespace BindTool
             generateData.objectInfo.typeString = generateData.mergeTypeString;
 
             //在开始行插入数据
-            List<string> addData = GenerateCSharpData.Generate(commonSettingData, generateData, isSpecifyNamespace);
+            List<string> addData = GenerateCSharpData.Generate(mainSetting, generateData);
             int addAmount = addData.Count;
             for (int i = 0; i < addAmount; i++) contents.Insert(startLine + i, addData[i]);
 
@@ -326,9 +326,9 @@ namespace BindTool
             return false;
         }
 
-        static void SavaOldScript(string path, CommonSettingData commonSettingData, GenerateData generateData)
+        static void SavaOldScript(string path, MainSetting mainSetting, GenerateData generateData)
         {
-            ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+            ScriptSetting selectSettion = mainSetting.selectScriptSetting;
 
             string assetPath = CommonTools.GetFolderPath(selectSettion.oldScriptFolderPath);
             string savaPath = Application.dataPath + assetPath + "/";
@@ -377,9 +377,9 @@ namespace BindTool
             mainWriter.Close();
         }
 
-        static void GenerateCSharpScript(CommonSettingData commonSettingData, GenerateData generateData, string path, string className, bool isGenerateData, bool isPartial)
+        static void GenerateCSharpScript(MainSetting mainSetting, GenerateData generateData, string path, string className, bool isGenerateData, bool isPartial)
         {
-            ScriptSetting selectSettion = commonSettingData.selectScriptSetting;
+            ScriptSetting selectSettion = mainSetting.selectScriptSetting;
 
             generateData.objectInfo.typeString.typeName = generateData.newScriptName;
             generateData.objectInfo.typeString.typeNameSpace = selectSettion.useNamespace;
@@ -402,7 +402,7 @@ namespace BindTool
 
             if (isGenerateData)
             {
-                List<string> addList = GenerateCSharpData.Generate(commonSettingData, generateData, selectSettion.isSpecifyNamespace);
+                List<string> addList = GenerateCSharpData.Generate(mainSetting, generateData);
                 int addAmount = addList.Count;
                 for (int i = 0; i < addAmount; i++)
                 {
@@ -439,10 +439,10 @@ namespace BindTool
 
             Writer("///该脚本为模板方法");
             Writer("///注意：");
-            Writer($"///需要生成的方法写入#region-{ConstData.TemplateRegionName}");
+            Writer($"///需要生成的方法写入#region-{CommonConst.TemplateRegionName}");
             Writer("///生成方法使用到的类型必须为[命名空间].[类型名]，如果使用using引用命名空间生成时可能会生成失败");
 
-            Writer($"namespace {ConstData.TemplateNamespace}");
+            Writer($"namespace {CommonConst.TemplateNamespace}");
             Writer("{");
 
             string inheritContent = "UnityEngine.MonoBehaviour";
@@ -451,7 +451,7 @@ namespace BindTool
 
             Writer($"public {targetType.GetVisitString()} templateValue;", 2);
 
-            Writer($"#region {ConstData.TemplateRegionName}", 2);
+            Writer($"#region {CommonConst.TemplateRegionName}", 2);
             mainWriter.WriteLine();
             Writer("#endregion", 2);
 
@@ -475,8 +475,8 @@ namespace BindTool
 
             TypeString typeString = new TypeString();
             typeString.typeName = $"{targetType.typeName}Template";
-            typeString.typeNameSpace = ConstData.TemplateNamespace;
-            typeString.assemblyName = ConstData.TemplateAssembly;
+            typeString.typeNameSpace = CommonConst.TemplateNamespace;
+            typeString.assemblyName = CommonConst.TemplateAssembly;
 
             return typeString;
         }
@@ -492,7 +492,7 @@ namespace BindTool
 
             addLine.Add("///该脚本为模板方法");
             addLine.Add("///注意：");
-            addLine.Add($"///需要生成的方法写入#region-{ConstData.TemplateRegionName}");
+            addLine.Add($"///需要生成的方法写入#region-{CommonConst.TemplateRegionName}");
             addLine.Add("///生成方法使用到的类型必须为[命名空间].[类型名]，如果使用using引用命名空间生成时可能会生成失败");
 
             for (int i = 0; i < lineAmount; i++)
@@ -502,7 +502,7 @@ namespace BindTool
                 else if (line.Contains("namespace")) break;
             }
 
-            Writer($"namespace {ConstData.TemplateNamespace}");
+            Writer($"namespace {CommonConst.TemplateNamespace}");
             Writer("{");
 
             string inheritContent = "UnityEngine.MonoBehaviour";
@@ -520,7 +520,7 @@ namespace BindTool
                 string line = contents[i];
                 if (startLine == -1)
                 {
-                    if (line.Contains($"#region {ConstData.TemplateRegionName}"))
+                    if (line.Contains($"#region {CommonConst.TemplateRegionName}"))
                     {
                         startLine = i;
                         addLine.Add(line);
