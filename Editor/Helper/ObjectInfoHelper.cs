@@ -1,9 +1,22 @@
+using BindTool;
+using Microsoft.CodeAnalysis.CSharp;
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public static class ObjectInfoHelper 
+public static class ObjectInfoHelper
 {
- 
+    public static SyntaxKind VisitTypeToSyntaxKind(VisitType visitType)
+    {
+        switch (visitType)
+        {
+            case VisitType.Public:
+                return SyntaxKind.PublicKeyword;
+            case VisitType.Private:
+                return SyntaxKind.PrivateKeyword;
+            case VisitType.Protected:
+                return SyntaxKind.ProtectedKeyword;
+            case VisitType.Internal:
+                return SyntaxKind.InternalKeyword;
+        }
+
+        return default;
+    }
 }

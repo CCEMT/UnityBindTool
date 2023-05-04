@@ -104,12 +104,7 @@ namespace BindTool
             GenerateData generateData = JsonUtility.FromJson<GenerateData>(EditorPrefs.GetString(CSharpBuildGenerateDataKey));
 
             if (generateData == null) return;
-            if (generateData.isStartBuild) { generateData.isStartBuild = false; }
-            else
-            {
-                EditorPrefs.DeleteKey(CSharpBuildGenerateDataKey);
-                return;
-            }
+            EditorPrefs.DeleteKey(CSharpBuildGenerateDataKey);
 
             GameObject bindObject = generateData.bindObject;
             if (bindObject == null) return;
@@ -168,7 +163,7 @@ namespace BindTool
                 Debug.Log("Create Prefab Finish.");
             }
 
-            EditorPrefs.DeleteKey(CSharpBuildGenerateDataKey);
+            AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
 
