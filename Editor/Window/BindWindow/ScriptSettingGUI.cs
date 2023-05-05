@@ -170,11 +170,9 @@ namespace BindTool
                         if (GUILayout.Button(selectSetting.inheritClass.typeName))
                         {
                             TypeSelectWindow.ShowWindown(typeof(MonoBehaviour), (isSelect, type) => {
-                                if (isSelect)
-                                {
-                                    selectSetting.inheritClass = type;
-                                    isSavaSetting = true;
-                                }
+                                if (! isSelect) return;
+                                selectSetting.inheritClass = type;
+                                this.isSavaSetting = true;
                             }, position.position);
                         }
                         GUI.color = Color.white;
@@ -194,11 +192,9 @@ namespace BindTool
                         if (GUILayout.Button("搜索", GUILayout.Width(50)))
                         {
                             SearchAssemblyWindow.ShowWindown((isSelect, assembly) => {
-                                if (isSelect)
-                                {
-                                    selectSetting.createScriptAssembly = assembly;
-                                    isSavaSetting = true;
-                                }
+                                if (! isSelect) return;
+                                selectSetting.createScriptAssembly = assembly;
+                                this.isSavaSetting = true;
                             }, position.position);
                         }
                     }
@@ -725,15 +721,13 @@ namespace BindTool
                                                 if (GUILayout.Button(templateData.temlateBaseType.typeName))
                                                 {
                                                     TypeSelectWindow.ShowWindown(typeof(MonoBehaviour), (isSelect, type) => {
-                                                        if (isSelect)
-                                                        {
-                                                            templateData.temlateBaseType = type;
-                                                            string path = CommonTools.GetFolderPath(selectSetting.templateScriptSavaFolderPath);
-                                                            ScriptGenerate.AlterCSharpTemplateBase(templateData,path);
-                                                            isSavaSetting = true;
-                                                            AssetDatabase.SaveAssets();
-                                                            AssetDatabase.Refresh();
-                                                        }
+                                                        if (! isSelect) return;
+                                                        templateData.temlateBaseType = type;
+                                                        string path = CommonTools.GetFolderPath(selectSetting.templateScriptSavaFolderPath);
+                                                        ScriptGenerate.AlterCSharpTemplateBase(templateData,path);
+                                                        this.isSavaSetting = true;
+                                                        AssetDatabase.SaveAssets();
+                                                        AssetDatabase.Refresh();
                                                     }, position.position);
                                                 }
                                                 GUI.color = Color.white;

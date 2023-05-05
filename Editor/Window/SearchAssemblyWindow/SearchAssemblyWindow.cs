@@ -118,35 +118,33 @@ namespace BindTool
             float itmeHeight = 525f / 18f;
             float currentHeight = 0;
 
-            if (currentEvent.type == EventType.KeyDown)
+            if (this.currentEvent.type != EventType.KeyDown) return;
+            switch (this.currentEvent.keyCode)
             {
-                switch (currentEvent.keyCode)
-                {
-                    case KeyCode.UpArrow:
-                        selectIndex -= 1;
-                        selectIndex = Mathf.Clamp(selectIndex, 0, selectAmount);
-                        Repaint();
-                        currentEvent.Use();
-                        currentHeight = itmeHeight * selectIndex;
-                        if (currentHeight < typeSelectScrollPosition1.y) typeSelectScrollPosition1.y -= itmeHeight;
-                        break;
-                    case KeyCode.DownArrow:
-                        selectIndex += 1;
-                        selectIndex = Mathf.Clamp(selectIndex, 0, selectAmount - 1);
-                        Repaint();
-                        currentEvent.Use();
-                        currentHeight = itmeHeight * (selectIndex + 1);
-                        if (currentHeight > typeSelectScrollPosition1.y + height) typeSelectScrollPosition1.y += itmeHeight;
-                        break;
-                    case KeyCode.Return:
-                        if (selectList.Count > 0)
-                        {
-                            callBack?.Invoke(true, selectList[selectIndex].GetName().Name);
-                            Close();
-                        }
-                        currentEvent.Use();
-                        break;
-                }
+                case KeyCode.UpArrow:
+                    this.selectIndex -= 1;
+                    this.selectIndex = Mathf.Clamp(this.selectIndex, 0, this.selectAmount);
+                    Repaint();
+                    this.currentEvent.Use();
+                    currentHeight = itmeHeight * this.selectIndex;
+                    if (currentHeight < this.typeSelectScrollPosition1.y) this.typeSelectScrollPosition1.y -= itmeHeight;
+                    break;
+                case KeyCode.DownArrow:
+                    this.selectIndex += 1;
+                    this.selectIndex = Mathf.Clamp(this.selectIndex, 0, this.selectAmount - 1);
+                    Repaint();
+                    this.currentEvent.Use();
+                    currentHeight = itmeHeight * (this.selectIndex + 1);
+                    if (currentHeight > this.typeSelectScrollPosition1.y + height) this.typeSelectScrollPosition1.y += itmeHeight;
+                    break;
+                case KeyCode.Return:
+                    if (this.selectList.Count > 0)
+                    {
+                        this.callBack?.Invoke(true, this.selectList[this.selectIndex].GetName().Name);
+                        Close();
+                    }
+                    this.currentEvent.Use();
+                    break;
             }
         }
     }

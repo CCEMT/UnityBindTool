@@ -169,121 +169,117 @@ namespace BindTool
             }
             EditorGUILayout.EndHorizontal();
 
-            if (this.selectNameBindAmount > 0)
+            if (this.selectNameBindAmount <= 0) return;
+            GUILayout.BeginVertical("box", GUILayout.Height(275));
             {
-                GUILayout.BeginVertical("box", GUILayout.Height(275));
+                for (int i = 0; i < NameBindShowAmount; i++)
                 {
-                    for (int i = 0; i < NameBindShowAmount; i++)
+                    int showIndex = (this.nameBindListIndex - 1) * NameBindShowAmount + i;
+                    if (showIndex >= this.selectNameBindAmount) { break; }
+                    GUILayout.BeginVertical("frameBox");
                     {
-                        int showIndex = (this.nameBindListIndex - 1) * NameBindShowAmount + i;
-                        if (showIndex >= this.selectNameBindAmount) { break; }
-                        GUILayout.BeginVertical("frameBox");
+                        EditorGUILayout.BeginHorizontal();
                         {
-                            EditorGUILayout.BeginHorizontal();
+                            NameBindData data = this.selectNameBindDataList[showIndex];
+
+                            EditorGUILayout.BeginVertical();
                             {
-                                NameBindData data = selectNameBindDataList[showIndex];
-
-                                EditorGUILayout.BeginVertical();
+                                EditorGUILayout.BeginHorizontal();
                                 {
-                                    EditorGUILayout.BeginHorizontal();
+                                    GUILayout.Label("检查名称");
+                                    string tempCheckName = GUILayout.TextField(data.nameCheck.name, GUILayout.MinWidth(50));
+                                    if (tempCheckName != data.nameCheck.name)
                                     {
-                                        GUILayout.Label("检查名称");
-                                        string tempCheckName = GUILayout.TextField(data.nameCheck.name, GUILayout.MinWidth(50));
-                                        if (tempCheckName != data.nameCheck.name)
-                                        {
-                                            data.nameCheck.name = tempCheckName;
-                                            isSavaSetting = true;
-                                        }
+                                        data.nameCheck.name = tempCheckName;
+                                        this.isSavaSetting = true;
                                     }
-                                    EditorGUILayout.EndHorizontal();
-
-                                    EditorGUILayout.BeginHorizontal();
-                                    {
-                                        GUILayout.Label("对应类");
-                                        GUI.color = Color.green;
-                                        if (GUILayout.Button(data.typeString.typeName))
-                                        {
-                                            int bindIndex = i;
-                                            TypeSelectWindow.ShowWindown(typeof(Component), (isSelect, type) => {
-                                                if (isSelect)
-                                                {
-                                                    data.typeString = type;
-                                                    selectSetting.nameBindDataList[bindIndex] = data;
-                                                    isSavaSetting = true;
-                                                }
-                                            }, position.position);
-                                        }
-                                        GUI.color = Color.white;
-                                    }
-                                    EditorGUILayout.EndHorizontal();
                                 }
-                                EditorGUILayout.EndVertical();
+                                EditorGUILayout.EndHorizontal();
 
-                                EditorGUILayout.BeginVertical();
+                                EditorGUILayout.BeginHorizontal();
                                 {
-                                    EditorGUILayout.BeginHorizontal();
+                                    GUILayout.Label("对应类");
+                                    GUI.color = Color.green;
+                                    if (GUILayout.Button(data.typeString.typeName))
                                     {
-                                        GUILayout.Label("区分大小写");
-                                        bool tempIsCaseSensitive = GUILayout.Toggle(data.nameCheck.nameRule.isCaseSensitive, "");
-                                        if (tempIsCaseSensitive != data.nameCheck.nameRule.isCaseSensitive)
-                                        {
-                                            data.nameCheck.nameRule.isCaseSensitive = tempIsCaseSensitive;
-                                            isSavaSetting = true;
-                                        }
-                                    }
-                                    EditorGUILayout.EndHorizontal();
-
-                                    EditorGUILayout.BeginHorizontal();
-                                    {
-                                        GUILayout.Label("匹配规则");
-                                        NameMatchingRule tempnNameMatchingRule = (NameMatchingRule) EditorGUILayout.EnumPopup(data.nameCheck.nameRule.nameMatchingRule, GUILayout.Width(100));
-                                        if (tempnNameMatchingRule != data.nameCheck.nameRule.nameMatchingRule)
-                                        {
-                                            data.nameCheck.nameRule.nameMatchingRule = tempnNameMatchingRule;
-                                            isSavaSetting = true;
-                                        }
-                                    }
-                                    EditorGUILayout.EndHorizontal();
-                                }
-                                EditorGUILayout.EndVertical();
-
-                                EditorGUILayout.BeginVertical();
-                                {
-                                    if (GUILayout.Button("操作", GUILayout.Width(50))) { }
-
-                                    GUI.color = Color.red;
-                                    if (GUILayout.Button("删除", GUILayout.Width(50)))
-                                    {
-                                        selectSetting.nameBindDataList.Remove(data);
-                                        isSavaSetting = true;
+                                        int bindIndex = i;
+                                        TypeSelectWindow.ShowWindown(typeof(Component), (isSelect, type) => {
+                                            if (! isSelect) return;
+                                            data.typeString = type;
+                                            selectSetting.nameBindDataList[bindIndex] = data;
+                                            this.isSavaSetting = true;
+                                        }, position.position);
                                     }
                                     GUI.color = Color.white;
                                 }
-                                EditorGUILayout.EndVertical();
+                                EditorGUILayout.EndHorizontal();
                             }
-                            EditorGUILayout.EndHorizontal();
+                            EditorGUILayout.EndVertical();
+
+                            EditorGUILayout.BeginVertical();
+                            {
+                                EditorGUILayout.BeginHorizontal();
+                                {
+                                    GUILayout.Label("区分大小写");
+                                    bool tempIsCaseSensitive = GUILayout.Toggle(data.nameCheck.nameRule.isCaseSensitive, "");
+                                    if (tempIsCaseSensitive != data.nameCheck.nameRule.isCaseSensitive)
+                                    {
+                                        data.nameCheck.nameRule.isCaseSensitive = tempIsCaseSensitive;
+                                        this.isSavaSetting = true;
+                                    }
+                                }
+                                EditorGUILayout.EndHorizontal();
+
+                                EditorGUILayout.BeginHorizontal();
+                                {
+                                    GUILayout.Label("匹配规则");
+                                    NameMatchingRule tempnNameMatchingRule = (NameMatchingRule) EditorGUILayout.EnumPopup(data.nameCheck.nameRule.nameMatchingRule, GUILayout.Width(100));
+                                    if (tempnNameMatchingRule != data.nameCheck.nameRule.nameMatchingRule)
+                                    {
+                                        data.nameCheck.nameRule.nameMatchingRule = tempnNameMatchingRule;
+                                        this.isSavaSetting = true;
+                                    }
+                                }
+                                EditorGUILayout.EndHorizontal();
+                            }
+                            EditorGUILayout.EndVertical();
+
+                            EditorGUILayout.BeginVertical();
+                            {
+                                if (GUILayout.Button("操作", GUILayout.Width(50))) { }
+
+                                GUI.color = Color.red;
+                                if (GUILayout.Button("删除", GUILayout.Width(50)))
+                                {
+                                    selectSetting.nameBindDataList.Remove(data);
+                                    this.isSavaSetting = true;
+                                }
+                                GUI.color = Color.white;
+                            }
+                            EditorGUILayout.EndVertical();
                         }
-                        GUILayout.EndHorizontal();
+                        EditorGUILayout.EndHorizontal();
                     }
+                    GUILayout.EndHorizontal();
                 }
-                GUILayout.EndHorizontal();
-                GUILayout.BeginHorizontal();
-                {
-                    GUILayout.Label($"{this.nameBindListIndex}/{this.nameBindListMaxIndex}", tabIndexStyle);
-                    GUILayout.Space(10);
-                    if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationLeft", GUILayout.Width(30), GUILayout.Height(20)))
-                    {
-                        nameBindListIndex--;
-                        this.nameBindListIndex = Mathf.Clamp(nameBindListIndex, 1, this.nameBindListMaxIndex);
-                    }
-                    if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationRight", GUILayout.Width(30), GUILayout.Height(20)))
-                    {
-                        nameBindListIndex++;
-                        this.nameBindListIndex = Mathf.Clamp(nameBindListIndex, 1, this.nameBindListMaxIndex);
-                    }
-                }
-                GUILayout.EndHorizontal();
             }
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            {
+                GUILayout.Label($"{this.nameBindListIndex}/{this.nameBindListMaxIndex}", this.tabIndexStyle);
+                GUILayout.Space(10);
+                if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationLeft", GUILayout.Width(30), GUILayout.Height(20)))
+                {
+                    this.nameBindListIndex--;
+                    this.nameBindListIndex = Mathf.Clamp(this.nameBindListIndex, 1, this.nameBindListMaxIndex);
+                }
+                if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationRight", GUILayout.Width(30), GUILayout.Height(20)))
+                {
+                    this.nameBindListIndex++;
+                    this.nameBindListIndex = Mathf.Clamp(this.nameBindListIndex, 1, this.nameBindListMaxIndex);
+                }
+            }
+            GUILayout.EndHorizontal();
         }
 
         void DrawNameLgnoreList()
@@ -307,75 +303,73 @@ namespace BindTool
             }
             EditorGUILayout.EndHorizontal();
 
-            if (this.selectLgnoreAmount > 0)
+            if (this.selectLgnoreAmount <= 0) return;
+            GUILayout.BeginVertical("box", GUILayout.Height(300));
             {
-                GUILayout.BeginVertical("box", GUILayout.Height(300));
+                for (int i = 0; i < NameLgnoreShowAmount; i++)
                 {
-                    for (int i = 0; i < NameLgnoreShowAmount; i++)
-                    {
-                        int showIndex = (this.nameLgnoreListIndex - 1) * NameLgnoreShowAmount + i;
-                        if (showIndex >= this.selectLgnoreAmount) { break; }
+                    int showIndex = (this.nameLgnoreListIndex - 1) * NameLgnoreShowAmount + i;
+                    if (showIndex >= this.selectLgnoreAmount) { break; }
 
-                        GUILayout.BeginVertical("frameBox");
+                    GUILayout.BeginVertical("frameBox");
+                    {
+                        EditorGUILayout.BeginHorizontal();
                         {
-                            EditorGUILayout.BeginHorizontal();
+                            NameCheck data = this.selectLgnoreDataList[showIndex];
+                            GUILayout.Label("检查名称");
+                            string tempCheckName = GUILayout.TextField(data.name, GUILayout.MinWidth(50));
+                            if (tempCheckName != data.name)
                             {
-                                NameCheck data = selectLgnoreDataList[showIndex];
-                                GUILayout.Label("检查名称");
-                                string tempCheckName = GUILayout.TextField(data.name, GUILayout.MinWidth(50));
-                                if (tempCheckName != data.name)
-                                {
-                                    data.name = tempCheckName;
-                                    isSavaSetting = true;
-                                }
-
-                                GUILayout.Label("匹配规则");
-                                NameMatchingRule tempNameMatchingRule = (NameMatchingRule) EditorGUILayout.EnumPopup(data.nameRule.nameMatchingRule, GUILayout.Width(75));
-                                if (tempNameMatchingRule != data.nameRule.nameMatchingRule)
-                                {
-                                    data.nameRule.nameMatchingRule = tempNameMatchingRule;
-                                    isSavaSetting = true;
-                                }
-
-                                bool tempIsCaseSensitive = GUILayout.Toggle(data.nameRule.isCaseSensitive, "区分大小写");
-                                if (tempIsCaseSensitive != data.nameRule.isCaseSensitive)
-                                {
-                                    data.nameRule.isCaseSensitive = tempIsCaseSensitive;
-                                    isSavaSetting = true;
-                                }
-
-                                GUI.color = Color.red;
-                                if (GUILayout.Button("删除", GUILayout.Width(50)))
-                                {
-                                    selectSetting.nameLgnoreDataList.Remove(data);
-                                    isSavaSetting = true;
-                                }
-                                GUI.color = Color.white;
-
+                                data.name = tempCheckName;
+                                this.isSavaSetting = true;
                             }
-                            EditorGUILayout.EndHorizontal();
+
+                            GUILayout.Label("匹配规则");
+                            NameMatchingRule tempNameMatchingRule = (NameMatchingRule) EditorGUILayout.EnumPopup(data.nameRule.nameMatchingRule, GUILayout.Width(75));
+                            if (tempNameMatchingRule != data.nameRule.nameMatchingRule)
+                            {
+                                data.nameRule.nameMatchingRule = tempNameMatchingRule;
+                                this.isSavaSetting = true;
+                            }
+
+                            bool tempIsCaseSensitive = GUILayout.Toggle(data.nameRule.isCaseSensitive, "区分大小写");
+                            if (tempIsCaseSensitive != data.nameRule.isCaseSensitive)
+                            {
+                                data.nameRule.isCaseSensitive = tempIsCaseSensitive;
+                                this.isSavaSetting = true;
+                            }
+
+                            GUI.color = Color.red;
+                            if (GUILayout.Button("删除", GUILayout.Width(50)))
+                            {
+                                selectSetting.nameLgnoreDataList.Remove(data);
+                                this.isSavaSetting = true;
+                            }
+                            GUI.color = Color.white;
+
                         }
-                        GUILayout.EndVertical();
+                        EditorGUILayout.EndHorizontal();
                     }
+                    GUILayout.EndVertical();
                 }
-                GUILayout.EndHorizontal();
-                GUILayout.BeginHorizontal();
-                {
-                    GUILayout.Label($"{this.nameLgnoreListIndex}/{this.nameLgnoreListMaxIndex}", tabIndexStyle);
-                    GUILayout.Space(10);
-                    if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationLeft", GUILayout.Width(30), GUILayout.Height(20)))
-                    {
-                        nameLgnoreListIndex--;
-                        this.nameLgnoreListIndex = Mathf.Clamp(nameLgnoreListIndex, 1, this.nameLgnoreListMaxIndex);
-                    }
-                    if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationRight", GUILayout.Width(30), GUILayout.Height(20)))
-                    {
-                        nameLgnoreListIndex++;
-                        this.nameLgnoreListIndex = Mathf.Clamp(nameLgnoreListIndex, 1, this.nameLgnoreListMaxIndex);
-                    }
-                }
-                GUILayout.EndHorizontal();
             }
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            {
+                GUILayout.Label($"{this.nameLgnoreListIndex}/{this.nameLgnoreListMaxIndex}", this.tabIndexStyle);
+                GUILayout.Space(10);
+                if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationLeft", GUILayout.Width(30), GUILayout.Height(20)))
+                {
+                    this.nameLgnoreListIndex--;
+                    this.nameLgnoreListIndex = Mathf.Clamp(this.nameLgnoreListIndex, 1, this.nameLgnoreListMaxIndex);
+                }
+                if (GUILayout.Button(string.Empty, (GUIStyle) "ArrowNavigationRight", GUILayout.Width(30), GUILayout.Height(20)))
+                {
+                    this.nameLgnoreListIndex++;
+                    this.nameLgnoreListIndex = Mathf.Clamp(this.nameLgnoreListIndex, 1, this.nameLgnoreListMaxIndex);
+                }
+            }
+            GUILayout.EndHorizontal();
         }
 
         void DrawStreamingBindList()
@@ -473,14 +467,12 @@ namespace BindTool
                                     GUI.color = Color.green;
                                     if (GUILayout.Button(data.typeString.typeName))
                                     {
-                                        int index = i;
+                                        int selectIndex = i;
                                         TypeSelectWindow.ShowWindown(typeof(Component), (isSelect, type) => {
-                                            if (isSelect)
-                                            {
-                                                data.typeString = type;
-                                                selectSetting.streamingBindDataList[index] = data;
-                                                isSavaSetting = true;
-                                            }
+                                            if (! isSelect) return;
+                                            data.typeString = type;
+                                            selectSetting.streamingBindDataList[selectIndex] = data;
+                                            this.isSavaSetting = true;
                                         }, position.position);
                                     }
 

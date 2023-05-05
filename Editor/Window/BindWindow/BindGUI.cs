@@ -151,12 +151,10 @@ namespace BindTool
                     {
                         Transform go = gameObjects[i];
                         ComponentBindInfo info = this.objectInfo.AutoBind(go, this.mainSetting.selectAutoBindSetting);
-                        if (info != null)
-                        {
-                            if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
-                                info.name = CommonTools.SetVariableName(info.instanceObject.name, this.mainSetting.selectCreateNameSetting);
-                            info.name = CommonTools.NameSettingByName(info, this.mainSetting.selectScriptSetting.nameSetting);
-                        }
+                        if (info == null) continue;
+                        if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
+                            info.name = NameHelper.SetVariableName(info.instanceObject.name, this.mainSetting.selectCreateNameSetting);
+                        info.name = NameHelper.NameSettingByName(info, this.mainSetting.selectScriptSetting.nameSetting);
                     }
                     this.isSavaSetting = true;
                 }
@@ -219,9 +217,9 @@ namespace BindTool
                                             this.objectInfo.Bind(componentBindInfo, infoIndex);
                                             if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
                                             {
-                                                componentBindInfo.name = CommonTools.SetVariableName(componentBindInfo.instanceObject.name, this.mainSetting.selectCreateNameSetting);
+                                                componentBindInfo.name = NameHelper.SetVariableName(componentBindInfo.instanceObject.name, this.mainSetting.selectCreateNameSetting);
                                             }
-                                            componentBindInfo.name = CommonTools.NameSettingByName(componentBindInfo, this.mainSetting.selectScriptSetting.nameSetting);
+                                            componentBindInfo.name = NameHelper.NameSettingByName(componentBindInfo, this.mainSetting.selectScriptSetting.nameSetting);
                                             this.isSavaSetting = true;
                                         });
                                     }
@@ -232,9 +230,9 @@ namespace BindTool
                                     DataBindInfo dataBindInfo = new DataBindInfo(selectObject);
                                     if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
                                     {
-                                        dataBindInfo.name = CommonTools.SetVariableName(dataBindInfo.bindObject.name, this.mainSetting.selectCreateNameSetting);
+                                        dataBindInfo.name = NameHelper.SetVariableName(dataBindInfo.bindObject.name, this.mainSetting.selectCreateNameSetting);
                                     }
-                                    dataBindInfo.name = CommonTools.NameSettingByName(dataBindInfo, this.mainSetting.selectScriptSetting.nameSetting);
+                                    dataBindInfo.name = NameHelper.NameSettingByName(dataBindInfo, this.mainSetting.selectScriptSetting.nameSetting);
                                     if (dataBindInfo.typeString.assemblyName.Equals("Assembly-CSharp-Editor") == false) { this.objectInfo.dataBindInfoList.Add(dataBindInfo); }
                                     else { Debug.Log("禁止绑定编辑器中的数据"); }
                                 }
@@ -260,9 +258,9 @@ namespace BindTool
                                         DataBindInfo dataBindInfo = new DataBindInfo(selectObject);
                                         if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
                                         {
-                                            dataBindInfo.name = CommonTools.SetVariableName(dataBindInfo.bindObject.name, this.mainSetting.selectCreateNameSetting);
+                                            dataBindInfo.name = NameHelper.SetVariableName(dataBindInfo.bindObject.name, this.mainSetting.selectCreateNameSetting);
                                         }
-                                        dataBindInfo.name = CommonTools.NameSettingByName(dataBindInfo, this.mainSetting.selectScriptSetting.nameSetting);
+                                        dataBindInfo.name = NameHelper.NameSettingByName(dataBindInfo, this.mainSetting.selectScriptSetting.nameSetting);
                                         if (dataBindInfo.typeString.assemblyName.Equals("Assembly-CSharp-Editor") == false) { this.objectInfo.dataBindInfoList.Add(dataBindInfo); }
                                         else { Debug.Log("禁止绑定编辑器中的数据"); }
                                     }
@@ -278,9 +276,9 @@ namespace BindTool
                                         this.objectInfo.AutoBind(info, this.mainSetting.selectAutoBindSetting);
                                         if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
                                         {
-                                            info.name = CommonTools.SetVariableName(info.instanceObject.name, this.mainSetting.selectCreateNameSetting);
+                                            info.name = NameHelper.SetVariableName(info.instanceObject.name, this.mainSetting.selectCreateNameSetting);
                                         }
-                                        info.name = CommonTools.NameSettingByName(info, this.mainSetting.selectScriptSetting.nameSetting);
+                                        info.name = NameHelper.NameSettingByName(info, this.mainSetting.selectScriptSetting.nameSetting);
                                     }
                                     this.isSavaSetting = true;
                                 });
@@ -297,15 +295,13 @@ namespace BindTool
                                             int infoTypeAmount = info.typeStrings.Length;
                                             for (int k = 0; k < infoTypeAmount; k++)
                                             {
-                                                if (info.typeStrings[k].Equals(typeString))
+                                                if (! info.typeStrings[k].Equals(typeString)) continue;
+                                                this.objectInfo.Bind(info, k);
+                                                if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
                                                 {
-                                                    this.objectInfo.Bind(info, k);
-                                                    if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
-                                                    {
-                                                        info.name = CommonTools.SetVariableName(info.instanceObject.name, this.mainSetting.selectCreateNameSetting);
-                                                    }
-                                                    info.name = CommonTools.NameSettingByName(info, this.mainSetting.selectScriptSetting.nameSetting);
+                                                    info.name = NameHelper.SetVariableName(info.instanceObject.name, this.mainSetting.selectCreateNameSetting);
                                                 }
+                                                info.name = NameHelper.NameSettingByName(info, this.mainSetting.selectScriptSetting.nameSetting);
                                             }
                                         }
                                         this.isSavaSetting = true;
@@ -351,66 +347,130 @@ namespace BindTool
             }
             GUILayout.EndVertical();
 
-            if (this.selectComponentAmount + this.selectDataAmount > 0)
+            if (this.selectComponentAmount + this.selectDataAmount <= 0) return;
+            GUILayout.BeginVertical("box", GUILayout.Height(272.5f));
             {
-                GUILayout.BeginVertical("box", GUILayout.Height(272.5f));
+                for (int i = 0; i < BindListShowAmount; i++)
                 {
-                    for (int i = 0; i < BindListShowAmount; i++)
+                    int showIndex = (this.bindListIndex - 1) * BindListShowAmount + i;
+
+                    if (showIndex >= this.selectComponentAmount + this.selectDataAmount) { break; }
+
+                    if (showIndex < this.selectComponentAmount)
                     {
-                        int showIndex = (this.bindListIndex - 1) * BindListShowAmount + i;
-
-                        if (showIndex >= this.selectComponentAmount + this.selectDataAmount) { break; }
-
-                        if (showIndex < this.selectComponentAmount)
+                        //显示选择的组件
+                        EditorGUILayout.BeginHorizontal("frameBox");
                         {
-                            //显示选择的组件
-                            EditorGUILayout.BeginHorizontal("frameBox");
+                            EditorGUILayout.BeginVertical();
+                            ComponentBindInfo componentBindInfo = this.selectComponentList[showIndex];
+                            int itemIndex = this.objectInfo.gameObjectBindInfoList.IndexOf(componentBindInfo);
+
+                            if (itemIndex == -1) GetBindSelectList();
+
+                            int tempComponentBindInfoIndex = EditorGUILayout.Popup(componentBindInfo.index, componentBindInfo.GetTypeStrings());
+                            if (tempComponentBindInfoIndex != componentBindInfo.index)
                             {
-                                EditorGUILayout.BeginVertical();
-                                ComponentBindInfo componentBindInfo = this.selectComponentList[showIndex];
-                                int itemIndex = this.objectInfo.gameObjectBindInfoList.IndexOf(componentBindInfo);
+                                this.objectInfo.gameObjectBindInfoList[itemIndex].index = tempComponentBindInfoIndex;
+                                this.isSavaSetting = true;
+                            }
+                            if (componentBindInfo.GetTypeName() == nameof(GameObject))
+                            {
+                                EditorGUILayout.ObjectField(componentBindInfo.instanceObject, componentBindInfo.GetValue().GetType(), true);
+                            }
+                            else { EditorGUILayout.ObjectField(componentBindInfo.GetValue(), componentBindInfo.GetValue().GetType(), true); }
 
-                                if (itemIndex == -1) GetBindSelectList();
+                            EditorGUILayout.EndVertical();
 
-                                int tempComponentBindInfoIndex = EditorGUILayout.Popup(componentBindInfo.index, componentBindInfo.GetTypeStrings());
-                                if (tempComponentBindInfoIndex != componentBindInfo.index)
-                                {
-                                    this.objectInfo.gameObjectBindInfoList[itemIndex].index = tempComponentBindInfoIndex;
+                            EditorGUILayout.BeginVertical();
+
+                            GUILayout.Label("变量名");
+                            string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(componentBindInfo.name));
+                            if (tempComponentBindInfoName != componentBindInfo.name)
+                            {
+                                this.objectInfo.gameObjectBindInfoList[itemIndex].name = tempComponentBindInfoName;
+                                this.isSavaSetting = true;
+                            }
+
+                            EditorGUILayout.EndVertical();
+
+                            EditorGUILayout.BeginVertical();
+
+                            if (GUILayout.Button("操作", GUILayout.Width(100)))
+                            {
+                                GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
+                                menu.AddItem(new GUIContent("设置默认名"), false, () => {
+
+                                    componentBindInfo.name = componentBindInfo.instanceObject.name;
+                                    if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
+                                    {
+                                        componentBindInfo.name = NameHelper.SetVariableName(componentBindInfo.instanceObject.name, this.mainSetting.selectCreateNameSetting);
+                                    }
+                                    componentBindInfo.name = NameHelper.NameSettingByName(componentBindInfo, this.mainSetting.selectScriptSetting.nameSetting);
+
                                     this.isSavaSetting = true;
-                                }
-                                if (componentBindInfo.GetTypeName() == nameof(GameObject))
-                                {
-                                    EditorGUILayout.ObjectField(componentBindInfo.instanceObject, componentBindInfo.GetValue().GetType(), true);
-                                }
-                                else { EditorGUILayout.ObjectField(componentBindInfo.GetValue(), componentBindInfo.GetValue().GetType(), true); }
+                                });
 
-                                EditorGUILayout.EndVertical();
+                                menu.ShowAsContext(); //显示菜单
+                            }
 
-                                EditorGUILayout.BeginVertical();
+                            GUI.color = Color.red;
+                            if (GUILayout.Button("删除", GUILayout.Width(100)))
+                            {
+                                this.objectInfo.gameObjectBindInfoList.RemoveAt(itemIndex);
+                                this.isSavaSetting = true;
+                                break;
+                            }
+                            GUI.color = Color.white;
 
+                            EditorGUILayout.EndVertical();
+                        }
+                        EditorGUILayout.EndHorizontal();
+                    }
+                    else
+                    {
+                        //显示选择的数据
+                        showIndex -= this.selectComponentAmount;
+                        DataBindInfo dataInfo = this.selectDataList[showIndex];
+                        int itemIndex = this.objectInfo.dataBindInfoList.IndexOf(dataInfo);
+
+                        if (itemIndex == -1) GetBindSelectList();
+
+                        EditorGUILayout.BeginHorizontal("frameBox");
+                        {
+                            EditorGUILayout.BeginVertical();
+                            {
+                                GUILayout.Label(dataInfo.typeString.typeName);
+
+                                EditorGUILayout.ObjectField(dataInfo.bindObject, dataInfo.typeString.ToType(), true);
+
+                            }
+                            EditorGUILayout.EndVertical();
+
+                            EditorGUILayout.BeginVertical();
+                            {
                                 GUILayout.Label("变量名");
-                                string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(componentBindInfo.name));
-                                if (tempComponentBindInfoName != componentBindInfo.name)
+                                string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(dataInfo.name));
+                                if (tempComponentBindInfoName != dataInfo.name)
                                 {
-                                    this.objectInfo.gameObjectBindInfoList[itemIndex].name = tempComponentBindInfoName;
+                                    this.objectInfo.dataBindInfoList[itemIndex].name = tempComponentBindInfoName;
                                     this.isSavaSetting = true;
                                 }
+                            }
+                            EditorGUILayout.EndVertical();
 
-                                EditorGUILayout.EndVertical();
-
-                                EditorGUILayout.BeginVertical();
+                            EditorGUILayout.BeginVertical();
+                            {
 
                                 if (GUILayout.Button("操作", GUILayout.Width(100)))
                                 {
                                     GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
                                     menu.AddItem(new GUIContent("设置默认名"), false, () => {
-
-                                        componentBindInfo.name = componentBindInfo.instanceObject.name;
+                                        dataInfo.name = dataInfo.bindObject.name;
                                         if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
                                         {
-                                            componentBindInfo.name = CommonTools.SetVariableName(componentBindInfo.instanceObject.name, this.mainSetting.selectCreateNameSetting);
+                                            dataInfo.name = NameHelper.SetVariableName(dataInfo.bindObject.name, this.mainSetting.selectCreateNameSetting);
                                         }
-                                        componentBindInfo.name = CommonTools.NameSettingByName(componentBindInfo, this.mainSetting.selectScriptSetting.nameSetting);
+                                        dataInfo.name = NameHelper.NameSettingByName(dataInfo, this.mainSetting.selectScriptSetting.nameSetting);
 
                                         this.isSavaSetting = true;
                                     });
@@ -421,106 +481,40 @@ namespace BindTool
                                 GUI.color = Color.red;
                                 if (GUILayout.Button("删除", GUILayout.Width(100)))
                                 {
-                                    this.objectInfo.gameObjectBindInfoList.RemoveAt(itemIndex);
+                                    this.objectInfo.dataBindInfoList.RemoveAt(itemIndex);
                                     this.isSavaSetting = true;
                                     break;
                                 }
                                 GUI.color = Color.white;
-
-                                EditorGUILayout.EndVertical();
                             }
-                            EditorGUILayout.EndHorizontal();
+                            EditorGUILayout.EndVertical();
                         }
-                        else
-                        {
-                            //显示选择的数据
-                            showIndex -= this.selectComponentAmount;
-                            DataBindInfo dataInfo = this.selectDataList[showIndex];
-                            int itemIndex = this.objectInfo.dataBindInfoList.IndexOf(dataInfo);
-
-                            if (itemIndex == -1) GetBindSelectList();
-
-                            EditorGUILayout.BeginHorizontal("frameBox");
-                            {
-                                EditorGUILayout.BeginVertical();
-                                {
-                                    GUILayout.Label(dataInfo.typeString.typeName);
-
-                                    EditorGUILayout.ObjectField(dataInfo.bindObject, dataInfo.typeString.ToType(), true);
-
-                                }
-                                EditorGUILayout.EndVertical();
-
-                                EditorGUILayout.BeginVertical();
-                                {
-                                    GUILayout.Label("变量名");
-                                    string tempComponentBindInfoName = CommonTools.GetNumberAlpha(GUILayout.TextField(dataInfo.name));
-                                    if (tempComponentBindInfoName != dataInfo.name)
-                                    {
-                                        this.objectInfo.dataBindInfoList[itemIndex].name = tempComponentBindInfoName;
-                                        this.isSavaSetting = true;
-                                    }
-                                }
-                                EditorGUILayout.EndVertical();
-
-                                EditorGUILayout.BeginVertical();
-                                {
-
-                                    if (GUILayout.Button("操作", GUILayout.Width(100)))
-                                    {
-                                        GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
-                                        menu.AddItem(new GUIContent("设置默认名"), false, () => {
-                                            dataInfo.name = dataInfo.bindObject.name;
-                                            if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
-                                            {
-                                                dataInfo.name = CommonTools.SetVariableName(dataInfo.bindObject.name, this.mainSetting.selectCreateNameSetting);
-                                            }
-                                            dataInfo.name = CommonTools.NameSettingByName(dataInfo, this.mainSetting.selectScriptSetting.nameSetting);
-
-                                            this.isSavaSetting = true;
-                                        });
-
-                                        menu.ShowAsContext(); //显示菜单
-                                    }
-
-                                    GUI.color = Color.red;
-                                    if (GUILayout.Button("删除", GUILayout.Width(100)))
-                                    {
-                                        this.objectInfo.dataBindInfoList.RemoveAt(itemIndex);
-                                        this.isSavaSetting = true;
-                                        break;
-                                    }
-                                    GUI.color = Color.white;
-                                }
-                                EditorGUILayout.EndVertical();
-                            }
-                            EditorGUILayout.EndHorizontal();
-                        }
-
+                        EditorGUILayout.EndHorizontal();
                     }
+
                 }
-                GUILayout.EndVertical();
-
-                GUILayout.BeginHorizontal();
-                {
-
-                    GUILayout.Label($"当前页数：{this.bindListIndex}  /  总页数：{this.bindListMaxIndex}");
-
-                    if (GUILayout.Button("上一页", GUILayout.Width(100)))
-                    {
-                        this.bindListIndex--;
-                        this.bindListIndex = Mathf.Clamp(this.bindListIndex, 1, this.bindListMaxIndex);
-
-                    }
-
-                    if (GUILayout.Button("下一页", GUILayout.Width(100)))
-                    {
-                        this.bindListIndex++;
-                        this.bindListIndex = Mathf.Clamp(this.bindListIndex, 1, this.bindListMaxIndex);
-                    }
-                }
-                GUILayout.EndHorizontal();
             }
+            GUILayout.EndVertical();
+
+            GUILayout.BeginHorizontal();
+            {
+
+                GUILayout.Label($"当前页数：{this.bindListIndex}  /  总页数：{this.bindListMaxIndex}");
+
+                if (GUILayout.Button("上一页", GUILayout.Width(100)))
+                {
+                    this.bindListIndex--;
+                    this.bindListIndex = Mathf.Clamp(this.bindListIndex, 1, this.bindListMaxIndex);
+
+                }
+
+                if (GUILayout.Button("下一页", GUILayout.Width(100)))
+                {
+                    this.bindListIndex++;
+                    this.bindListIndex = Mathf.Clamp(this.bindListIndex, 1, this.bindListMaxIndex);
+                }
+            }
+            GUILayout.EndHorizontal();
         }
 
         void GetBindSelectList()
@@ -599,9 +593,9 @@ namespace BindTool
             if (_bindWindow.mainSetting.selectCreateNameSetting.isBindAutoGenerateName) componentBindInfo.name = CommonTools.GetNumberAlpha(componentBindInfo.instanceObject.name);
             if (this.mainSetting.selectCreateNameSetting.isBindAutoGenerateName)
             {
-                componentBindInfo.name = CommonTools.SetVariableName(componentBindInfo.instanceObject.name, this.mainSetting.selectCreateNameSetting);
+                componentBindInfo.name = NameHelper.SetVariableName(componentBindInfo.instanceObject.name, this.mainSetting.selectCreateNameSetting);
             }
-            componentBindInfo.name = CommonTools.NameSettingByName(componentBindInfo, this.mainSetting.selectScriptSetting.nameSetting);
+            componentBindInfo.name = NameHelper.NameSettingByName(componentBindInfo, this.mainSetting.selectScriptSetting.nameSetting);
             _bindWindow.isSavaSetting = true;
         }
 
@@ -634,14 +628,12 @@ namespace BindTool
                     for (int i = 0; i < amount; i++)
                     {
                         Transform transform = transforms[i];
-                        if (transform.gameObject != removeObject)
+                        if (transform.gameObject == removeObject) continue;
+                        int childBindInfoAmount = this.objectInfo.gameObjectBindInfoList.Count;
+                        for (int j = childBindInfoAmount - 1; j >= 0; j--)
                         {
-                            int childBindInfoAmount = this.objectInfo.gameObjectBindInfoList.Count;
-                            for (int j = childBindInfoAmount - 1; j >= 0; j--)
-                            {
-                                ComponentBindInfo componentBindInfo = this.objectInfo.gameObjectBindInfoList[j];
-                                if (componentBindInfo.instanceObject == transform.gameObject) this.objectInfo.gameObjectBindInfoList.RemoveAt(j);
-                            }
+                            ComponentBindInfo componentBindInfo = this.objectInfo.gameObjectBindInfoList[j];
+                            if (componentBindInfo.instanceObject == transform.gameObject) this.objectInfo.gameObjectBindInfoList.RemoveAt(j);
                         }
                     }
                     break;

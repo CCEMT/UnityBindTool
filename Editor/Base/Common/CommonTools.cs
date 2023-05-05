@@ -51,87 +51,6 @@ namespace BindTool
             return null;
         }
 
-        public static ObjectInfo GetObjectInfo(GameObject bindObject)
-        {
-            ObjectInfo objectInfo = null;
-
-            BindComponents bindComponents = bindObject.GetComponent<BindComponents>();
-
-            if (bindComponents != null)
-            {
-                if (bindComponents.bindRoot == null) { Object.DestroyImmediate(bindComponents); }
-                else
-                {
-                    objectInfo = new ObjectInfo();
-                    objectInfo.typeString = new TypeString(bindComponents.bindRoot.GetType());
-                    objectInfo.rootBindInfo = new ComponentBindInfo(bindObject);
-                    objectInfo.rootBindInfo.name = objectInfo.typeString.typeName;
-                    objectInfo.gameObjectBindInfoList = new List<ComponentBindInfo>();
-                    objectInfo.dataBindInfoList = new List<DataBindInfo>();
-
-                    Type type = bindComponents.bindRoot.GetType();
-                    FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    for (int i = 0; i < fieldInfos.Length; i++)
-                    {
-                        FieldInfo fieldInfo = fieldInfos[i];
-                        AutoGenerateAttribute attribute = (AutoGenerateAttribute) fieldInfo.GetCustomAttribute(typeof(AutoGenerateAttribute), true);
-                        if (attribute == null || attribute.autoGenerateType != AutoGenerateType.OriginalField) continue;
-                        Object bindComponent = (Object) fieldInfo.GetValue(bindComponents.bindRoot);
-                        if (bindComponent is GameObject == false && bindComponent.GetType().IsSubclassOf(typeof(Component)) == false)
-                        {
-                            DataBindInfo dataBindInfo = new DataBindInfo(bindComponent);
-                            dataBindInfo.name = fieldInfo.Name;
-                            objectInfo.dataBindInfoList.Add(dataBindInfo);
-                        }
-                        else
-                        {
-                            ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindComponent);
-                            componentBindInfo.name = fieldInfo.Name;
-                            componentBindInfo.SetIndex(new TypeString(fieldInfo.FieldType));
-                            objectInfo.gameObjectBindInfoList.Add(componentBindInfo);
-                        }
-                    }
-                }
-
-            }
-
-            if (objectInfo == null)
-            {
-                objectInfo = new ObjectInfo();
-                objectInfo.gameObjectBindInfoList = new List<ComponentBindInfo>();
-                objectInfo.dataBindInfoList = new List<DataBindInfo>();
-                objectInfo.SetObject(bindObject);
-            }
-
-            return objectInfo;
-        }
-
-        public static string SetVariableName(string content, CreateNameSetting createNameSetting)
-        {
-            string newName = GetNumberAlpha(content);
-            int amount = createNameSetting.variableNameReplaceDataList.Count;
-            for (int i = 0; i < amount; i++)
-            {
-                NameReplaceData nameReplaceData = createNameSetting.variableNameReplaceDataList[i];
-                if (nameReplaceData.nameCheck.Check(newName, out string matchingContent)) newName = content.Replace(matchingContent, nameReplaceData.targetName);
-            }
-
-            return newName;
-        }
-
-        public static string SetPropertyName(string content, CreateNameSetting createNameSetting)
-        {
-            string newName = GetNumberAlpha(content);
-            int amount = createNameSetting.propertyNameReplaceDataList.Count;
-            for (int i = 0; i < amount; i++)
-            {
-                NameReplaceData nameReplaceData = createNameSetting.propertyNameReplaceDataList[i];
-                if (nameReplaceData.nameCheck.Check(newName, out string matchingContent)) newName = content.Replace(matchingContent, nameReplaceData.targetName);
-            }
-
-            return newName;
-        }
-
         public static string GetNumberAlpha(string source)
         {
             if (string.IsNullOrEmpty(source)) return null;
@@ -181,92 +100,18 @@ namespace BindTool
 
         public static string InitialUpper(string content)
         {
-            if (string.IsNullOrEmpty(content) == false)
-            {
-                char[] contents = content.ToCharArray();
-                contents[0] = char.ToUpper(contents[0]);
-                return new string(contents);
-            }
-            return "";
+            if (string.IsNullOrEmpty(content)) return "";
+            char[] contents = content.ToCharArray();
+            contents[0] = char.ToUpper(contents[0]);
+            return new string(contents);
         }
 
         public static string InitialLower(string content)
         {
-            if (string.IsNullOrEmpty(content) == false)
-            {
-                char[] contents = content.ToCharArray();
-                contents[0] = char.ToLower(contents[0]);
-                return new string(contents);
-            }
-            return "";
-        }
-
-        public static string NameSettingByName(ComponentBindInfo componentBindInfo, NameSetting nameSetting)
-        {
-            return NameSettingByName(componentBindInfo.name, componentBindInfo, nameSetting);
-        }
-
-        public static string NameSettingByName(string targetName, ComponentBindInfo componentBindInfo, NameSetting nameSetting)
-        {
-            switch (nameSetting.namingDispose)
-            {
-                case ScriptNamingDispose.InitialLower:
-                    targetName = InitialLower(targetName);
-                    break;
-                case ScriptNamingDispose.InitialUpper:
-                    targetName = InitialUpper(targetName);
-                    break;
-                case ScriptNamingDispose.AllLower:
-                    targetName = componentBindInfo.name.ToLower();
-                    break;
-                case ScriptNamingDispose.AllUppe:
-                    targetName = componentBindInfo.name.ToUpper();
-                    break;
-            }
-
-            if (nameSetting.isAddClassName)
-            {
-                if (nameSetting.isFrontOrBehind) { targetName = componentBindInfo.GetTypeName() + componentBindInfo.name; }
-                else { targetName = componentBindInfo.name + componentBindInfo.GetTypeName(); }
-            }
-
-            if (nameSetting.isAddFront) targetName = nameSetting.frontName + componentBindInfo.name;
-            if (nameSetting.isAddBehind) targetName = componentBindInfo.name + nameSetting.behindName;
-            return targetName;
-        }
-
-        public static string NameSettingByName(DataBindInfo dataBindInfo, NameSetting nameSetting)
-        {
-            return NameSettingByName(dataBindInfo.name, dataBindInfo, nameSetting);
-        }
-
-        public static string NameSettingByName(string targetName, DataBindInfo dataBindInfo, NameSetting nameSetting)
-        {
-            switch (nameSetting.namingDispose)
-            {
-                case ScriptNamingDispose.InitialLower:
-                    targetName = InitialLower(targetName);
-                    break;
-                case ScriptNamingDispose.InitialUpper:
-                    targetName = InitialUpper(targetName);
-                    break;
-                case ScriptNamingDispose.AllLower:
-                    targetName = dataBindInfo.name.ToLower();
-                    break;
-                case ScriptNamingDispose.AllUppe:
-                    targetName = dataBindInfo.name.ToUpper();
-                    break;
-            }
-
-            if (nameSetting.isAddClassName)
-            {
-                if (nameSetting.isFrontOrBehind) { targetName = dataBindInfo.typeString.typeName + dataBindInfo.name; }
-                else { targetName = dataBindInfo.name + dataBindInfo.typeString.typeName; }
-            }
-
-            if (nameSetting.isAddFront) targetName = nameSetting.frontName + dataBindInfo.name;
-            if (nameSetting.isAddBehind) targetName = dataBindInfo.name + nameSetting.behindName;
-            return targetName;
+            if (string.IsNullOrEmpty(content)) return "";
+            char[] contents = content.ToCharArray();
+            contents[0] = char.ToLower(contents[0]);
+            return new string(contents);
         }
 
         public static string GetWholePath(Transform currentGameObject, GameObject target)
@@ -343,36 +188,6 @@ namespace BindTool
             }
         }
 
-        public static string GetVisitString(VisitType valueTuple)
-        {
-            switch (valueTuple)
-            {
-                case VisitType.Public:
-                    return "public";
-                case VisitType.Private:
-                    return "private";
-                case VisitType.Protected:
-                    return "protected";
-                case VisitType.Internal:
-                    return "internal";
-            }
-            return null;
-        }
-
-        public static string GetRemoveString(RemoveType removeType)
-        {
-            switch (removeType)
-            {
-                case RemoveType.This:
-                    return "解除自身绑定";
-                case RemoveType.Child:
-                    return "解除子对象绑定";
-                case RemoveType.ThisAndChild:
-                    return "解除自身以及子对象绑定";
-            }
-            return null;
-        }
-
         public static bool Search(string check, string input)
         {
             if (string.IsNullOrEmpty(input)) return true;
@@ -396,7 +211,7 @@ namespace BindTool
             path = path.Substring(6);
             return path;
         }
-        
+
         public static string GetObjectPath(Object target)
         {
             string path = AssetDatabase.GetAssetPath(target);

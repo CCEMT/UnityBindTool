@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace BindTool
 {
-    public class BindBuild
+    public static class BindBuild
     {
         public const string CSharpBuildGenerateDataKey = "CSharpBuildGenerateData";
 
@@ -72,6 +72,7 @@ namespace BindTool
                 }
             }
 
+            BindComponentsHelper.AddBindComponent(generateData);
             IGenerator generator = GeneratorFactory.GetGenerator(generatorType, mainSetting, generateData);
 
             switch (generatorType)

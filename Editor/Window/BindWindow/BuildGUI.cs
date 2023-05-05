@@ -297,26 +297,24 @@ namespace BindTool
             }
             //if (GUILayout.Button("Copy Lua Code")) Debug.Log("开发中...");
 
-            if (GUILayout.Button("Build"))
+            if (! GUILayout.Button("Build")) return;
+            int errorAmount = this.errorList.Count;
+            if (errorAmount > 0)
             {
-                int errorAmount = errorList.Count;
-                if (errorAmount > 0)
+                Debug.LogError($"构建失败,有{errorAmount}个错误");
+                for (int i = 0; i < errorAmount; i++)
                 {
-                    Debug.LogError($"构建失败,有{errorAmount}个错误");
-                    for (int i = 0; i < errorAmount; i++)
-                    {
-                        string errorInfo = errorList[i];
-                        Debug.LogError(errorInfo);
-                    }
+                    string errorInfo = this.errorList[i];
+                    Debug.LogError(errorInfo);
                 }
-                else
-                {
-                    BindBuild.Build(bindObject, objectInfo,GeneratorType.CSharp);
-                    EditorUtility.SetDirty(this.mainSetting);
-                    AssetDatabase.SaveAssets();
-                    AssetDatabase.Refresh();
-                    Close();
-                }
+            }
+            else
+            {
+                BindBuild.Build(this.bindObject, this.objectInfo,GeneratorType.CSharp);
+                EditorUtility.SetDirty(this.mainSetting);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+                Close();
             }
         }
     }

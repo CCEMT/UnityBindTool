@@ -15,4 +15,10 @@ MonoBehaviour:
   programName: DefaultUICreateNameSetting
   isBindAutoGenerateName: 1
   variableNameReplaceDataList: []
-  propertyNameReplaceDataList: []
+  propertyNameReplaceDataList:
+  - targetName: 
+    nameCheck:
+      name: m_
+      nameRule:
+        isCaseSensitive: 0
+        nameMatchingRule: 0

@@ -17,9 +17,9 @@ MonoBehaviour:
   isCustomBind: 1
   newScriptName: BuildingUpLevelPanel
   mergeTypeString:
-    typeName: 
-    typeNameSpace: 
-    assemblyName: 
+    typeName: GameObject
+    typeNameSpace: UnityEngine
+    assemblyName: UnityEngine.CoreModule
   isCreatePrefab: 1
   isCreatePrefabFolder: 1
   createPrefabPath: Files/GeneratePrefabs

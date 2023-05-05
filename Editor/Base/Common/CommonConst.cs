@@ -7,13 +7,13 @@
         public const string DefaultLuaCreatePath = "Lua";
         public const string CommonSettingName = "CommonSetting";
 
-        public static string DefaultAssembly = "Assembly-CSharp";
-        public static string DefaultName = "Auto Generate";
-        public static string DefaultBindMethodName = "GetBind";
+        public const string DefaultAssembly = "Assembly-CSharp";
+        public const string DefaultName = "Auto Generate";
+        public const string DefaultBindMethodName = "GetBind";
 
-        public static string TemplateAssembly = "UnityBindTool.Editor";
-        public static string TemplateNamespace = "BindTool.Template";
-        public static string TemplateRegionName = "Template Method";
+        public const string TemplateAssembly = "UnityBindTool.Editor";
+        public const string TemplateNamespace = "BindTool.Template";
+        public const string TemplateRegionName = "Template Method";
 
         public const string DefaultScriptSettingName = "ScriptSetting";
         public const string DefaultAutoBindSettingName = "AutoBindSetting";
@@ -24,5 +24,10 @@
         public const string LuaFileSuffix = ".lua.txt";
         public const string TextFileSuffix = ".txt";
         public const string MateFileSuffix = ".meta";
+        
+        public const string UnityEditorAcer = "UNITY_EDITOR";
+        public const string UntiyEditorNameSpace = "UnityEditor";
+        public const string PropertyValue = "value";
+        public const string MethodVoid = "void";
     }
 }

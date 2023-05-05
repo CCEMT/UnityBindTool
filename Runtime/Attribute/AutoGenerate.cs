@@ -4,12 +4,15 @@ namespace BindTool
 {
     public enum AutoGenerateType
     {
-        OriginalField
+        Content,
+        OriginalField,
     }
-    public class AutoGenerateAttribute : Attribute
+
+    public class AutoGenerate : Attribute
     {
         public AutoGenerateType autoGenerateType;
-        public AutoGenerateAttribute(AutoGenerateType type)
+
+        public AutoGenerate(AutoGenerateType type = AutoGenerateType.Content)
         {
             this.autoGenerateType = type;
         }

@@ -161,8 +161,6 @@ namespace BindTool
             return componentBindInfo;
         }
 
-        #region Equals
-
         public bool GameObjectEquals(object obj)
         {
             if (obj != null)
@@ -180,32 +178,5 @@ namespace BindTool
             }
             return false;
         }
-
-        public override bool Equals(object obj)
-        {
-            ObjectInfo objectInfo = (ObjectInfo) obj;
-            if (objectInfo != null) return Equals(objectInfo);
-            return false;
-        }
-
-        protected bool Equals(ObjectInfo other)
-        {
-            return typeString.Equals(other.typeString) && Equals(rootBindInfo, other.rootBindInfo) && Equals(gameObjectBindInfoList, other.gameObjectBindInfoList) &&
-                   Equals(dataBindInfoList, other.dataBindInfoList);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hashCode = typeString.GetHashCode();
-                hashCode = (hashCode * 397) ^ (rootBindInfo != null ? rootBindInfo.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (gameObjectBindInfoList != null ? gameObjectBindInfoList.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (dataBindInfoList != null ? dataBindInfoList.GetHashCode() : 0);
-                return hashCode;
-            }
-        }
-
-        #endregion
     }
 }

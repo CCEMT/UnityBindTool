@@ -48,8 +48,8 @@ namespace BindTool
             {
                 ComponentBindInfo componentInfo = generateData.objectInfo.gameObjectBindInfoList[i];
                 string variableName = componentInfo.name;
-                string propertyName = CommonTools.SetPropertyName(variableName, mainSetting.selectCreateNameSetting);
-                propertyName = CommonTools.NameSettingByName(propertyName, componentInfo, selectSettion.propertyNameSetting);
+                string propertyName = NameHelper.SetPropertyName(variableName, mainSetting.selectCreateNameSetting);
+                propertyName = NameHelper.NameSettingByName(propertyName, componentInfo, selectSettion.propertyNameSetting);
                 ComponentNameData componentNameData = new ComponentNameData();
                 componentNameData.componentBindInfo = componentInfo;
                 AddVariable(componentNameData, variableName, propertyName, componentInfo.GetTypeString());
@@ -61,8 +61,8 @@ namespace BindTool
             {
                 DataBindInfo dataInfo = generateData.objectInfo.dataBindInfoList[i];
                 string variableName = dataInfo.name;
-                string propertyName = CommonTools.SetPropertyName(variableName, mainSetting.selectCreateNameSetting);
-                propertyName = CommonTools.NameSettingByName(propertyName, dataInfo, selectSettion.propertyNameSetting);
+                string propertyName = NameHelper.SetPropertyName(variableName, mainSetting.selectCreateNameSetting);
+                propertyName = NameHelper.NameSettingByName(propertyName, dataInfo, selectSettion.propertyNameSetting);
                 DataName dataName = new DataName();
                 dataName.dataBindInfo = dataInfo;
                 AddVariable(dataName, variableName, propertyName, dataInfo.typeString);
@@ -145,7 +145,7 @@ namespace BindTool
                 for (int j = 0; j < addComponentAmount; j++)
                 {
                     ComponentNameData componentNameData = addComponentMethodList[j];
-                    string methodName = CommonTools.NameSettingByName(componentNameData.componentBindInfo, selectSettion.methodNameSetting);
+                    string methodName = NameHelper.NameSettingByName(componentNameData.componentBindInfo, selectSettion.methodNameSetting);
                     bool isCantainsComponentMethod = methodNameAmountDict.ContainsKey(methodName);
                     if (isCantainsComponentMethod == false) { methodNameAmountDict.Add(methodName, 1); }
 
@@ -197,7 +197,7 @@ namespace BindTool
                 for (int j = 0; j < addDataAmount; j++)
                 {
                     DataName dataName = addDataMethodList[j];
-                    string methodName = CommonTools.NameSettingByName(dataName.dataBindInfo, selectSettion.methodNameSetting);
+                    string methodName = NameHelper.NameSettingByName(dataName.dataBindInfo, selectSettion.methodNameSetting);
                     bool isCantainsDataMethod = methodNameAmountDict.ContainsKey(methodName);
                     if (isCantainsDataMethod == false) { methodNameAmountDict.Add(methodName, 1); }
 
@@ -300,14 +300,14 @@ namespace BindTool
                 for (int j = 0; j < addComponentMethodAmount; j++)
                 {
                     ComponentNameData componentNameData = addComponentMethodList[j];
-                    string methodName = CommonTools.NameSettingByName(componentNameData.componentBindInfo, selectSettion.methodNameSetting);
+                    string methodName = NameHelper.NameSettingByName(componentNameData.componentBindInfo, selectSettion.methodNameSetting);
                     TempMethod(templateData, addLine, methodName, componentNameData.variableName);
                 }
                 int addDataMethodAmount = addDataMethodList.Count;
                 for (int j = 0; j < addDataMethodAmount; j++)
                 {
                     DataName dataName = addDataMethodList[i];
-                    string methodName = CommonTools.NameSettingByName(dataName.dataBindInfo, selectSettion.methodNameSetting);
+                    string methodName = NameHelper.NameSettingByName(dataName.dataBindInfo, selectSettion.methodNameSetting);
                     TempMethod(templateData, addLine, methodName, dataName.variableName);
                 }
             }
@@ -433,7 +433,7 @@ namespace BindTool
                 nameList.Add(variableName);
                 baseData.variableName = variableName;
 
-                string content = $"[BindTool.{nameof(AutoGenerateAttribute)}({nameof(AutoGenerateType.OriginalField)})][UnityEngine.SerializeField]{CommonTools.GetVisitString(selectSettion.variableVisitType)} ";
+                string content = $"[BindTool.{nameof(AutoGenerate)}({nameof(AutoGenerateType.OriginalField)})][UnityEngine.SerializeField]{LabelHelper.GetVisitString(selectSettion.variableVisitType)} ";
 
                 TypeString type = typeString;
                 content += type.GetVisitString();
@@ -477,7 +477,7 @@ namespace BindTool
                     nameList.Add(propertyName);
                     baseData.propertyName = propertyName;
 
-                    string propertyContent = $"{CommonTools.GetVisitString(selectSettion.propertyVisitType)} ";
+                    string propertyContent = $"{LabelHelper.GetVisitString(selectSettion.propertyVisitType)} ";
                     propertyContent += typeString.GetVisitString();
                     propertyContent += $" {propertyName}";
 

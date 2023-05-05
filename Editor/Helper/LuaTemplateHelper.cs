@@ -2,17 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LuaTemplateHelper : MonoBehaviour
+public static class LuaTemplateHelper
 {
-    // Start is called before the first frame update
-    void Start()
+    public static void GenerateLuaTemplate()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+      
     }
 }

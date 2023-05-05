@@ -33,13 +33,11 @@ namespace BindTool
         [MenuItem("GameObject/BindWindown", false, 0)]
         static void CreateUIPanel()
         {
-            if (Check())
-            {
-                _bindWindow = GetWindowWithRect<BindWindow>(new Rect(Screen.width / 2f, Screen.height / 2f, 500, 600), true, "BindWindown");
-                _bindWindow.CenterOnMainWin();
-                _bindWindow.Init();
-                _bindWindow.Show();
-            }
+            if (! Check()) return;
+            _bindWindow = GetWindowWithRect<BindWindow>(new Rect(Screen.width / 2f, Screen.height / 2f, 500, 600), true, "BindWindown");
+            _bindWindow.CenterOnMainWin();
+            _bindWindow.Init();
+            _bindWindow.Show();
         }
 
         void Init()
@@ -56,7 +54,7 @@ namespace BindTool
                 this.mainSetting.createNameSettingList.Add(this.mainSetting.selectCreateNameSetting);
             }
 
-            objectInfo = CommonTools.GetObjectInfo(bindObject);
+            objectInfo = ObjectInfoHelper.GetObjectInfo(bindObject);
             objectInfo.rootBindInfo.instanceObject = bindObject;
             objectInfo.AgainGet();
 

@@ -20,8 +20,6 @@ namespace BindTool
 
         public AutoBindSetting autoBindSetting;
 
-        #region Equals
-
         public bool GameObjectEquals(object obj)
         {
             if (obj != null)
@@ -35,35 +33,6 @@ namespace BindTool
             }
             return false;
         }
-
-        public override bool Equals(object obj)
-        {
-            ComponentBindInfo componentBindInfo = (ComponentBindInfo) obj;
-            if (componentBindInfo != null) { return Equals(componentBindInfo); }
-            else { return false; }
-        }
-
-        protected bool Equals(ComponentBindInfo other)
-        {
-            return name == other.name && Equals(typeStrings, other.typeStrings) && index == other.index && Equals(instanceObject, other.instanceObject) && Equals(prefabObject, other.prefabObject) &&
-                   Equals(autoBindSetting, other.autoBindSetting);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hashCode = name != null ? name.GetHashCode() : 0;
-                hashCode = (hashCode * 397) ^ (typeStrings != null ? typeStrings.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ index;
-                hashCode = (hashCode * 397) ^ (instanceObject != null ? instanceObject.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (prefabObject != null ? prefabObject.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (autoBindSetting != null ? autoBindSetting.GetHashCode() : 0);
-                return hashCode;
-            }
-        }
-
-        #endregion
 
         public string[] GetTypeStrings()
         {

@@ -33,40 +33,6 @@ namespace BindTool
 
         //根据流绑定
         public List<StreamingBindData> streamingBindDataList = new List<StreamingBindData>();
-
-        #region Equals
-
-        public override bool Equals(object other)
-        {
-            AutoBindSetting equalsValue = (AutoBindSetting) other;
-            if (equalsValue != null) return Equals(equalsValue);
-            return false;
-        }
-
-        protected bool Equals(AutoBindSetting other)
-        {
-            return base.Equals(other) && this.programName == other.programName && Equals(this.nameBindDataList, other.nameBindDataList) && Equals(this.nameLgnoreDataList, other.nameLgnoreDataList) &&
-                   this.isEnableStreamingBind == other.isEnableStreamingBind && this.isBindComponent == other.isBindComponent && this.isBindAllComponent == other.isBindAllComponent &&
-                   Equals(this.streamingBindDataList, other.streamingBindDataList);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hashCode = base.GetHashCode();
-                hashCode = (hashCode * 397) ^ (this.programName != null ? this.programName.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (this.nameBindDataList != null ? this.nameBindDataList.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (this.nameLgnoreDataList != null ? this.nameLgnoreDataList.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ this.isEnableStreamingBind.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.isBindComponent.GetHashCode();
-                hashCode = (hashCode * 397) ^ this.isBindAllComponent.GetHashCode();
-                hashCode = (hashCode * 397) ^ (this.streamingBindDataList != null ? this.streamingBindDataList.GetHashCode() : 0);
-                return hashCode;
-            }
-        }
-
-        #endregion
     }
 
     [Serializable]
@@ -74,27 +40,6 @@ namespace BindTool
     {
         public NameCheck nameCheck = new NameCheck();
         public TypeString typeString;
-
-        #region Equals
-
-        public override bool Equals(object obj)
-        {
-            NameBindData equalsValue = (NameBindData) obj;
-            if (equalsValue != null) return Equals(equalsValue);
-            return false;
-        }
-
-        protected bool Equals(NameBindData other)
-        {
-            return Equals(nameCheck, other.nameCheck) && typeString.Equals(other.typeString);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked { return ((nameCheck != null ? nameCheck.GetHashCode() : 0) * 397) ^ typeString.GetHashCode(); }
-        }
-
-        #endregion
     }
 
     [Serializable]
@@ -138,27 +83,6 @@ namespace BindTool
             }
             return false;
         }
-
-        #region Equals
-
-        public override bool Equals(object obj)
-        {
-            NameCheck nameCheck = (NameCheck) obj;
-            if (nameCheck != null) return Equals(nameCheck);
-            return false;
-        }
-
-        protected bool Equals(NameCheck other)
-        {
-            return name == other.name && nameRule.Equals(other.nameRule);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked { return ((name != null ? name.GetHashCode() : 0) * 397) ^ nameRule.GetHashCode(); }
-        }
-
-        #endregion
     }
 
     [Serializable]
@@ -167,33 +91,6 @@ namespace BindTool
         public int sequence;
         public bool isElse;
         public TypeString typeString;
-
-        #region Equals
-
-        public override bool Equals(object obj)
-        {
-            StreamingBindData equalsValue = (StreamingBindData) obj;
-            if (equalsValue != null) return Equals(equalsValue);
-            return false;
-        }
-
-        protected bool Equals(StreamingBindData other)
-        {
-            return sequence == other.sequence && isElse == other.isElse && typeString.Equals(other.typeString);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hashCode = sequence;
-                hashCode = (hashCode * 397) ^ isElse.GetHashCode();
-                hashCode = (hashCode * 397) ^ typeString.GetHashCode();
-                return hashCode;
-            }
-        }
-
-        #endregion
     }
 
     [Serializable]
@@ -201,26 +98,6 @@ namespace BindTool
     {
         public bool isCaseSensitive; //是否区分大小写
         public NameMatchingRule nameMatchingRule; //名字匹配规则
-
-        #region Equals
-
-        public override bool Equals(object obj)
-        {
-            NameRule equalsValue = (NameRule) obj;
-            return Equals(equalsValue);
-        }
-
-        public bool Equals(NameRule other)
-        {
-            return isCaseSensitive == other.isCaseSensitive && nameMatchingRule == other.nameMatchingRule;
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked { return (isCaseSensitive.GetHashCode() * 397) ^ (int) nameMatchingRule; }
-        }
-
-        #endregion
     }
 
     public enum NameMatchingRule
