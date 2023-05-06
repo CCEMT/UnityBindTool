@@ -2,12 +2,7 @@ using BindTool;
 
 public class LuaGenerator : IGenerator
 {
-    public string Generate(MainSetting setting, GenerateData generateData)
-    {
-        return null;
-    }
-
-    public void Init(MainSetting setting, GenerateData generateData)
+    public void Init(CompositionSetting setting, GenerateData generateData)
     {
         throw new System.NotImplementedException();
     }

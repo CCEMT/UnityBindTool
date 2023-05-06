@@ -9,7 +9,7 @@ public enum GeneratorType
 
 public static class GeneratorFactory
 {
-    public static IGenerator GetGenerator(GeneratorType generatorType, MainSetting setting, GenerateData generateData)
+    public static IGenerator GetGenerator(GeneratorType generatorType, CompositionSetting setting, GenerateData generateData)
     {
         IGenerator generator = default;
         switch (generatorType)

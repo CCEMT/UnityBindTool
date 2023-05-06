@@ -10,8 +10,9 @@ using UnityEngine;
 
 public class CSharpGenerator : IGenerator
 {
-    private MainSetting mainSetting;
+    private CompositionSetting selectSetting;
     private ScriptSetting scriptSetting;
+    private CSharpScriptSetting csharpScriptSetting;
 
     private GenerateData generateData;
 
@@ -19,18 +20,19 @@ public class CSharpGenerator : IGenerator
 
     private NameDisposeCentre nameDisposeCentre;
 
-    public void Init(MainSetting setting, GenerateData data)
+    public void Init(CompositionSetting setting, GenerateData data)
     {
-        this.mainSetting = setting;
+        this.selectSetting = setting;
         this.generateData = data;
-        scriptSetting = mainSetting.selectScriptSetting;
+        scriptSetting = this.selectSetting.scriptSetting;
+        csharpScriptSetting = this.scriptSetting.csharpScriptSetting;
         nameDisposeCentre = new NameDisposeCentre();
     }
 
     public void Write(string scriptPath)
     {
         this.scriptPath = scriptPath;
-        if (scriptSetting.isGenerateNew) { GenerateNewFile(); }
+        if (csharpScriptSetting.isGenerateNew) { GenerateNewFile(); }
         else { ModifyFile(); }
 
         AssetDatabase.SaveAssets();
@@ -41,15 +43,15 @@ public class CSharpGenerator : IGenerator
     void GenerateNewFile()
     {
         generateData.objectInfo.typeString.typeName = generateData.newScriptName;
-        generateData.objectInfo.typeString.typeNameSpace = scriptSetting.useNamespace;
-        generateData.objectInfo.typeString.assemblyName = scriptSetting.createScriptAssembly;
+        generateData.objectInfo.typeString.typeNameSpace = csharpScriptSetting.useNamespace;
+        generateData.objectInfo.typeString.assemblyName = csharpScriptSetting.createScriptAssembly;
 
         nameDisposeCentre.useNames.Add(generateData.newScriptName);
 
         string mainFilePath = scriptPath + $"{generateData.newScriptName}{CommonConst.CSharpFileSuffix}";
-        if (this.scriptSetting.isGeneratePartial)
+        if (this.csharpScriptSetting.isGeneratePartial)
         {
-            string partialFilePath = scriptPath + $"{generateData.newScriptName}.{this.scriptSetting.partialName}{CommonConst.CSharpFileSuffix}";
+            string partialFilePath = scriptPath + $"{generateData.newScriptName}.{this.csharpScriptSetting.partialName}{CommonConst.CSharpFileSuffix}";
             GeneratePartialFile(mainFilePath, partialFilePath);
             GenerateFixedContent(partialFilePath);
             GenerateTemplateContent(mainFilePath, partialFilePath, true);
@@ -108,7 +110,7 @@ public class CSharpGenerator : IGenerator
     void GenerateFile(string filePath, bool isPartial)
     {
         string inheritContent = typeof(MonoBehaviour).FullName;
-        if (string.IsNullOrEmpty(scriptSetting.inheritClass.typeName) == false) { inheritContent = scriptSetting.inheritClass.GetVisitString(); }
+        if (string.IsNullOrEmpty(csharpScriptSetting.inheritClass.typeName) == false) { inheritContent = csharpScriptSetting.inheritClass.GetVisitString(); }
 
         BaseTypeSyntax baseType = SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName(inheritContent));
 
@@ -119,10 +121,10 @@ public class CSharpGenerator : IGenerator
 
         CompilationUnitSyntax compilationUnit = SyntaxFactory.CompilationUnit();
 
-        if (this.scriptSetting.isSpecifyNamespace == false) { compilationUnit = compilationUnit.AddMembers(classDeclaration); }
+        if (this.csharpScriptSetting.isSpecifyNamespace == false) { compilationUnit = compilationUnit.AddMembers(classDeclaration); }
         else
         {
-            NamespaceDeclarationSyntax namespaceDeclaration = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(scriptSetting.useNamespace)).NormalizeWhitespace();
+            NamespaceDeclarationSyntax namespaceDeclaration = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(csharpScriptSetting.useNamespace)).NormalizeWhitespace();
             namespaceDeclaration = namespaceDeclaration.AddMembers(classDeclaration);
             compilationUnit = compilationUnit.AddMembers(namespaceDeclaration);
         }
@@ -144,16 +146,16 @@ public class CSharpGenerator : IGenerator
         if (this.scriptSetting.isSavaOldScript)
         {
             string directoryName = SavaOldScriptHelper.GetDirectoryNameByGenerateData(this.generateData);
-            SavaOldScriptHelper.GenerateOldScriptFile(mainFilePath, directoryName);
+            SavaOldScriptHelper.GenerateOldScriptFile(this.scriptSetting, mainFilePath, directoryName);
         }
         DeleteOldContent(mainFilePath);
-        if (this.scriptSetting.isGeneratePartial)
+        if (this.csharpScriptSetting.isGeneratePartial)
         {
-            string partialFilePath = scriptPath + $"{generateData.newScriptName}.{this.scriptSetting.partialName}{CommonConst.CSharpFileSuffix}";
+            string partialFilePath = scriptPath + $"{generateData.newScriptName}.{this.csharpScriptSetting.partialName}{CommonConst.CSharpFileSuffix}";
             if (this.scriptSetting.isSavaOldScript)
             {
                 string directoryName = SavaOldScriptHelper.GetDirectoryNameByGenerateData(this.generateData);
-                SavaOldScriptHelper.GenerateOldScriptFile(partialFilePath, directoryName);
+                SavaOldScriptHelper.GenerateOldScriptFile(this.scriptSetting, partialFilePath, directoryName);
             }
             DeleteOldContent(partialFilePath);
             GenerateFixedContent(partialFilePath);
@@ -234,8 +236,8 @@ public class CSharpGenerator : IGenerator
         ClassDeclarationSyntax targetClass = classDeclarationSyntaxs.First();
         ClassDeclarationSyntax oldNode = targetClass;
 
-        IRepetitionNameDisposer fieldNameDisposer = RepetitionNameDisposeFactory.GetRepetitionNameDisposer(this.scriptSetting.nameSetting.repetitionNameDispose);
-        IRepetitionNameDisposer propertyNameDisposer = RepetitionNameDisposeFactory.GetRepetitionNameDisposer(this.scriptSetting.propertyNameSetting.repetitionNameDispose);
+        IRepetitionNameDisposer fieldNameDisposer = RepetitionNameDisposeFactory.GetRepetitionNameDisposer(this.csharpScriptSetting.nameSetting.repetitionNameDispose);
+        IRepetitionNameDisposer propertyNameDisposer = RepetitionNameDisposeFactory.GetRepetitionNameDisposer(this.csharpScriptSetting.propertyNameSetting.repetitionNameDispose);
 
         IfDirectiveTriviaSyntax ifNode = SyntaxFactory.IfDirectiveTrivia(SyntaxFactory.IdentifierName(CommonConst.UnityEditorAcer), true, false, false);
         EndIfDirectiveTriviaSyntax endIfNode = SyntaxFactory.EndIfDirectiveTrivia(true);
@@ -255,8 +257,8 @@ public class CSharpGenerator : IGenerator
             ComponentBindInfo componentInfo = generateData.objectInfo.gameObjectBindInfoList[i];
             string typeString = componentInfo.GetTypeString().GetVisitString();
             string fieldName = fieldNameDisposer.DisposeName(this.nameDisposeCentre, componentInfo.name);
-            string propertyName = NameHelper.SetPropertyName(fieldName, mainSetting.selectCreateNameSetting);
-            propertyName = NameHelper.NameSettingByName(propertyName, componentInfo, this.scriptSetting.propertyNameSetting);
+            string propertyName = NameHelper.SetPropertyName(fieldName, this.selectSetting.nameGenerateSetting.csharpNameGenerateSetting);
+            propertyName = NameHelper.NameSettingByName(propertyName, componentInfo, this.csharpScriptSetting.propertyNameSetting);
             propertyName = propertyNameDisposer.DisposeName(this.nameDisposeCentre, propertyName);
 
             FieldDeclarationSyntax field = GenerateField(typeString, fieldName);
@@ -277,8 +279,8 @@ public class CSharpGenerator : IGenerator
 
             string typeString = dataInfo.typeString.GetVisitString();
             string fieldName = fieldNameDisposer.DisposeName(this.nameDisposeCentre, dataInfo.name);
-            string propertyName = NameHelper.SetPropertyName(fieldName, mainSetting.selectCreateNameSetting);
-            propertyName = NameHelper.NameSettingByName(propertyName, dataInfo, this.scriptSetting.propertyNameSetting);
+            string propertyName = NameHelper.SetPropertyName(fieldName, this.selectSetting.nameGenerateSetting.csharpNameGenerateSetting);
+            propertyName = NameHelper.NameSettingByName(propertyName, dataInfo, this.csharpScriptSetting.propertyNameSetting);
             propertyName = propertyNameDisposer.DisposeName(this.nameDisposeCentre, propertyName);
 
             bool isEditorAsset = typeString.Contains(CommonConst.UntiyEditorNameSpace);
@@ -333,7 +335,7 @@ public class CSharpGenerator : IGenerator
         VariableDeclarationSyntax variable = SyntaxFactory.VariableDeclaration(SyntaxFactory.ParseTypeName(typeString));
         variable = variable.AddVariables(SyntaxFactory.VariableDeclarator(fieldName));
 
-        SyntaxKind fieldVisitKey = ObjectInfoHelper.VisitTypeToSyntaxKind(this.scriptSetting.variableVisitType);
+        SyntaxKind fieldVisitKey = ObjectInfoHelper.VisitTypeToSyntaxKind(this.csharpScriptSetting.variableVisitType);
         FieldDeclarationSyntax field = SyntaxFactory.FieldDeclaration(variable).AddModifiers(SyntaxFactory.Token(fieldVisitKey));
         AttributeListSyntax attributeList = SyntaxFactory.AttributeList();
         AttributeSyntax serializeFieldAttribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(SerializeField).FullName));
@@ -354,7 +356,7 @@ public class CSharpGenerator : IGenerator
     {
         IdentifierNameSyntax fieldSyntax = SyntaxFactory.IdentifierName(fieldName);
         MemberAccessExpressionSyntax fieldExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ThisExpression(), fieldSyntax);
-        SyntaxKind propertyVisitKey = ObjectInfoHelper.VisitTypeToSyntaxKind(this.scriptSetting.propertyVisitType);
+        SyntaxKind propertyVisitKey = ObjectInfoHelper.VisitTypeToSyntaxKind(this.csharpScriptSetting.propertyVisitType);
 
         PropertyDeclarationSyntax property = SyntaxFactory.PropertyDeclaration(SyntaxFactory.ParseTypeName(typeString), propertyName);
         property = property.AddModifiers(SyntaxFactory.Token(propertyVisitKey));
@@ -370,7 +372,7 @@ public class CSharpGenerator : IGenerator
         BlockSyntax setBlock = SyntaxFactory.Block(SyntaxFactory.SingletonList<StatementSyntax>(SyntaxFactory.ExpressionStatement(setExpression)));
         AccessorDeclarationSyntax set = SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration, setBlock);
 
-        switch (this.scriptSetting.propertyType)
+        switch (this.csharpScriptSetting.propertyType)
         {
             case PropertyType.Set:
                 property = property.AddAccessorListAccessors(set);
@@ -478,6 +480,5 @@ public class CSharpGenerator : IGenerator
         ClassDeclarationSyntax targetClass = classDeclarationSyntaxs.First();
         ClassDeclarationSyntax oldNode = targetClass;
 
-        
     }
 }

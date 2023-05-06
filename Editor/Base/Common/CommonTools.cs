@@ -1,14 +1,10 @@
 ﻿#region Using
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 #endregion
 
@@ -16,38 +12,13 @@ namespace BindTool
 {
     public static class CommonTools
     {
-        /// <summary>
-        /// 获取预制体资源。
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <returns></returns>
         public static GameObject GetPrefabAsset(GameObject gameObject)
         {
             if (gameObject == null) return null;
-            // Project中的Prefab是Asset不是Instance
-            if (PrefabUtility.IsPartOfPrefabAsset(gameObject))
-            {
-                // 预制体资源就是自身
-                return gameObject;
-            }
-
-            // PrefabMode中的GameObject既不是Instance也不是Asset
+            if (PrefabUtility.IsPartOfPrefabAsset(gameObject)) return gameObject;
             PrefabStage prefabStage = PrefabStageUtility.GetPrefabStage(gameObject);
-            if (prefabStage != null)
-            {
-                // 预制体资源：prefabAsset = prefabStage.prefabContentsRoot
-                return prefabStage.prefabContentsRoot;
-            }
-
-            // Scene中的Prefab Instance是Instance不是Asset
-            if (PrefabUtility.IsPartOfPrefabInstance(gameObject))
-            {
-                // 获取预制体资源
-                GameObject prefabAsset = PrefabUtility.GetCorrespondingObjectFromOriginalSource(gameObject);
-                return prefabAsset;
-            }
-
-            // 不是预制体
+            if (prefabStage != null) return prefabStage.prefabContentsRoot;
+            if (PrefabUtility.IsPartOfPrefabInstance(gameObject)) return PrefabUtility.GetCorrespondingObjectFromOriginalSource(gameObject);
             return null;
         }
 
@@ -125,67 +96,6 @@ namespace BindTool
             if (currentGameObject.parent == null) return false;
             if (currentGameObject.parent.gameObject == target) return true;
             return GetIsParent(currentGameObject.parent, target);
-        }
-
-        public static Type[] GetAllDerivedTypes(this AppDomain targetAppDomain, Type targetType)
-        {
-            List<Type> result = new List<Type>();
-            Assembly[] assemblies = targetAppDomain.GetAssemblies();
-            int assebliesAmount = assemblies.Length;
-            for (int i = 0; i < assebliesAmount; i++)
-            {
-                Assembly assembly = assemblies[i];
-                Type[] types = assembly.GetTypes();
-                int typesAmount = types.Length;
-                for (int j = 0; j < typesAmount; j++)
-                {
-                    Type type = types[j];
-                    if (type.IsSubclassOf(targetType)) result.Add(type);
-                }
-            }
-
-            return result.ToArray();
-        }
-
-        public static Rect GetEditorMainWindowPos()
-        {
-            Type containerWinType = AppDomain.CurrentDomain.GetAllDerivedTypes(typeof(ScriptableObject)).FirstOrDefault(t => t.Name == "ContainerWindow");
-            if (containerWinType == null) throw new MissingMemberException("Can't find internal type ContainerWindow. Maybe something has changed inside Unity");
-            FieldInfo showModeField = containerWinType.GetField("m_ShowMode", BindingFlags.NonPublic | BindingFlags.Instance);
-            PropertyInfo positionProperty = containerWinType.GetProperty("position", BindingFlags.Public | BindingFlags.Instance);
-            if (showModeField == null || positionProperty == null)
-            {
-                throw new MissingFieldException("Can't find internal fields 'm_ShowMode' or 'position'. Maybe something has changed inside Unity");
-            }
-            Object[] windows = Resources.FindObjectsOfTypeAll(containerWinType);
-            int amount = windows.Length;
-            for (int i = 0; i < amount; i++)
-            {
-                Object window = windows[i];
-                int showmode = (int) showModeField.GetValue(window);
-                if (showmode == 4) // main window
-                {
-                    Rect pos = (Rect) positionProperty.GetValue(window, null);
-                    return pos;
-                }
-            }
-            throw new NotSupportedException("Can't find internal main window. Maybe something has changed inside Unity");
-        }
-
-        public static void CenterOnMainWin(this EditorWindow aWin)
-        {
-            Rect main = GetEditorMainWindowPos();
-            Rect pos = aWin.position;
-            float w = (main.width - pos.width) * 0.5f;
-            float h = (main.height - pos.height) * 0.5f;
-            pos.x = main.x + w;
-            pos.y = main.y + h;
-            try { aWin.position = pos; }
-            catch (Exception e)
-            {
-                Debug.Log("编译错误：请删除Library/ScriptAssemblies/Assembly-CSharp-Editor和BindTool,重新打开项目后导入BindTool");
-                Debug.Log(e);
-            }
         }
 
         public static bool Search(string check, string input)

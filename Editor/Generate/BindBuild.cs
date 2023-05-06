@@ -1,7 +1,6 @@
 ﻿#region Using
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEditor;
@@ -16,28 +15,19 @@ namespace BindTool
     {
         public const string CSharpBuildGenerateDataKey = "CSharpBuildGenerateData";
 
-        public static void Build(GameObject bindObject, ObjectInfo objectInfo, GeneratorType generatorType)
+        public static void Build(CompositionSetting setting, GenerateData generateData, GeneratorType generatorType)
         {
-            MainSetting mainSetting = MainSetting.Get();
+            CommonSetting commonSetting = setting.commonSetting;
 
-            string path = Application.dataPath + "/" + mainSetting.createScriptPath + "/";
+            string path = Application.dataPath + "/" + commonSetting.createScriptPath + "/";
             if (Directory.Exists(path) == false)
             {
                 Debug.LogError($"{path} 不是有效路径！");
                 return;
             }
 
-            GenerateData generateData = new GenerateData();
-
-            //保存临时数据
-            generateData.newScriptName = mainSetting.newScriptName;
-            generateData.mergeTypeString = mainSetting.mergeTypeString;
-            generateData.bindObject = bindObject;
-            generateData.objectInfo = objectInfo;
-            generateData.isStartBuild = true;
-
             //创建文件夹
-            if (mainSetting.isCreateScriptFolder)
+            if (commonSetting.isCreateScriptFolder)
             {
                 path += $"{generateData.newScriptName}/";
                 if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
@@ -45,35 +35,35 @@ namespace BindTool
 
             Debug.Log("脚本生成路径：" + path);
 
-            if (mainSetting.isCustomBind == false)
-            {
-                generateData.objectInfo.gameObjectBindInfoList.Clear();
-                Transform[] gameObjects = bindObject.GetComponentsInChildren<Transform>(true);
-                List<ComponentBindInfo> componentBindInfoList = new List<ComponentBindInfo>();
-
-                int amount = gameObjects.Length;
-                for (int i = 0; i < amount; i++)
-                {
-                    Transform go = gameObjects[i];
-                    int componentAmount = new ComponentBindInfo(go.gameObject).typeStrings.Length;
-                    for (int j = 0; j < componentAmount; j++)
-                    {
-                        ComponentBindInfo info = new ComponentBindInfo(go.gameObject);
-                        info.index = j;
-                        componentBindInfoList.Add(info);
-                        if (mainSetting.selectCreateNameSetting.isBindAutoGenerateName) info.name = CommonTools.GetNumberAlpha(info.instanceObject.name);
-                    }
-                }
-                int infoAmount = componentBindInfoList.Count;
-                for (int i = 0; i < infoAmount; i++)
-                {
-                    ComponentBindInfo info = componentBindInfoList[i];
-                    if (generateData.objectInfo.gameObjectBindInfoList.Contains(info) == false) generateData.objectInfo.gameObjectBindInfoList.Add(info);
-                }
-            }
+            // if (mainSetting.isCustomBind == false)
+            // {
+            //     generateData.objectInfo.gameObjectBindInfoList.Clear();
+            //     Transform[] gameObjects = bindObject.GetComponentsInChildren<Transform>(true);
+            //     List<ComponentBindInfo> componentBindInfoList = new List<ComponentBindInfo>();
+            //
+            //     int amount = gameObjects.Length;
+            //     for (int i = 0; i < amount; i++)
+            //     {
+            //         Transform go = gameObjects[i];
+            //         int componentAmount = new ComponentBindInfo(go.gameObject).typeStrings.Length;
+            //         for (int j = 0; j < componentAmount; j++)
+            //         {
+            //             ComponentBindInfo info = new ComponentBindInfo(go.gameObject);
+            //             info.index = j;
+            //             componentBindInfoList.Add(info);
+            //             if (mainSetting.selectCreateNameSetting.isBindAutoGenerateName) info.name = CommonTools.GetNumberAlpha(info.instanceObject.name);
+            //         }
+            //     }
+            //     int infoAmount = componentBindInfoList.Count;
+            //     for (int i = 0; i < infoAmount; i++)
+            //     {
+            //         ComponentBindInfo info = componentBindInfoList[i];
+            //         if (generateData.objectInfo.gameObjectBindInfoList.Contains(info) == false) generateData.objectInfo.gameObjectBindInfoList.Add(info);
+            //     }
+            // }
 
             BindComponentsHelper.AddBindComponent(generateData);
-            IGenerator generator = GeneratorFactory.GetGenerator(generatorType, mainSetting, generateData);
+            IGenerator generator = GeneratorFactory.GetGenerator(generatorType, setting, generateData);
 
             switch (generatorType)
             {
@@ -81,7 +71,7 @@ namespace BindTool
                     CSharpBuild(generator, path, generateData);
                     break;
                 case GeneratorType.Lua:
-                    LuaBuild(generator, path, mainSetting, generateData);
+                    LuaBuild(generator, path, setting, generateData);
                     break;
                 default:
                     Debug.LogError("生成失败,没有对应的生成器");
@@ -101,7 +91,9 @@ namespace BindTool
         static void CSharpDispose()
         {
             if (EditorPrefs.HasKey(CSharpBuildGenerateDataKey) == false) { return; }
-            MainSetting mainSetting = MainSetting.Get();
+            BindSetting bindSetting = BindSetting.Get();
+            CommonSetting commonSetting = bindSetting.selectCompositionSetting.commonSetting;
+
             GenerateData generateData = JsonUtility.FromJson<GenerateData>(EditorPrefs.GetString(CSharpBuildGenerateDataKey));
 
             if (generateData == null) return;
@@ -109,7 +101,7 @@ namespace BindTool
 
             GameObject bindObject = generateData.bindObject;
             if (bindObject == null) return;
-            string path = Application.dataPath + "/" + mainSetting.createPrefabPath;
+            string path = Application.dataPath + "/" + commonSetting.createPrefabPath;
 
             //检查路径是否有效
             if (Directory.Exists(path) == false)
@@ -119,7 +111,7 @@ namespace BindTool
             }
 
             //创建文件夹
-            if (mainSetting.isCreatePrefabFolder)
+            if (commonSetting.isCreatePrefabFolder)
             {
                 path += $"/{bindObject.name}";
                 if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
@@ -156,7 +148,7 @@ namespace BindTool
             }
             else { Debug.Log("添加类型为空"); }
 
-            if (mainSetting.isCreatePrefab)
+            if (commonSetting.isCreatePrefab)
             {
                 //创建预制体
                 if (File.Exists(path)) { path = path.Substring(path.IndexOf("Assets", StringComparison.Ordinal)); }
@@ -168,8 +160,10 @@ namespace BindTool
             AssetDatabase.Refresh();
         }
 
-        static void LuaBuild(IGenerator generator, string scriptPath, MainSetting setting, GenerateData generateData)
+        static void LuaBuild(IGenerator generator, string scriptPath, CompositionSetting setting, GenerateData generateData)
         {
+            CommonSetting commonSetting = setting.commonSetting;
+
             GameObject bindObject = generateData.bindObject;
 
             BindComponents bindComponents = bindObject.GetComponent<BindComponents>();
@@ -181,10 +175,10 @@ namespace BindTool
                 bindComponents.bindComponentList.Add(componentBindInfo.GetValue());
             }
 
-            if (setting.isCreatePrefab)
+            if (commonSetting.isCreatePrefab)
             {
                 //创建预制体
-                string path = Application.dataPath + "/" + setting.createPrefabPath;
+                string path = Application.dataPath + "/" + commonSetting.createPrefabPath;
                 if (Directory.Exists(path) == false)
                 {
                     Debug.LogError($"{path} 不是有效路径！");

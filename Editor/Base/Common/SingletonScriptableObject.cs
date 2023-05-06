@@ -1,7 +1,8 @@
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
-public class SingletonScriptableObject<T> : ScriptableObject where T : SingletonScriptableObject<T>
+public class SingletonScriptableObject<T> : SerializedScriptableObject where T : SingletonScriptableObject<T>
 {
     private static T instance;
 

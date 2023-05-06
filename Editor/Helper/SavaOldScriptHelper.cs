@@ -11,11 +11,9 @@ public static class SavaOldScriptHelper
         return generateData.newScriptName;
     }
 
-    public static void GenerateOldScriptFile(string path, string directoryName)
+    public static void GenerateOldScriptFile(ScriptSetting setting, string path, string directoryName)
     {
-        MainSetting mainSetting = MainSetting.Get();
-
-        DefaultAsset saveFolder = mainSetting.selectScriptSetting.oldScriptFolderPath;
+        DefaultAsset saveFolder = setting.oldScriptFolderPath;
         string savePath = AssetDatabase.GetAssetPath(saveFolder);
 
         string fileName = Path.GetFileNameWithoutExtension(savePath);

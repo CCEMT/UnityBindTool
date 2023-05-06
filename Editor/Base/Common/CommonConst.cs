@@ -2,6 +2,8 @@
 {
     public static class CommonConst
     {
+        public const string AssetsFilterPath = "Assets/";
+
         public const string DefaultScriptCreatePath = "Scripts";
         public const string DefaultPrefabCreatePath = "Prefabs";
         public const string DefaultLuaCreatePath = "Lua";
@@ -24,7 +26,7 @@
         public const string LuaFileSuffix = ".lua.txt";
         public const string TextFileSuffix = ".txt";
         public const string MateFileSuffix = ".meta";
-        
+
         public const string UnityEditorAcer = "UNITY_EDITOR";
         public const string UntiyEditorNameSpace = "UnityEditor";
         public const string PropertyValue = "value";
