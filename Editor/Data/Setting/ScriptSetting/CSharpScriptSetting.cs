@@ -31,8 +31,7 @@ public class CSharpScriptSetting
     [LabelText("字段访问类型")]
     public VisitType variableVisitType;
 
-    [LabelText("字段命名设置")]
-    public NameSetting nameSetting = new NameSetting();
+
 
     [LabelText("是否创建属性")]
     public bool isAddProperty;

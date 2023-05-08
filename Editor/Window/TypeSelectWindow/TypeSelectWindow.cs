@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -119,7 +120,7 @@ namespace BindTool
             for (int i = 0; i < componentAmount; i++)
             {
                 Type type = componentTypeList[i];
-                if (CommonTools.Search(type.Name, inputString)) selectList.Add(type);
+                if (FuzzySearch.Contains(type.Name, inputString)) selectList.Add(type);
             }
             selectAmount = selectList.Count;
         }

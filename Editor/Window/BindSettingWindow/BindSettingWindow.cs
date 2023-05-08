@@ -20,6 +20,7 @@ public class BindSettingWindow : OdinMenuEditorWindow
     void Init()
     {
         this.bindSetting = BindSetting.Get();
+        MenuWidth = 240f;
     }
 
     protected override OdinMenuTree BuildMenuTree()

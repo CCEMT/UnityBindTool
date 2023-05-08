@@ -7,7 +7,7 @@ namespace BindTool
     {
         public string name;
         public CollectionType collectionType;
-        public TypeString typeString;
+        public TypeString targetType;
         public Object[] bindObjects;
     }
 }

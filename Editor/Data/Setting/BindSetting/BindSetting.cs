@@ -72,6 +72,9 @@ public class ScriptSetting
     [LabelText("旧脚本文件夹")]
     public DefaultAsset oldScriptFolderPath;
 
+    [LabelText("命名设置")]
+    public NameSetting nameSetting = new NameSetting();
+
     [HideInInspector]
     public CSharpScriptSetting csharpScriptSetting = new CSharpScriptSetting();
 

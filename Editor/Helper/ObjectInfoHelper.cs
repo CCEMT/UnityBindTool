@@ -40,8 +40,6 @@ public static class ObjectInfoHelper
                 objectInfo.typeString = new TypeString(bindComponents.bindRoot.GetType());
                 objectInfo.rootBindInfo = new ComponentBindInfo(bindObject);
                 objectInfo.rootBindInfo.name = objectInfo.typeString.typeName;
-                objectInfo.gameObjectBindInfoList = new List<ComponentBindInfo>();
-                objectInfo.dataBindInfoList = new List<DataBindInfo>();
 
                 Type type = bindComponents.bindRoot.GetType();
                 FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -71,20 +69,66 @@ public static class ObjectInfoHelper
 
         if (objectInfo != null) return objectInfo;
         objectInfo = new ObjectInfo();
-        objectInfo.gameObjectBindInfoList = new List<ComponentBindInfo>();
-        objectInfo.dataBindInfoList = new List<DataBindInfo>();
         //objectInfo.SetRootObject(bindObject);
 
         return objectInfo;
     }
 
-    // public ComponentBindInfo AutoBind(Object ob, AutoBindSetting autoBindSetting)
-    // {
-    //     ComponentBindInfo componentBindInfo = new ComponentBindInfo(ob);
-    //     BindByAutoSetting(componentBindInfo, autoBindSetting);
-    //     return componentBindInfo;
-    // }
-    //
+    public static void ClearAllBind(ObjectInfo objectInfo)
+    {
+        objectInfo.gameObjectBindInfoList.Clear();
+        objectInfo.dataBindInfoList.Clear();
+        objectInfo.componentCollectionBindInfoList.Clear();
+        objectInfo.dataCollectionBindInfoList.Clear();
+    }
+
+    public static void BindAll(ObjectInfo objectInfo, GameObject target)
+    {
+        objectInfo.gameObjectBindInfoList.Clear();
+        Transform[] gameObjects = target.GetComponentsInChildren<Transform>(true);
+        List<ComponentBindInfo> componentBindInfoList = new List<ComponentBindInfo>();
+
+        int amount = gameObjects.Length;
+        for (int i = 0; i < amount; i++)
+        {
+            Transform go = gameObjects[i];
+            int componentAmount = new ComponentBindInfo(go.gameObject).typeStrings.Length;
+            for (int j = 0; j < componentAmount; j++)
+            {
+                ComponentBindInfo info = new ComponentBindInfo(go.gameObject);
+                info.index = j;
+                componentBindInfoList.Add(info);
+                info.name = CommonTools.GetNumberAlpha(info.instanceObject.name);
+            }
+        }
+        int infoAmount = componentBindInfoList.Count;
+        for (int i = 0; i < infoAmount; i++)
+        {
+            ComponentBindInfo info = componentBindInfoList[i];
+            if (objectInfo.gameObjectBindInfoList.Contains(info) == false) objectInfo.gameObjectBindInfoList.Add(info);
+        }
+    }
+
+    public static void ObjectInfoAutoBind(ObjectInfo objectInfo, GameObject bindObject, CompositionSetting compositionSetting)
+    {
+        Transform[] gameObjects = bindObject.GetComponentsInChildren<Transform>(true);
+        int amount = gameObjects.Length;
+        for (int i = 0; i < amount; i++)
+        {
+            Transform go = gameObjects[i];
+            ComponentBindInfo info = AutoBind(go, compositionSetting.autoBindSetting);
+            if (info == null) continue;
+            BindComponent(objectInfo, info, compositionSetting);
+        }
+    }
+
+    public static ComponentBindInfo AutoBind(Object ob, AutoBindSetting autoBindSetting)
+    {
+        ComponentBindInfo componentBindInfo = new ComponentBindInfo(ob);
+        //BindByAutoSetting(componentBindInfo, autoBindSetting);
+        return componentBindInfo;
+    }
+
     // public void AutoBind(ComponentBindInfo bindInfo, AutoBindSetting autoBindSetting)
     // {
     //     BindByAutoSetting(bindInfo, autoBindSetting);
@@ -232,4 +276,61 @@ public static class ObjectInfoHelper
     //     if (targetPrefab == currentPrefab) return true;
     //     return false;
     // }
+
+    public static void BindComponent(ObjectInfo objectInfo, ComponentBindInfo info, CompositionSetting setting)
+    {
+        if (setting.nameGenerateSetting.isBindAutoGenerateName) info.name = NameHelper.SetVariableName(info.instanceObject.name, setting.nameGenerateSetting);
+        info.name = NameHelper.NameSettingByName(info, setting.scriptSetting.nameSetting);
+        if (objectInfo.gameObjectBindInfoList.Contains(info) == false) objectInfo.gameObjectBindInfoList.Add(info);
+    }
+
+    public static void RemoveBindInfo(ObjectInfo objectInfo, GameObject removeObject, RemoveType removeType)
+    {
+        switch (removeType)
+        {
+            case RemoveType.This:
+            {
+                int thisBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
+                for (int i = thisBindInfoAmount - 1; i >= 0; i--)
+                {
+                    ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[i];
+                    if (componentBindInfo.instanceObject == removeObject) objectInfo.gameObjectBindInfoList.RemoveAt(i);
+                }
+                break;
+            }
+            case RemoveType.Child:
+            {
+                Transform[] transforms = removeObject.GetComponentsInChildren<Transform>(true);
+                int amount = transforms.Length;
+                for (int i = 0; i < amount; i++)
+                {
+                    Transform transform = transforms[i];
+                    if (transform.gameObject == removeObject) continue;
+                    int childBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
+                    for (int j = childBindInfoAmount - 1; j >= 0; j--)
+                    {
+                        ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[j];
+                        if (componentBindInfo.instanceObject == transform.gameObject) objectInfo.gameObjectBindInfoList.RemoveAt(j);
+                    }
+                }
+                break;
+            }
+            case RemoveType.ThisAndChild:
+            {
+                Transform[] transforms = removeObject.GetComponentsInChildren<Transform>(true);
+                int amount = transforms.Length;
+                for (int i = 0; i < amount; i++)
+                {
+                    Transform transform = transforms[i];
+                    int childBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
+                    for (int j = childBindInfoAmount - 1; j >= 0; j--)
+                    {
+                        ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[j];
+                        if (componentBindInfo.instanceObject == transform.gameObject) objectInfo.gameObjectBindInfoList.RemoveAt(j);
+                    }
+                }
+                break;
+            }
+        }
+    }
 }

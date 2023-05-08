@@ -48,6 +48,8 @@ public partial class BindWindow : EditorWindow
         this.bindSetting = BindSetting.Get();
         editorObjectInfo = ObjectInfoHelper.GetObjectInfo(bindObject);
         generateData = new GenerateData();
+
+        BindInfoListInit();
     }
 
     private void OnInspectorUpdate()
@@ -60,10 +62,10 @@ public partial class BindWindow : EditorWindow
         switch (this.bindWindowState)
         {
             case BindWindowState.BindInfoListGUI:
-                BindInfoListGUIDraw();
+                DrawBindInfoListGUI();
                 break;
             case BindWindowState.BuildGUI:
-                BuildGUIDraw();
+                DrawBuildGUI();
                 break;
         }
     }

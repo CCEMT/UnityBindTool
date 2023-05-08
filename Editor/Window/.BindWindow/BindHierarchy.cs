@@ -18,7 +18,7 @@ namespace BindTool
 
         static void SetShow(int id, Rect rect)
         {
-            if (_bindWindow == null || _bindWindow.mainSetting == null || ! _bindWindow.mainSetting.isCustomBind || _bindWindow.bindObject == null) return;
+            if (bindWindow == null) return;
             BindInfo(id, rect);
             BindOperate(id, rect);
             ExamineBind(id, rect);

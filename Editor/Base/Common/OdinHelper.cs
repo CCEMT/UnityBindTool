@@ -19,7 +19,7 @@ public static class OdinHelper
             if (GUILayout.Button(enumLable, "MiniPopup"))
             {
                 Dictionary<string, Enum> DataForDraw = new Dictionary<string, Enum>() { };
-                Enum[] enums = Enum.GetValues(typeof(NameMatchingRule)).OfType<Enum>().ToArray();
+                Enum[] enums = Enum.GetValues(enumTargetValue.GetType()).OfType<Enum>().ToArray();
                 enums.ForEach((enumValue) => { DataForDraw.Add(GetEnumLableText(enumValue), enumValue); });
 
                 IEnumerable<GenericSelectorItem<Enum>> customCollection = DataForDraw.Keys.Select(itemName =>

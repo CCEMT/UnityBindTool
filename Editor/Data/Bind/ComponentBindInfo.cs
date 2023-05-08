@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -30,10 +31,7 @@ namespace BindTool
 
         public string[] GetTypeStrings()
         {
-            List<string> typeNames = new List<string>();
-            int amount = typeStrings.Length;
-            for (int i = 0; i < amount; i++) typeNames.Add(typeStrings[i].typeName);
-            return typeNames.ToArray();
+            return typeStrings.Select((v) => v.typeName).ToArray();
         }
 
         public GameObject GetObject()

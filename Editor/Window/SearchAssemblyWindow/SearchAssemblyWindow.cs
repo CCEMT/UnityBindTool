@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -107,7 +108,7 @@ namespace BindTool
             for (int i = 0; i < componentAmount; i++)
             {
                 Assembly assembly = componentTypeList[i];
-                if (CommonTools.Search(assembly.FullName, inputString)) selectList.Add(assembly);
+                if (FuzzySearch.Contains(assembly.FullName, inputString)) selectList.Add(assembly);
             }
             selectAmount = selectList.Count;
         }

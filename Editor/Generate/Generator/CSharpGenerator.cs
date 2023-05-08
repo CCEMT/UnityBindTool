@@ -236,7 +236,7 @@ public class CSharpGenerator : IGenerator
         ClassDeclarationSyntax targetClass = classDeclarationSyntaxs.First();
         ClassDeclarationSyntax oldNode = targetClass;
 
-        IRepetitionNameDisposer fieldNameDisposer = RepetitionNameDisposeFactory.GetRepetitionNameDisposer(this.csharpScriptSetting.nameSetting.repetitionNameDispose);
+        IRepetitionNameDisposer fieldNameDisposer = RepetitionNameDisposeFactory.GetRepetitionNameDisposer(this.scriptSetting.nameSetting.repetitionNameDispose);
         IRepetitionNameDisposer propertyNameDisposer = RepetitionNameDisposeFactory.GetRepetitionNameDisposer(this.csharpScriptSetting.propertyNameSetting.repetitionNameDispose);
 
         IfDirectiveTriviaSyntax ifNode = SyntaxFactory.IfDirectiveTrivia(SyntaxFactory.IdentifierName(CommonConst.UnityEditorAcer), true, false, false);
