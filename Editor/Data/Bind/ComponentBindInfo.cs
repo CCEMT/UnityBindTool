@@ -1,7 +1,6 @@
 ﻿#region Using
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -63,7 +62,7 @@ namespace BindTool
         {
             if (prefabObject == null) { prefabObject = CommonTools.GetPrefabAsset(GetObject()); }
             TypeString currenTypeString = typeStrings[index];
-            AddComponentsTypes(GetObject());
+            this.typeStrings = BindHelper.GetTypeStringByObject(GetObject());
 
             int amount = typeStrings.Length;
             index = -1;
@@ -101,40 +100,14 @@ namespace BindTool
             {
                 this.prefabObject = CommonTools.GetPrefabAsset(gameObject);
                 this.instanceObject = gameObject;
-                AddComponentsTypes(gameObject);
             }
             else if (target is Component component)
             {
                 this.prefabObject = CommonTools.GetPrefabAsset(component.gameObject);
                 this.instanceObject = component.gameObject;
-                AddComponentsTypes(component.gameObject);
             }
-            else
-            {
-                Type type = target.GetType();
-                this.typeStrings = new TypeString[] {new TypeString(type)};
-                this.index = 0;
-            }
-        }
-
-        private void AddComponentsTypes(GameObject gameObject)
-        {
-            List<TypeString> typeStringList = new List<TypeString>();
-
-            Type gameObjectType = typeof(GameObject);
-            TypeString gameObjectTypeString = new TypeString(gameObjectType);
-            typeStringList.Add(gameObjectTypeString);
-
-            Component[] cs = gameObject.GetComponents(typeof(Component));
-            foreach (Component t in cs)
-            {
-                if (t == null) continue;
-                Type type = t.GetType();
-                TypeString typeString = new TypeString(type);
-                typeStringList.Add(typeString);
-            }
-
-            typeStrings = typeStringList.ToArray();
+            else { this.index = 0; }
+            this.typeStrings = BindHelper.GetTypeStringByObject(target);
         }
     }
 }

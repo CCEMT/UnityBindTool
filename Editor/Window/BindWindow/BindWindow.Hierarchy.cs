@@ -19,12 +19,12 @@ public partial class BindWindow
     static void SetShow(int id, Rect rect)
     {
         if (bindWindow == null) return;
-        BindInfo(id, rect);
-        BindOperate(id, rect);
-        ExamineBind(id, rect);
+        DrawBindInfo(id, rect);
+        DrawBindOperate(id, rect);
+        DrawExamineBind(id, rect);
     }
 
-    static void BindInfo(int id, Rect rect)
+    static void DrawBindInfo(int id, Rect rect)
     {
         GameObject go = EditorUtility.InstanceIDToObject(id) as GameObject;
         if (go == null) return;
@@ -36,34 +36,29 @@ public partial class BindWindow
             GUIStyle style = new GUIStyle();
             style.normal.textColor = Color.red;
             GUI.Label(r, "★", style);
+            return;
+        }
+        ComponentBindInfo findInfo = bindWindow.editorObjectInfo.gameObjectBindInfoList.Find((info) => info.instanceObject == go || CommonTools.GetPrefabAsset(go) == info.instanceObject);
+        if (findInfo == null) return;
+        Rect targetRect = new Rect(rect);
+        targetRect.x = 34;
+        targetRect.width = 80;
+        GUIStyle targetStyle = new GUIStyle();
+        if (CommonTools.GetIsParent(go.transform, bindWindow.bindObject))
+        {
+            targetStyle.normal.textColor = Color.yellow;
+            GUI.Label(targetRect, "★", targetStyle);
         }
         else
         {
-            ComponentBindInfo findInfo = bindWindow.editorObjectInfo.gameObjectBindInfoList.Find((bindInfo) => {
-                if (bindInfo.instanceObject == go || CommonTools.GetPrefabAsset(go) == bindInfo.instanceObject) { return true; }
-                else { return false; }
-            });
-
-            if (findInfo == null) return;
-            Rect r = new Rect(rect);
-            r.x = 34;
-            r.width = 80;
-            GUIStyle style = new GUIStyle();
-            if (CommonTools.GetIsParent(go.transform, bindWindow.bindObject))
-            {
-                style.normal.textColor = Color.yellow;
-                GUI.Label(r, "★", style);
-            }
-            else
-            {
-                style.normal.textColor = Color.white;
-                GUI.Label(r, "★", style);
-            }
+            targetStyle.normal.textColor = Color.white;
+            GUI.Label(targetRect, "★", targetStyle);
         }
     }
 
-    static void BindOperate(int id, Rect rect)
+    static void DrawBindOperate(int id, Rect rect)
     {
+        if (Selection.objects.Length > 1) return;
         if (! Selection.activeObject || id != Selection.activeObject.GetInstanceID()) return;
         GameObject go = EditorUtility.InstanceIDToObject(id) as GameObject;
         if (go == null) return;
@@ -75,25 +70,13 @@ public partial class BindWindow
         GUIStyle style = new GUIStyle();
         style.fontSize = 12;
         style.normal.textColor = Color.green;
-        if (! GUI.Button(rect, "绑定", style)) return;
-        GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
+        if (GUI.Button(rect, "绑定", style)) HierarchyBind(go);
 
-        ComponentBindInfo componentBindInfo = new ComponentBindInfo(go);
-        int typeAmount = componentBindInfo.typeStrings.Length;
-        for (int i = 0; i < typeAmount; i++)
-        {
-            menu.AddItem(new GUIContent(componentBindInfo.typeStrings[i].typeName), false, (index) => {
-                componentBindInfo.index = (int) index;
-                ObjectInfoHelper.BindComponent(bindWindow.editorObjectInfo, componentBindInfo, bindWindow.bindSetting.selectCompositionSetting);
-                bindWindow.Repaint();
-            }, i);
-        }
-
-        menu.ShowAsContext(); //显示菜单
     }
 
-    static void ExamineBind(int id, Rect rect)
+    static void DrawExamineBind(int id, Rect rect)
     {
+        if (Selection.objects.Length > 1) return;
         if (! Selection.activeObject || id != Selection.activeObject.GetInstanceID()) return;
         GameObject go = EditorUtility.InstanceIDToObject(id) as GameObject;
         if (go == null) return;
@@ -110,69 +93,100 @@ public partial class BindWindow
         }
 
         if (bindList.Count <= 0) return;
+        Rect lookRect = new Rect(rect);
+
+        float lookWidth = 30f;
+        float lookHeight = 17.5f;
+        lookRect.x += rect.width - lookWidth - 30f;
+        lookRect.width = lookWidth;
+        lookRect.height = lookHeight;
+        GUIStyle lookStyle = new GUIStyle();
+        lookStyle.fontSize = 12;
+        lookStyle.normal.textColor = Color.white;
+        if (GUI.Button(lookRect, "查看", lookStyle)) HierarchyLook(bindList);
+
+        Rect deleteRect = new Rect(rect);
+        float deleteWidth = 30f;
+        float deleteHeight = 17.5f;
+        deleteRect.x += rect.width - deleteWidth - lookWidth - 30f;
+        deleteRect.width = deleteHeight;
+        deleteRect.height = deleteHeight;
+
+        GUIStyle deleteStyle = new GUIStyle();
+        deleteStyle.fontSize = 12;
+        deleteStyle.normal.textColor = Color.red;
+        if (GUI.Button(deleteRect, "解除", deleteStyle)) HierarchyRemove(go);
+    }
+
+    static void HierarchyBind(GameObject go)
+    {
+        GenericMenu menu = new GenericMenu();
+
+        ComponentBindInfo componentBindInfo = new ComponentBindInfo(go);
+        int typeAmount = componentBindInfo.typeStrings.Length;
+        for (int i = 0; i < typeAmount; i++)
         {
-            Rect lookRect = new Rect(rect);
-
-            float lookWidth = 30f;
-            float lookHeight = 17.5f;
-            lookRect.x += rect.width - lookWidth - 30f;
-            lookRect.width = lookWidth;
-            lookRect.height = lookHeight;
-            GUIStyle lookStyle = new GUIStyle();
-            lookStyle.fontSize = 12;
-            lookStyle.normal.textColor = Color.white;
-            if (GUI.Button(lookRect, "查看", lookStyle))
-            {
-                GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
-
-                int bindAmount = bindList.Count;
-                for (int i = 0; i < bindAmount; i++)
-                {
-                    ComponentBindInfo info = bindList[i];
-                    menu.AddItem(new GUIContent(info.GetTypeName()), false, () => {
-                        bindWindow.bindWindowState = BindWindowState.BindInfoListGUI;
-                        bindWindow.bindTypeIndex = BindTypeIndex.Item;
-                        bindWindow.selectComponentList.Clear();
-                        bindWindow.selectDataList.Clear();
-                        bindWindow.selectComponentList.Add(info);
-                    }); //向菜单中添加菜单项
-                }
-                menu.ShowAsContext(); //显示菜单
-            }
-
-            Rect deleteRect = new Rect(rect);
-            float deleteWidth = 30f;
-            float deleteHeight = 17.5f;
-            deleteRect.x += rect.width - deleteWidth - lookWidth - 30f;
-            deleteRect.width = deleteHeight;
-            deleteRect.height = deleteHeight;
-
-            GUIStyle deleteStyle = new GUIStyle();
-            deleteStyle.fontSize = 12;
-            deleteStyle.normal.textColor = Color.red;
-            if (! GUI.Button(deleteRect, "解除", deleteStyle)) return;
-            {
-                List<RemoveType> removeTypes = new List<RemoveType>();
-                removeTypes.Add(RemoveType.This);
-
-                Transform[] transforms = go.GetComponentsInChildren<Transform>(true);
-                if (transforms.Length > 1)
-                {
-                    removeTypes.Add(RemoveType.Child);
-                    removeTypes.Add(RemoveType.ThisAndChild);
-                }
-
-                GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
-
-                int selectAmount = removeTypes.Count;
-                for (int i = 0; i < selectAmount; i++)
-                {
-                    RemoveType removeType = removeTypes[i];
-                    menu.AddItem(new GUIContent(LabelHelper.GetRemoveString(removeType)), false, () => { ObjectInfoHelper.RemoveBindInfo(bindWindow.editorObjectInfo, go, removeType); });
-                }
-
-                menu.ShowAsContext(); //显示菜单
-            }
+            menu.AddItem(new GUIContent(componentBindInfo.typeStrings[i].typeName), false, (index) => {
+                componentBindInfo.index = (int) index;
+                ObjectInfoHelper.BindComponent(bindWindow.editorObjectInfo, componentBindInfo, bindWindow.bindSetting.selectCompositionSetting);
+                bindWindow.SearchSelectList();
+                bindWindow.Repaint();
+            }, i);
         }
+
+        menu.ShowAsContext();
+    }
+
+    static void HierarchyLook(List<ComponentBindInfo> bindList)
+    {
+        GenericMenu menu = new GenericMenu();
+        int bindAmount = bindList.Count;
+        for (int i = 0; i < bindAmount; i++)
+        {
+            ComponentBindInfo info = bindList[i];
+            menu.AddItem(new GUIContent(info.GetTypeName()), false, BindWindowLook, info);
+        }
+        menu.ShowAsContext();
+    }
+
+    static void BindWindowLook(object bindInfo)
+    {
+        bindWindow.bindWindowState = BindWindowState.BindInfoListGUI;
+        bindWindow.bindTypeIndex = BindTypeIndex.Item;
+        bindWindow.selectComponentList.Clear();
+        bindWindow.selectDataList.Clear();
+        bindWindow.selectComponentList.Add((ComponentBindInfo) bindInfo);
+        bindWindow.Repaint();
+    }
+
+    static void HierarchyRemove(GameObject go)
+    {
+        List<RemoveType> removeTypes = new List<RemoveType>();
+        removeTypes.Add(RemoveType.This);
+
+        Transform[] transforms = go.GetComponentsInChildren<Transform>(true);
+        if (transforms.Length > 1)
+        {
+            removeTypes.Add(RemoveType.Child);
+            removeTypes.Add(RemoveType.ThisAndChild);
+        }
+
+        GenericMenu menu = new GenericMenu();
+
+        int selectAmount = removeTypes.Count;
+        for (int i = 0; i < selectAmount; i++)
+        {
+            RemoveType removeType = removeTypes[i];
+            menu.AddItem(new GUIContent(LabelHelper.GetRemoveString(removeType)), false, Remove, removeType);
+        }
+
+        void Remove(object removeType)
+        {
+            ObjectInfoHelper.RemoveBindInfo(bindWindow.editorObjectInfo, go, (RemoveType) removeType);
+            bindWindow.SearchSelectList();
+            bindWindow.Repaint();
+        }
+
+        menu.ShowAsContext();
     }
 }

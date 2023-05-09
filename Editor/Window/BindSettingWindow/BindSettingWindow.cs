@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class BindSettingWindow : OdinMenuEditorWindow
 {
-    [MenuItem("Tools/BindSettingWindow")]
     public static void OpenWindow()
     {
         BindSettingWindow window = GetWindow<BindSettingWindow>("Bind Setting");
@@ -92,16 +91,25 @@ public class BindSettingWindow : OdinMenuEditorWindow
                 ForceMenuTreeRebuild();
             }
 
-            if (selected != null)
+            if (selected != null && selected.Value is CompositionSetting)
             {
-                if (selected.Value is CompositionSetting && SirenixEditorGUI.ToolbarButton(new GUIContent("删除")))
+                CompositionSetting value = selected.Value as CompositionSetting;
+                if (SirenixEditorGUI.ToolbarButton(new GUIContent("选择")))
                 {
-                    this.bindSetting.compositionSettingList.Remove((CompositionSetting) selected.Value);
+                    this.bindSetting.selectCompositionSetting = value;
+                    SaveSetting();
+                }
+
+                if (SirenixEditorGUI.ToolbarButton(new GUIContent("删除")))
+                {
+                    this.bindSetting.compositionSettingList.Remove(value);
                     SaveSetting();
                     ForceMenuTreeRebuild();
                 }
             }
 
+            string content = bindSetting.selectCompositionSetting != null ? this.bindSetting.selectCompositionSetting.compositionName : "";
+            GUILayout.Label(content);
         }
         SirenixEditorGUI.EndHorizontalToolbar();
     }

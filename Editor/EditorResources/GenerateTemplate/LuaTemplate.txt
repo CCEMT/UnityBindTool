@@ -4,5 +4,5 @@
 local [ClassName] = BaseClass([InheritClass])--此处的BaseClass为Lua中模拟的Class
 
 function [ClassName]:OnInit(target)--target 参数为对应UI的GameObject
-    [GenerateContent]
+[GenerateContent]
 end

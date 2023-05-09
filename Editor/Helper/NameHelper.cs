@@ -11,7 +11,6 @@ public static class NameHelper
         {
             NameReplaceData nameReplaceData = nameGenerateSetting.nameReplaceDataList[i];
             if (NameCheckContent(nameReplaceData.nameCheck, newName, out string matchingContent)) { newName = content.Replace(matchingContent, nameReplaceData.targetName); }
-
         }
 
         return newName;

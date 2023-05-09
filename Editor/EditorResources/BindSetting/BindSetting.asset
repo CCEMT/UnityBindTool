@@ -22,33 +22,23 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes:
     - Name: selectCompositionSetting
-      Entry: 6
-      Data: 
-    - Name: compositionSettingList
       Entry: 7
-      Data: 0|System.Collections.Generic.List`1[[CompositionSetting, UnityBindTool.Editor]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 1|CompositionSetting, UnityBindTool.Editor
+      Data: 0|CompositionSetting, UnityBindTool.Editor
     - Name: compositionName
       Entry: 1
       Data: New Composition
     - Name: commonSetting
       Entry: 7
-      Data: 2|CommonSetting, UnityBindTool.Editor
+      Data: 1|CommonSetting, UnityBindTool.Editor
     - Name: isCreateScriptFolder
       Entry: 5
-      Data: false
+      Data: true
     - Name: createScriptPath
       Entry: 1
       Data: UnityBindTool/Editor/Data
     - Name: isCreatePrefab
       Entry: 5
-      Data: false
+      Data: true
     - Name: isCreatePrefabFolder
       Entry: 5
       Data: false
@@ -57,7 +47,7 @@ MonoBehaviour:
       Data: 
     - Name: isCreateLua
       Entry: 5
-      Data: false
+      Data: true
     - Name: isCreateLuaFolder
       Entry: 5
       Data: false
@@ -69,7 +59,7 @@ MonoBehaviour:
       Data: 
     - Name: scriptSetting
       Entry: 7
-      Data: 3|ScriptSetting, UnityBindTool.Editor
+      Data: 2|ScriptSetting, UnityBindTool.Editor
     - Name: isSavaOldScript
       Entry: 5
       Data: false
@@ -108,7 +98,7 @@ MonoBehaviour:
       Data: 
     - Name: csharpScriptSetting
       Entry: 7
-      Data: 4|CSharpScriptSetting, UnityBindTool.Editor
+      Data: 3|CSharpScriptSetting, UnityBindTool.Editor
     - Name: isGenerateNew
       Entry: 5
       Data: false
@@ -219,7 +209,7 @@ MonoBehaviour:
       Data: 
     - Name: templateDataList
       Entry: 7
-      Data: 5|System.Collections.Generic.List`1[[TemplateData, UnityBindTool.Editor]],
+      Data: 4|System.Collections.Generic.List`1[[TemplateData, UnityBindTool.Editor]],
         mscorlib
     - Name: 
       Entry: 12
@@ -235,7 +225,7 @@ MonoBehaviour:
       Data: 
     - Name: luaScriptSetting
       Entry: 7
-      Data: 6|LuaScriptSetting, UnityBindTool.Editor
+      Data: 5|LuaScriptSetting, UnityBindTool.Editor
     - Name: 
       Entry: 8
       Data: 
@@ -244,16 +234,16 @@ MonoBehaviour:
       Data: 
     - Name: autoBindSetting
       Entry: 7
-      Data: 7|AutoBindSetting, UnityBindTool.Editor
+      Data: 6|AutoBindSetting, UnityBindTool.Editor
     - Name: nameBindSetting
       Entry: 7
-      Data: 8|NameBindSetting, UnityBindTool.Editor
+      Data: 7|NameBindSetting, UnityBindTool.Editor
     - Name: isEnable
       Entry: 5
-      Data: false
+      Data: true
     - Name: nameBindDataList
       Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[NameBindData, UnityBindTool.Editor]],
+      Data: 8|System.Collections.Generic.List`1[[NameBindData, UnityBindTool.Editor]],
         mscorlib
     - Name: 
       Entry: 12
@@ -269,13 +259,13 @@ MonoBehaviour:
       Data: 
     - Name: nameLgnoreSetting
       Entry: 7
-      Data: 10|NameLgnoreSetting, UnityBindTool.Editor
+      Data: 9|NameLgnoreSetting, UnityBindTool.Editor
     - Name: isEnable
       Entry: 5
-      Data: false
+      Data: true
     - Name: nameLgnoreDataList
       Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[NameCheck, UnityBindTool.Editor]],
+      Data: 10|System.Collections.Generic.List`1[[NameCheck, UnityBindTool.Editor]],
         mscorlib
     - Name: 
       Entry: 12
@@ -291,10 +281,10 @@ MonoBehaviour:
       Data: 
     - Name: streamingBindSetting
       Entry: 7
-      Data: 12|StreamingBindSetting, UnityBindTool.Editor
+      Data: 11|StreamingBindSetting, UnityBindTool.Editor
     - Name: isEnable
       Entry: 5
-      Data: false
+      Data: true
     - Name: isBindComponent
       Entry: 5
       Data: false
@@ -303,7 +293,7 @@ MonoBehaviour:
       Data: false
     - Name: streamingBindDataList
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[StreamingBindData, UnityBindTool.Editor]],
+      Data: 12|System.Collections.Generic.List`1[[StreamingBindData, UnityBindTool.Editor]],
         mscorlib
     - Name: 
       Entry: 12
@@ -322,26 +312,26 @@ MonoBehaviour:
       Data: 
     - Name: nameGenerateSetting
       Entry: 7
-      Data: 14|NameGenerateSetting, UnityBindTool.Editor
+      Data: 13|NameGenerateSetting, UnityBindTool.Editor
     - Name: isBindAutoGenerateName
       Entry: 5
-      Data: false
+      Data: true
     - Name: nameReplaceDataList
       Entry: 7
-      Data: 15|System.Collections.Generic.List`1[[NameReplaceData, UnityBindTool.Editor]],
+      Data: 14|System.Collections.Generic.List`1[[NameReplaceData, UnityBindTool.Editor]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 16|NameReplaceData, UnityBindTool.Editor
+      Data: 15|NameReplaceData, UnityBindTool.Editor
     - Name: targetName
       Entry: 6
       Data: 
     - Name: nameCheck
       Entry: 7
-      Data: 17|NameCheck, UnityBindTool.Editor
+      Data: 16|NameCheck, UnityBindTool.Editor
     - Name: name
       Entry: 6
       Data: 
@@ -371,10 +361,10 @@ MonoBehaviour:
       Data: 
     - Name: csharpNameGenerateSetting
       Entry: 7
-      Data: 18|CSharpNameGenerateSetting, UnityBindTool.Editor
+      Data: 17|CSharpNameGenerateSetting, UnityBindTool.Editor
     - Name: propertyNameReplaceDataList
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[NameReplaceData, UnityBindTool.Editor]],
+      Data: 18|System.Collections.Generic.List`1[[NameReplaceData, UnityBindTool.Editor]],
         mscorlib
     - Name: 
       Entry: 12
@@ -387,7 +377,7 @@ MonoBehaviour:
       Data: 
     - Name: methodNameReplaceDataList
       Entry: 7
-      Data: 20|System.Collections.Generic.List`1[[NameReplaceData, UnityBindTool.Editor]],
+      Data: 19|System.Collections.Generic.List`1[[NameReplaceData, UnityBindTool.Editor]],
         mscorlib
     - Name: 
       Entry: 12
@@ -403,7 +393,7 @@ MonoBehaviour:
       Data: 
     - Name: luaNameGenerateSetting
       Entry: 7
-      Data: 21|LuaNameGenerateSetting, UnityBindTool.Editor
+      Data: 20|LuaNameGenerateSetting, UnityBindTool.Editor
     - Name: 
       Entry: 8
       Data: 
@@ -413,6 +403,16 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: compositionSettingList
+      Entry: 7
+      Data: 21|System.Collections.Generic.List`1[[CompositionSetting, UnityBindTool.Editor]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 9
+      Data: 0
     - Name: 
       Entry: 13
       Data: 

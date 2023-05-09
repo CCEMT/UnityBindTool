@@ -48,4 +48,13 @@ public static class OdinHelper
         foreach (LabelTextAttribute attribute in customAttributes) { name = attribute.Text; }
         return name;
     }
+
+    public static void InputDropDown(Action<string> inputCallback)
+    {
+        OdinEditorWindow window = null;
+        inputCallback += (_) => { window.Close(); };
+        InputData inputData = new InputData(inputCallback);
+        Rect rect = new Rect(Event.current.mousePosition.x, Event.current.mousePosition.y, 0, 0);
+        window = OdinEditorWindow.InspectObjectInDropDown(inputData, rect, 300);
+    }
 }

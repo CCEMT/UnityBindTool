@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using BindTool;
 using Microsoft.CodeAnalysis.CSharp;
@@ -82,12 +83,10 @@ public static class ObjectInfoHelper
         objectInfo.dataCollectionBindInfoList.Clear();
     }
 
-    public static void BindAll(ObjectInfo objectInfo, GameObject target)
+    public static void BindAll(ObjectInfo objectInfo, GameObject target, CompositionSetting compositionSetting)
     {
         objectInfo.gameObjectBindInfoList.Clear();
         Transform[] gameObjects = target.GetComponentsInChildren<Transform>(true);
-        List<ComponentBindInfo> componentBindInfoList = new List<ComponentBindInfo>();
-
         int amount = gameObjects.Length;
         for (int i = 0; i < amount; i++)
         {
@@ -97,15 +96,8 @@ public static class ObjectInfoHelper
             {
                 ComponentBindInfo info = new ComponentBindInfo(go.gameObject);
                 info.index = j;
-                componentBindInfoList.Add(info);
-                info.name = CommonTools.GetNumberAlpha(info.instanceObject.name);
+                BindComponent(objectInfo, info, compositionSetting);
             }
-        }
-        int infoAmount = componentBindInfoList.Count;
-        for (int i = 0; i < infoAmount; i++)
-        {
-            ComponentBindInfo info = componentBindInfoList[i];
-            if (objectInfo.gameObjectBindInfoList.Contains(info) == false) objectInfo.gameObjectBindInfoList.Add(info);
         }
     }
 
@@ -116,17 +108,8 @@ public static class ObjectInfoHelper
         for (int i = 0; i < amount; i++)
         {
             Transform go = gameObjects[i];
-            ComponentBindInfo info = AutoBind(go, compositionSetting.autoBindSetting);
-            if (info == null) continue;
-            BindComponent(objectInfo, info, compositionSetting);
+            StartAutoBind(objectInfo, go, compositionSetting);
         }
-    }
-
-    public static ComponentBindInfo AutoBind(Object ob, AutoBindSetting autoBindSetting)
-    {
-        ComponentBindInfo componentBindInfo = new ComponentBindInfo(ob);
-        //BindByAutoSetting(componentBindInfo, autoBindSetting);
-        return componentBindInfo;
     }
 
     // public void AutoBind(ComponentBindInfo bindInfo, AutoBindSetting autoBindSetting)
@@ -134,101 +117,112 @@ public static class ObjectInfoHelper
     //     BindByAutoSetting(bindInfo, autoBindSetting);
     // }
     //
-    // void BindByAutoSetting(ComponentBindInfo bindInfo, AutoBindSetting autoBindSetting)
-    // {
-    //     GameObject bindObject = bindInfo.GetObject();
-    //     if (bindObject == null) return;
-    //     int lgnoreAmount = autoBindSetting.nameLgnoreDataList.Count;
-    //     for (int i = 0; i < lgnoreAmount; i++)
-    //     {
-    //         NameCheck data = autoBindSetting.nameLgnoreDataList[i];
-    //         if (data.Check(bindObject.name, out string _)) return;
-    //     }
-    //     ComponentBind(bindInfo, autoBindSetting);
-    //
-    // }
-    //
-    // void ComponentBind(ComponentBindInfo bindInfo, AutoBindSetting autoBindSetting)
-    // {
-    //     bindInfo.autoBindSetting = autoBindSetting;
-    //     GameObject bindObject = bindInfo.GetObject();
-    //
-    //     List<TypeString> tempTypeList = new List<TypeString>();
-    //     tempTypeList.AddRange(bindInfo.typeStrings);
-    //
-    //     int nameBindAmont = autoBindSetting.nameBindDataList.Count;
-    //     for (int i = 0; i < nameBindAmont; i++)
-    //     {
-    //         NameBindData data = autoBindSetting.nameBindDataList[i];
-    //         if (data.nameCheck.Check(bindObject.name, out string _))
-    //         {
-    //             if (tempTypeList.Contains(data.typeString))
-    //             {
-    //                 int index = bindInfo.SetIndex(data.typeString);
-    //                 if (index != -1)
-    //                 {
-    //                     this.gameObjectBindInfoList.Add(bindInfo);
-    //                     return;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //
-    //     if (autoBindSetting.isEnableStreamingBind)
-    //     {
-    //         List<TypeString> elseType = new List<TypeString>();
-    //         elseType.AddRange(tempTypeList);
-    //         elseType.Remove(new TypeString(typeof(GameObject)));
-    //         autoBindSetting.streamingBindDataList = autoBindSetting.streamingBindDataList.OrderByDescending(x => x.sequence).ToList();
-    //         int sequenceAmount = autoBindSetting.streamingBindDataList.Count;
-    //         for (int i = 0; i < sequenceAmount; i++)
-    //         {
-    //             StreamingBindData data = autoBindSetting.streamingBindDataList[i];
-    //             if (tempTypeList.Contains(data.typeString)) elseType.Remove(data.typeString);
-    //         }
-    //
-    //         for (int i = 0; i < sequenceAmount; i++)
-    //         {
-    //             StreamingBindData data = autoBindSetting.streamingBindDataList[i];
-    //             if (data.isElse)
-    //             {
-    //                 if (elseType.Count > 0)
-    //                 {
-    //                     bindInfo.SetIndex(elseType.First());
-    //                     break;
-    //                 }
-    //             }
-    //             else
-    //             {
-    //                 if (tempTypeList.Contains(data.typeString))
-    //                 {
-    //                     bindInfo.SetIndex(data.typeString);
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //
-    //         this.gameObjectBindInfoList.Add(bindInfo);
-    //     }
-    //     else
-    //     {
-    //         if (autoBindSetting.isBindComponent)
-    //         {
-    //             if (autoBindSetting.isBindAllComponent)
-    //             {
-    //                 int amount = bindInfo.typeStrings.Length;
-    //                 for (int i = 0; i < amount; i++)
-    //                 {
-    //                     ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindInfo.instanceObject);
-    //                     componentBindInfo.index = i;
-    //                     this.gameObjectBindInfoList.Add(componentBindInfo);
-    //                 }
-    //             }
-    //             else { this.gameObjectBindInfoList.Add(bindInfo); }
-    //         }
-    //     }
-    // }
-    //
+    static void StartAutoBind(ObjectInfo objectInfo, Object target, CompositionSetting autoBindSetting)
+    {
+        NameLgnoreSetting lgnoreSetting = autoBindSetting.autoBindSetting.nameLgnoreSetting;
+
+        if (lgnoreSetting.isEnable)
+        {
+            if (target == null) return;
+            int lgnoreAmount = lgnoreSetting.nameLgnoreDataList.Count;
+            for (int i = 0; i < lgnoreAmount; i++)
+            {
+                NameCheck data = lgnoreSetting.nameLgnoreDataList[i];
+                if (NameHelper.NameCheckContent(data, target.name, out string _)) return;
+            }
+        }
+        StartNameBind(objectInfo, target, autoBindSetting);
+    }
+
+    public static void StartNameBind(ObjectInfo objectInfo, Object target, CompositionSetting setting)
+    {
+        NameBindSetting nameBindSetting = setting.autoBindSetting.nameBindSetting;
+
+        if (nameBindSetting.isEnable)
+        {
+            List<NameBindData> canNameData = new List<NameBindData>();
+
+            int nameBindAmont = nameBindSetting.nameBindDataList.Count;
+            for (int i = 0; i < nameBindAmont; i++)
+            {
+                NameBindData data = nameBindSetting.nameBindDataList[i];
+
+                if (! NameHelper.NameCheckContent(data.nameCheck, target.name, out string _)) continue;
+                canNameData.Add(data);
+            }
+
+            int canNameAmount = canNameData.Count;
+            for (int i = 0; i < canNameAmount; i++)
+            {
+                NameBindData data = canNameData[i];
+                ComponentBindInfo componentBindInfo = new ComponentBindInfo(target);
+                int index = componentBindInfo.SetIndex(data.typeString);
+                if (index == -1) continue;
+                BindComponent(objectInfo, componentBindInfo, setting);
+            }
+
+        }
+        StreamingBind(objectInfo, target, setting);
+    }
+
+    static void StreamingBind(ObjectInfo objectInfo, Object target, CompositionSetting setting)
+    {
+        StreamingBindSetting streamingBindSetting = setting.autoBindSetting.streamingBindSetting;
+
+        if (streamingBindSetting.isEnable)
+        {
+            ComponentBindInfo bindInfo = new ComponentBindInfo(target);
+
+            List<TypeString> tempTypeList = new List<TypeString>();
+            tempTypeList.AddRange(bindInfo.typeStrings);
+
+            List<TypeString> elseType = new List<TypeString>();
+            elseType.AddRange(tempTypeList);
+            elseType.Remove(new TypeString(typeof(GameObject)));
+            streamingBindSetting.streamingBindDataList = streamingBindSetting.streamingBindDataList.OrderByDescending(x => x.sequence).ToList();
+            int sequenceAmount = streamingBindSetting.streamingBindDataList.Count;
+            for (int i = 0; i < sequenceAmount; i++)
+            {
+                StreamingBindData data = streamingBindSetting.streamingBindDataList[i];
+                if (tempTypeList.Contains(data.typeString)) elseType.Remove(data.typeString);
+            }
+
+            for (int i = 0; i < sequenceAmount; i++)
+            {
+                StreamingBindData data = streamingBindSetting.streamingBindDataList[i];
+                if (data.isElse)
+                {
+                    if (elseType.Count <= 0) continue;
+                    bindInfo.SetIndex(elseType.First());
+                    break;
+                }
+                else
+                {
+                    if (! tempTypeList.Contains(data.typeString)) continue;
+                    bindInfo.SetIndex(data.typeString);
+                    break;
+                }
+            }
+
+            BindComponent(objectInfo, bindInfo, setting);
+        }
+        else
+        {
+            if (! streamingBindSetting.isBindComponent) return;
+            if (! streamingBindSetting.isBindAllComponent) return;
+
+            ComponentBindInfo bindInfo = new ComponentBindInfo(target);
+
+            int amount = bindInfo.typeStrings.Length;
+            for (int i = 0; i < amount; i++)
+            {
+                ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindInfo.instanceObject);
+                componentBindInfo.index = i;
+                BindComponent(objectInfo, componentBindInfo, setting);
+            }
+        }
+    }
+
     // public void Bind(ComponentBindInfo bindInfo, int index)
     // {
     //     bindInfo.index = index;
@@ -281,7 +275,16 @@ public static class ObjectInfoHelper
     {
         if (setting.nameGenerateSetting.isBindAutoGenerateName) info.name = NameHelper.SetVariableName(info.instanceObject.name, setting.nameGenerateSetting);
         info.name = NameHelper.NameSettingByName(info, setting.scriptSetting.nameSetting);
+        info.name = CommonTools.GetNumberAlpha(info.name);
         if (objectInfo.gameObjectBindInfoList.Contains(info) == false) objectInfo.gameObjectBindInfoList.Add(info);
+    }
+
+    public static void BindData(ObjectInfo objectInfo, DataBindInfo info, CompositionSetting setting)
+    {
+        if (setting.nameGenerateSetting.isBindAutoGenerateName) info.name = NameHelper.SetVariableName(info.bindObject.name, setting.nameGenerateSetting);
+        info.name = NameHelper.NameSettingByName(info, setting.scriptSetting.nameSetting);
+        info.name = CommonTools.GetNumberAlpha(info.name);
+        if (objectInfo.dataBindInfoList.Contains(info) == false) objectInfo.dataBindInfoList.Add(info);
     }
 
     public static void RemoveBindInfo(ObjectInfo objectInfo, GameObject removeObject, RemoveType removeType)

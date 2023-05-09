@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using BindTool;
 using UnityEditor;
 using UnityEngine;
@@ -75,8 +76,21 @@ public partial class BindWindow
     {
         EditorGUILayout.BeginVertical("frameBox");
         {
+            DrawSetting();
             DrawBuild();
             DrawBind();
+        }
+        EditorGUILayout.EndHorizontal();
+    }
+
+    void DrawSetting()
+    {
+        EditorGUILayout.BeginHorizontal("box");
+        {
+            string content = this.bindSetting.selectCompositionSetting != null ? this.bindSetting.selectCompositionSetting.compositionName : "选择设置为空，请先选择设置";
+            GUILayout.Label(content);
+
+            if (GUILayout.Button("编辑", GUILayout.Width(50f))) { BindSettingWindow.OpenWindow(); }
         }
         EditorGUILayout.EndHorizontal();
     }
@@ -92,7 +106,7 @@ public partial class BindWindow
         {
             if (GUILayout.Button("绑定所有"))
             {
-                ObjectInfoHelper.BindAll(this.editorObjectInfo, this.bindObject);
+                ObjectInfoHelper.BindAll(this.editorObjectInfo, this.bindObject, this.bindSetting.selectCompositionSetting);
                 SearchSelectList();
             }
 
@@ -129,10 +143,140 @@ public partial class BindWindow
         if (currentEvent.type == EventType.DragPerform)
         {
             DragAndDrop.AcceptDrag();
-            Object[] bindTargets = DragAndDrop.objectReferences;
-            BindHelper.BindTarget(this.editorObjectInfo, bindTargets);
+            BindSelectTarget(DragAndDrop.objectReferences);
         }
         currentEvent.Use();
+    }
+
+    void BindSelectTarget(Object[] bindTargets)
+    {
+        if (bindTargets.Length == 0) return;
+
+        switch (this.bindTypeIndex)
+        {
+            case BindTypeIndex.Item:
+                BindItem(bindTargets);
+                break;
+            case BindTypeIndex.Collection:
+                BindCollection(bindTargets);
+                break;
+        }
+        SearchSelectList();
+    }
+
+    void BindItem(Object[] bindTargets)
+    {
+        if (bindTargets.Length == 1) BindSingle(bindTargets.First());
+        else BindMulti(bindTargets);
+    }
+
+    void BindSingle(Object target)
+    {
+        if (target is GameObject)
+        {
+            ComponentBindInfo componentBindInfo = new ComponentBindInfo(target);
+
+            GenericMenu menu = new GenericMenu();
+
+            int typeAmount = componentBindInfo.typeStrings.Length;
+            for (int i = 0; i < typeAmount; i++)
+            {
+                string content = componentBindInfo.typeStrings[i].typeName;
+                menu.AddItem(new GUIContent(content), false, BindComponent, i);
+            }
+
+            void BindComponent(object index)
+            {
+                componentBindInfo.index = (int) index;
+                ObjectInfoHelper.BindComponent(this.editorObjectInfo, componentBindInfo, this.bindSetting.selectCompositionSetting);
+            }
+
+            menu.ShowAsContext();
+            return;
+        }
+        else if (target is Component)
+        {
+            ComponentBindInfo componentBindInfo = new ComponentBindInfo(target);
+            componentBindInfo.SetIndex(new TypeString(target.GetType()));
+            ObjectInfoHelper.BindComponent(this.editorObjectInfo, componentBindInfo, this.bindSetting.selectCompositionSetting);
+            return;
+        }
+        DataBindInfo dataBindInfo = new DataBindInfo(target);
+        ObjectInfoHelper.BindData(this.editorObjectInfo, dataBindInfo, this.bindSetting.selectCompositionSetting);
+    }
+
+    void BindMulti(Object[] bindTargets)
+    {
+        List<TypeString> bindTypeList = new List<TypeString>();
+
+        int bindAmount = bindTargets.Length;
+        for (int i = 0; i < bindAmount; i++)
+        {
+            Object bindTarget = bindTargets[i];
+
+            if (bindTarget is GameObject bindGameObject)
+            {
+                TypeString[] addTypeString = BindHelper.GetTypeStringByGameObject(bindGameObject);
+                bindTypeList = bindTypeList.Intersect(addTypeString).ToList();
+            }
+            else if (bindTarget is Component)
+            {
+                ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindTarget);
+                componentBindInfo.SetIndex(new TypeString(bindTarget.GetType()));
+                ObjectInfoHelper.BindComponent(this.editorObjectInfo, componentBindInfo, this.bindSetting.selectCompositionSetting);
+            }
+
+            DataBindInfo dataBindInfo = new DataBindInfo(bindTarget);
+            ObjectInfoHelper.BindData(this.editorObjectInfo, dataBindInfo, this.bindSetting.selectCompositionSetting);
+        }
+
+        int bindTypeAmount = bindTypeList.Count;
+        if (bindTypeAmount == 0) return;
+
+        GenericMenu menu = new GenericMenu();
+
+        for (int i = 0; i < bindTypeAmount; i++)
+        {
+            TypeString typeString = bindTypeList[i];
+            menu.AddItem(new GUIContent(typeString.typeName), false, BindComponent, typeString);
+        }
+        menu.AddItem(new GUIContent("自动获取类型"), false, AutoBindComponent);
+
+        menu.ShowAsContext();
+
+        void BindComponent(object bindType)
+        {
+            TypeString typeString = (TypeString) bindType;
+            for (int i = 0; i < bindAmount; i++)
+            {
+                Object bindTarget = bindTargets[i];
+                ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindTarget);
+                componentBindInfo.SetIndex(typeString);
+                ObjectInfoHelper.BindComponent(this.editorObjectInfo, componentBindInfo, this.bindSetting.selectCompositionSetting);
+            }
+        }
+
+        void AutoBindComponent()
+        {
+            for (int i = 0; i < bindAmount; i++)
+            {
+                Object bindTarget = bindTargets[i];
+                ObjectInfoHelper.StartNameBind(this.editorObjectInfo, bindTarget, this.bindSetting.selectCompositionSetting);
+            }
+        }
+    }
+
+    void BindCollection(Object[] bindTargets)
+    {
+        int amount = bindTargets.Length;
+        for (int i = 0; i < amount; i++)
+        {
+            Object bindTarget = bindTargets[i];
+            if (bindTarget is GameObject or Component)
+            {
+                
+            }
+        }
     }
 
     void DrawBindInfo()
@@ -166,10 +310,10 @@ public partial class BindWindow
 
     void ListOperate()
     {
-        GenericMenu menu = new GenericMenu(); //初始化GenericMenu 
+        GenericMenu menu = new GenericMenu(); 
         menu.AddItem(new GUIContent("重置搜索名称"), false, ResetSearchContent);
         menu.AddItem(new GUIContent("查找重复名称的Item"), false, FindRepetitionNameItem);
-        menu.ShowAsContext(); //显示菜单
+        menu.ShowAsContext(); 
     }
 
     void ResetSearchContent()
@@ -222,7 +366,7 @@ public partial class BindWindow
 
     void DrawBindItem()
     {
-        EditorGUILayout.BeginVertical("box", GUILayout.Height(position.height - ContentHight));
+        EditorGUILayout.BeginVertical("box", GUILayout.Height(position.height - ContentHight), GUILayout.ExpandWidth(true));
         {
             for (int i = 0; i < this.showAmount; i++)
             {
@@ -301,7 +445,7 @@ public partial class BindWindow
 
     void DrawBindCollection()
     {
-        EditorGUILayout.BeginVertical("box", GUILayout.Height(position.height - ContentHight));
+        EditorGUILayout.BeginVertical("box", GUILayout.Height(position.height - ContentHight), GUILayout.ExpandWidth(true));
         {
             for (int i = 0; i < this.showAmount; i++)
             {
