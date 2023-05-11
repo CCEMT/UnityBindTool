@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using BindTool;
 using Microsoft.CodeAnalysis.CSharp;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 public static class ObjectInfoHelper
 {
@@ -34,35 +31,24 @@ public static class ObjectInfoHelper
 
         if (bindComponents != null)
         {
-            if (bindComponents.bindRoot == null) { Object.DestroyImmediate(bindComponents); }
+            objectInfo = new ObjectInfo();
+            if (bindComponents.targetType == null) { Object.DestroyImmediate(bindComponents); }
             else
             {
                 objectInfo = new ObjectInfo();
-                objectInfo.typeString = new TypeString(bindComponents.bindRoot.GetType());
-                objectInfo.rootBindInfo = new ComponentBindInfo(bindObject);
-                objectInfo.rootBindInfo.name = objectInfo.typeString.typeName;
+                objectInfo.typeString = new TypeString(bindComponents.targetType);
 
-                Type type = bindComponents.bindRoot.GetType();
-                FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                for (int i = 0; i < fieldInfos.Length; i++)
+                BindData rootData = BindDataHelper.CreateBindData(bindObject);
+                objectInfo.rootData = rootData;
+                objectInfo.rootData.name = objectInfo.typeString.typeName;
+
+                int bindAmount = bindComponents.bindComponentList.Count;
+                for (int i = 0; i < bindAmount; i++)
                 {
-                    FieldInfo fieldInfo = fieldInfos[i];
-                    AutoGenerate attribute = (AutoGenerate) fieldInfo.GetCustomAttribute(typeof(AutoGenerate), true);
-                    if (attribute == null || attribute.autoGenerateType != AutoGenerateType.OriginalField) continue;
-                    Object bindComponent = (Object) fieldInfo.GetValue(bindComponents.bindRoot);
-                    if (bindComponent is GameObject == false && bindComponent.GetType().IsSubclassOf(typeof(Component)) == false)
-                    {
-                        DataBindInfo dataBindInfo = new DataBindInfo(bindComponent);
-                        dataBindInfo.name = fieldInfo.Name;
-                        objectInfo.dataBindInfoList.Add(dataBindInfo);
-                    }
-                    else
-                    {
-                        ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindComponent);
-                        componentBindInfo.name = fieldInfo.Name;
-                        componentBindInfo.SetIndex(new TypeString(fieldInfo.FieldType));
-                        objectInfo.gameObjectBindInfoList.Add(componentBindInfo);
-                    }
+                    Object bindTarget = bindComponents.bindComponentList[i];
+                    BindData bindData = BindDataHelper.CreateBindData(bindTarget);
+                    bindData.name = bindComponents.bindName[i];
+                    objectInfo.bindDataList.Add(bindData);
                 }
             }
 
@@ -70,33 +56,36 @@ public static class ObjectInfoHelper
 
         if (objectInfo != null) return objectInfo;
         objectInfo = new ObjectInfo();
-        //objectInfo.SetRootObject(bindObject);
+        BindData newRootData = BindDataHelper.CreateBindData(bindObject);
+        objectInfo.rootData = newRootData;
 
         return objectInfo;
     }
 
     public static void ClearAllBind(ObjectInfo objectInfo)
     {
-        objectInfo.gameObjectBindInfoList.Clear();
-        objectInfo.dataBindInfoList.Clear();
-        objectInfo.componentCollectionBindInfoList.Clear();
-        objectInfo.dataCollectionBindInfoList.Clear();
+        objectInfo.bindDataList.Clear();
+        objectInfo.bindCollectionList.Clear();
     }
 
     public static void BindAll(ObjectInfo objectInfo, GameObject target, CompositionSetting compositionSetting)
     {
-        objectInfo.gameObjectBindInfoList.Clear();
+        objectInfo.bindDataList.Clear();
         Transform[] gameObjects = target.GetComponentsInChildren<Transform>(true);
         int amount = gameObjects.Length;
         for (int i = 0; i < amount; i++)
         {
             Transform go = gameObjects[i];
-            int componentAmount = new ComponentBindInfo(go.gameObject).typeStrings.Length;
+            Component[] components = go.gameObject.GetComponents<Component>();
+
+            int componentAmount = components.Length;
             for (int j = 0; j < componentAmount; j++)
             {
-                ComponentBindInfo info = new ComponentBindInfo(go.gameObject);
-                info.index = j;
-                BindComponent(objectInfo, info, compositionSetting);
+                Component component = components[j];
+                BindData bindData = BindDataHelper.CreateBindData(component);
+                bindData.SetBindInfo<BindComponent>();
+                bindData.index = j;
+                BindDataToObjectInfo(objectInfo, bindData, compositionSetting);
             }
         }
     }
@@ -112,11 +101,6 @@ public static class ObjectInfoHelper
         }
     }
 
-    // public void AutoBind(ComponentBindInfo bindInfo, AutoBindSetting autoBindSetting)
-    // {
-    //     BindByAutoSetting(bindInfo, autoBindSetting);
-    // }
-    //
     static void StartAutoBind(ObjectInfo objectInfo, Object target, CompositionSetting autoBindSetting)
     {
         NameLgnoreSetting lgnoreSetting = autoBindSetting.autoBindSetting.nameLgnoreSetting;
@@ -138,30 +122,28 @@ public static class ObjectInfoHelper
     {
         NameBindSetting nameBindSetting = setting.autoBindSetting.nameBindSetting;
 
+        bool isBindSuccess = false;
         if (nameBindSetting.isEnable)
         {
-            List<NameBindData> canNameData = new List<NameBindData>();
-
+            NameBindData nameBindData = null;
             int nameBindAmont = nameBindSetting.nameBindDataList.Count;
             for (int i = 0; i < nameBindAmont; i++)
             {
                 NameBindData data = nameBindSetting.nameBindDataList[i];
-
                 if (! NameHelper.NameCheckContent(data.nameCheck, target.name, out string _)) continue;
-                canNameData.Add(data);
+                nameBindData = data;
+                break;
             }
 
-            int canNameAmount = canNameData.Count;
-            for (int i = 0; i < canNameAmount; i++)
+            if (nameBindData != null)
             {
-                NameBindData data = canNameData[i];
-                ComponentBindInfo componentBindInfo = new ComponentBindInfo(target);
-                int index = componentBindInfo.SetIndex(data.typeString);
-                if (index == -1) continue;
-                BindComponent(objectInfo, componentBindInfo, setting);
+                isBindSuccess = true;
+                BindData bindData = BindDataHelper.CreateBindData(target);
+                bindData.SetBindComponentIndex(nameBindData.typeString);
+                BindDataToObjectInfo(objectInfo, bindData, setting);
             }
-
         }
+        if (isBindSuccess) return;
         StreamingBind(objectInfo, target, setting);
     }
 
@@ -171,20 +153,19 @@ public static class ObjectInfoHelper
 
         if (streamingBindSetting.isEnable)
         {
-            ComponentBindInfo bindInfo = new ComponentBindInfo(target);
-
-            List<TypeString> tempTypeList = new List<TypeString>();
-            tempTypeList.AddRange(bindInfo.typeStrings);
+            BindData bindData = BindDataHelper.CreateBindData(target);
+            bindData.SetBindInfo<BindComponent>();
+            TypeString[] targetTypeString = bindData.bindTarget.GetTypeStrings();
 
             List<TypeString> elseType = new List<TypeString>();
-            elseType.AddRange(tempTypeList);
+            elseType.AddRange(targetTypeString);
             elseType.Remove(new TypeString(typeof(GameObject)));
             streamingBindSetting.streamingBindDataList = streamingBindSetting.streamingBindDataList.OrderByDescending(x => x.sequence).ToList();
             int sequenceAmount = streamingBindSetting.streamingBindDataList.Count;
             for (int i = 0; i < sequenceAmount; i++)
             {
                 StreamingBindData data = streamingBindSetting.streamingBindDataList[i];
-                if (tempTypeList.Contains(data.typeString)) elseType.Remove(data.typeString);
+                if (targetTypeString.Contains(data.typeString)) elseType.Remove(data.typeString);
             }
 
             for (int i = 0; i < sequenceAmount; i++)
@@ -193,32 +174,35 @@ public static class ObjectInfoHelper
                 if (data.isElse)
                 {
                     if (elseType.Count <= 0) continue;
-                    bindInfo.SetIndex(elseType.First());
+                    bindData.SetBindComponentIndex(elseType.First());
                     break;
                 }
                 else
                 {
-                    if (! tempTypeList.Contains(data.typeString)) continue;
-                    bindInfo.SetIndex(data.typeString);
+                    if (! targetTypeString.Contains(data.typeString)) continue;
+                    bindData.SetBindComponentIndex(data.typeString);
                     break;
                 }
             }
 
-            BindComponent(objectInfo, bindInfo, setting);
+            BindDataToObjectInfo(objectInfo, bindData, setting);
         }
         else
         {
             if (! streamingBindSetting.isBindComponent) return;
             if (! streamingBindSetting.isBindAllComponent) return;
 
-            ComponentBindInfo bindInfo = new ComponentBindInfo(target);
+            BindData bindData = BindDataHelper.CreateBindData(target);
+            bindData.SetBindInfo<BindComponent>();
+            TypeString[] targetTypeString = bindData.bindTarget.GetTypeStrings();
 
-            int amount = bindInfo.typeStrings.Length;
+            int amount = targetTypeString.Length;
             for (int i = 0; i < amount; i++)
             {
-                ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindInfo.instanceObject);
-                componentBindInfo.index = i;
-                BindComponent(objectInfo, componentBindInfo, setting);
+                BindData targetBindData = BindDataHelper.CreateBindData(target);
+                bindData.SetBindInfo<BindComponent>();
+                targetBindData.index = i;
+                BindDataToObjectInfo(objectInfo, targetBindData, setting);
             }
         }
     }
@@ -271,20 +255,12 @@ public static class ObjectInfoHelper
     //     return false;
     // }
 
-    public static void BindComponent(ObjectInfo objectInfo, ComponentBindInfo info, CompositionSetting setting)
+    public static void BindDataToObjectInfo(ObjectInfo objectInfo, BindData info, CompositionSetting setting)
     {
-        if (setting.nameGenerateSetting.isBindAutoGenerateName) info.name = NameHelper.SetVariableName(info.instanceObject.name, setting.nameGenerateSetting);
+        if (setting.nameGenerateSetting.isBindAutoGenerateName) info.name = NameHelper.SetVariableName(info.GetGameObject().name, setting.nameGenerateSetting);
         info.name = NameHelper.NameSettingByName(info, setting.scriptSetting.nameSetting);
         info.name = CommonTools.GetNumberAlpha(info.name);
-        if (objectInfo.gameObjectBindInfoList.Contains(info) == false) objectInfo.gameObjectBindInfoList.Add(info);
-    }
-
-    public static void BindData(ObjectInfo objectInfo, DataBindInfo info, CompositionSetting setting)
-    {
-        if (setting.nameGenerateSetting.isBindAutoGenerateName) info.name = NameHelper.SetVariableName(info.bindObject.name, setting.nameGenerateSetting);
-        info.name = NameHelper.NameSettingByName(info, setting.scriptSetting.nameSetting);
-        info.name = CommonTools.GetNumberAlpha(info.name);
-        if (objectInfo.dataBindInfoList.Contains(info) == false) objectInfo.dataBindInfoList.Add(info);
+        if (objectInfo.bindDataList.Contains(info) == false) objectInfo.bindDataList.Add(info);
     }
 
     public static void RemoveBindInfo(ObjectInfo objectInfo, GameObject removeObject, RemoveType removeType)
@@ -293,11 +269,13 @@ public static class ObjectInfoHelper
         {
             case RemoveType.This:
             {
-                int thisBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
-                for (int i = thisBindInfoAmount - 1; i >= 0; i--)
+                int bindDataAmount = objectInfo.bindDataList.Count;
+                for (int i = bindDataAmount - 1; i >= 0; i--)
                 {
-                    ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[i];
-                    if (componentBindInfo.instanceObject == removeObject) objectInfo.gameObjectBindInfoList.RemoveAt(i);
+                    BindData bindData = objectInfo.bindDataList[i];
+                    GameObject targetGameObject = bindData.GetGameObject();
+                    if (targetGameObject == null) { continue; }
+                    if (targetGameObject == removeObject) objectInfo.bindDataList.RemoveAt(i);
                 }
                 break;
             }
@@ -309,11 +287,13 @@ public static class ObjectInfoHelper
                 {
                     Transform transform = transforms[i];
                     if (transform.gameObject == removeObject) continue;
-                    int childBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
-                    for (int j = childBindInfoAmount - 1; j >= 0; j--)
+                    int bindDataAmount = objectInfo.bindDataList.Count;
+                    for (int j = bindDataAmount - 1; j >= 0; j--)
                     {
-                        ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[j];
-                        if (componentBindInfo.instanceObject == transform.gameObject) objectInfo.gameObjectBindInfoList.RemoveAt(j);
+                        BindData bindData = objectInfo.bindDataList[j];
+                        GameObject targetGameObject = bindData.GetGameObject();
+                        if (targetGameObject == null) { continue; }
+                        if (targetGameObject == transform.gameObject) objectInfo.bindDataList.RemoveAt(j);
                     }
                 }
                 break;
@@ -325,11 +305,13 @@ public static class ObjectInfoHelper
                 for (int i = 0; i < amount; i++)
                 {
                     Transform transform = transforms[i];
-                    int childBindInfoAmount = objectInfo.gameObjectBindInfoList.Count;
-                    for (int j = childBindInfoAmount - 1; j >= 0; j--)
+                    int bindDataAmount = objectInfo.bindDataList.Count;
+                    for (int j = bindDataAmount - 1; j >= 0; j--)
                     {
-                        ComponentBindInfo componentBindInfo = objectInfo.gameObjectBindInfoList[j];
-                        if (componentBindInfo.instanceObject == transform.gameObject) objectInfo.gameObjectBindInfoList.RemoveAt(j);
+                        BindData bindData = objectInfo.bindDataList[j];
+                        GameObject targetGameObject = bindData.GetGameObject();
+                        if (targetGameObject == null) { continue; }
+                        if (targetGameObject == transform.gameObject) objectInfo.bindDataList.RemoveAt(j);
                     }
                 }
                 break;

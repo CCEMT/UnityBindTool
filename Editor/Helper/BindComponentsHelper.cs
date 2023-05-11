@@ -3,24 +3,30 @@ using UnityEngine;
 
 public static class BindComponentsHelper
 {
-    public static void AddBindComponent(GenerateData generateData)
+    public static BindComponents AddBindComponent(GenerateData generateData)
     {
-        GameObject root = generateData.objectInfo.rootBindInfo.GetObject();
+        GameObject root = generateData.objectInfo.rootData.GetBindInfo<BindComponent>().bindGameObject;
         BindComponents bindComponents = root.GetComponent<BindComponents>();
-        if (bindComponents != null) return;
-        bindComponents = root.AddComponent<BindComponents>();
-        int componentAmount = generateData.objectInfo.gameObjectBindInfoList.Count;
-        for (int i = 0; i < componentAmount; i++)
+        if (bindComponents == null)
         {
-            ComponentBindInfo componentBindInfo = generateData.objectInfo.gameObjectBindInfoList[i];
-            bindComponents.bindComponentList.Add(componentBindInfo.GetValue());
+            bindComponents.bindComponentList.Clear();
+            bindComponents.bindCollectionList.Clear();
+        }
+        bindComponents = root.AddComponent<BindComponents>();
+
+        int bindAmount = generateData.objectInfo.bindDataList.Count;
+        for (int i = 0; i < bindAmount; i++)
+        {
+            BindData bindData = generateData.objectInfo.bindDataList[i];
+            bindComponents.bindComponentList.Add(bindData.GetValue());
         }
 
-        int dataAmount = generateData.objectInfo.dataBindInfoList.Count;
-        for (int i = 0; i < dataAmount; i++)
+        int collectionAmount = generateData.objectInfo.bindCollectionList.Count;
+        for (int i = 0; i < collectionAmount; i++)
         {
-            DataBindInfo dataBindInfo = generateData.objectInfo.dataBindInfoList[i];
-            bindComponents.bindComponentList.Add(dataBindInfo.bindObject);
+            BindCollection bindCollection = generateData.objectInfo.bindCollectionList[i];
+            bindComponents.bindCollectionList.Add(bindCollection.GetValue());
         }
+        return bindComponents;
     }
 }

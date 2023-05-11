@@ -38,8 +38,8 @@ public partial class BindWindow
             GUI.Label(r, "★", style);
             return;
         }
-        ComponentBindInfo findInfo = bindWindow.editorObjectInfo.gameObjectBindInfoList.Find((info) => info.instanceObject == go || CommonTools.GetPrefabAsset(go) == info.instanceObject);
-        if (findInfo == null) return;
+        BindData findData = bindWindow.editorObjectInfo.bindDataList.Find((info) => info.GetGameObject() == go || CommonTools.GetPrefabAsset(go) == info.GetGameObject());
+        if (findData == null) return;
         Rect targetRect = new Rect(rect);
         targetRect.x = 34;
         targetRect.width = 80;
@@ -80,16 +80,14 @@ public partial class BindWindow
         if (! Selection.activeObject || id != Selection.activeObject.GetInstanceID()) return;
         GameObject go = EditorUtility.InstanceIDToObject(id) as GameObject;
         if (go == null) return;
-        List<ComponentBindInfo> bindList = new List<ComponentBindInfo>();
-        List<int> bindIndex = new List<int>();
+        List<BindData> bindList = new List<BindData>();
         ObjectInfo objectInfo = bindWindow.editorObjectInfo;
-        int amount = objectInfo.gameObjectBindInfoList.Count;
+        int amount = objectInfo.bindDataList.Count;
         for (int i = 0; i < amount; i++)
         {
-            ComponentBindInfo info = objectInfo.gameObjectBindInfoList[i];
-            if (! info.GameObjectEquals(go)) continue;
-            bindList.Add(info);
-            bindIndex.Add(i);
+            BindData bindData = objectInfo.bindDataList[i];
+            if (! bindData.GameObjectEquals(go)) continue;
+            bindList.Add(bindData);
         }
 
         if (bindList.Count <= 0) return;
@@ -122,13 +120,17 @@ public partial class BindWindow
     {
         GenericMenu menu = new GenericMenu();
 
-        ComponentBindInfo componentBindInfo = new ComponentBindInfo(go);
-        int typeAmount = componentBindInfo.typeStrings.Length;
+        BindData bindData = BindDataHelper.CreateBindData(go);
+        bindData.SetBindInfo<BindComponent>();
+        TypeString[] typeStrings = bindData.bindTarget.GetTypeStrings();
+
+        int typeAmount = typeStrings.Length;
         for (int i = 0; i < typeAmount; i++)
         {
-            menu.AddItem(new GUIContent(componentBindInfo.typeStrings[i].typeName), false, (index) => {
-                componentBindInfo.index = (int) index;
-                ObjectInfoHelper.BindComponent(bindWindow.editorObjectInfo, componentBindInfo, bindWindow.bindSetting.selectCompositionSetting);
+            TypeString typeString = typeStrings[i];
+            menu.AddItem(new GUIContent(typeString.typeName), false, (index) => {
+                bindData.index = (int) index;
+                ObjectInfoHelper.BindDataToObjectInfo(bindWindow.editorObjectInfo, bindData, bindWindow.bindSetting.selectCompositionSetting);
                 bindWindow.SearchSelectList();
                 bindWindow.Repaint();
             }, i);
@@ -137,13 +139,13 @@ public partial class BindWindow
         menu.ShowAsContext();
     }
 
-    static void HierarchyLook(List<ComponentBindInfo> bindList)
+    static void HierarchyLook(List<BindData> bindList)
     {
         GenericMenu menu = new GenericMenu();
         int bindAmount = bindList.Count;
         for (int i = 0; i < bindAmount; i++)
         {
-            ComponentBindInfo info = bindList[i];
+            BindData info = bindList[i];
             menu.AddItem(new GUIContent(info.GetTypeName()), false, BindWindowLook, info);
         }
         menu.ShowAsContext();
@@ -153,9 +155,7 @@ public partial class BindWindow
     {
         bindWindow.bindWindowState = BindWindowState.BindInfoListGUI;
         bindWindow.bindTypeIndex = BindTypeIndex.Item;
-        bindWindow.selectComponentList.Clear();
-        bindWindow.selectDataList.Clear();
-        bindWindow.selectComponentList.Add((ComponentBindInfo) bindInfo);
+        bindWindow.selectBindDataList.Add((BindData) bindInfo);
         bindWindow.Repaint();
     }
 

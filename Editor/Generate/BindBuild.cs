@@ -35,36 +35,8 @@ namespace BindTool
 
             Debug.Log("脚本生成路径：" + path);
 
-            // if (mainSetting.isCustomBind == false)
-            // {
-            //     generateData.objectInfo.gameObjectBindInfoList.Clear();
-            //     Transform[] gameObjects = bindObject.GetComponentsInChildren<Transform>(true);
-            //     List<ComponentBindInfo> componentBindInfoList = new List<ComponentBindInfo>();
-            //
-            //     int amount = gameObjects.Length;
-            //     for (int i = 0; i < amount; i++)
-            //     {
-            //         Transform go = gameObjects[i];
-            //         int componentAmount = new ComponentBindInfo(go.gameObject).typeStrings.Length;
-            //         for (int j = 0; j < componentAmount; j++)
-            //         {
-            //             ComponentBindInfo info = new ComponentBindInfo(go.gameObject);
-            //             info.index = j;
-            //             componentBindInfoList.Add(info);
-            //             if (mainSetting.selectCreateNameSetting.isBindAutoGenerateName) info.name = CommonTools.GetNumberAlpha(info.instanceObject.name);
-            //         }
-            //     }
-            //     int infoAmount = componentBindInfoList.Count;
-            //     for (int i = 0; i < infoAmount; i++)
-            //     {
-            //         ComponentBindInfo info = componentBindInfoList[i];
-            //         if (generateData.objectInfo.gameObjectBindInfoList.Contains(info) == false) generateData.objectInfo.gameObjectBindInfoList.Add(info);
-            //     }
-            // }
-
-            BindComponentsHelper.AddBindComponent(generateData);
             IGenerator generator = GeneratorFactory.GetGenerator(generatorType, setting, generateData);
-
+            BindComponentsHelper.AddBindComponent(generateData);
             switch (generatorType)
             {
                 case GeneratorType.CSharp:
@@ -120,20 +92,6 @@ namespace BindTool
             path += $"/{bindObject.name}{CommonConst.PrefabFileSuffix}";
 
             BindComponents bindComponents = bindObject.GetComponent<BindComponents>();
-            bindComponents.bindComponentList.Clear();
-            int componentAmount = generateData.objectInfo.gameObjectBindInfoList.Count;
-            for (int i = 0; i < componentAmount; i++)
-            {
-                ComponentBindInfo componentBindInfo = generateData.objectInfo.gameObjectBindInfoList[i];
-                bindComponents.bindComponentList.Add(componentBindInfo.GetValue());
-            }
-
-            int dataAmount = generateData.objectInfo.dataBindInfoList.Count;
-            for (int i = 0; i < dataAmount; i++)
-            {
-                DataBindInfo dataBindInfo = generateData.objectInfo.dataBindInfoList[i];
-                bindComponents.bindComponentList.Add(dataBindInfo.bindObject);
-            }
 
             Type addType = generateData.objectInfo.typeString.ToType();
             Component component = null;
@@ -141,7 +99,7 @@ namespace BindTool
             {
                 component = generateData.bindObject.GetComponent(addType);
                 if (component == null) component = generateData.bindObject.AddComponent(addType);
-                bindComponents.bindRoot = component;
+                bindComponents.targetType = component.GetType();
 
                 MethodInfo method = addType.GetMethod(generateData.getBindDataMethodName, new Type[] { });
                 method.Invoke(component, new object[] { });
@@ -165,15 +123,6 @@ namespace BindTool
             CommonSetting commonSetting = setting.commonSetting;
 
             GameObject bindObject = generateData.bindObject;
-
-            BindComponents bindComponents = bindObject.GetComponent<BindComponents>();
-            bindComponents.bindComponentList.Clear();
-            int componentAmount = generateData.objectInfo.gameObjectBindInfoList.Count;
-            for (int i = 0; i < componentAmount; i++)
-            {
-                ComponentBindInfo componentBindInfo = generateData.objectInfo.gameObjectBindInfoList[i];
-                bindComponents.bindComponentList.Add(componentBindInfo.GetValue());
-            }
 
             if (commonSetting.isCreatePrefab)
             {

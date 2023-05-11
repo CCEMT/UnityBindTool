@@ -29,12 +29,12 @@ public static class NameHelper
         return newName;
     }
 
-    public static string NameSettingByName(ComponentBindInfo componentBindInfo, NameSetting nameSetting)
+    public static string NameSettingByName(BindData bindData, NameSetting nameSetting)
     {
-        return NameSettingByName(componentBindInfo.name, componentBindInfo, nameSetting);
+        return NameSettingByName(bindData.name, bindData, nameSetting);
     }
 
-    public static string NameSettingByName(string targetName, ComponentBindInfo componentBindInfo, NameSetting nameSetting)
+    public static string NameSettingByName(string targetName, BindData bindData, NameSetting nameSetting)
     {
         switch (nameSetting.namingDispose)
         {
@@ -45,55 +45,21 @@ public static class NameHelper
                 targetName = CommonTools.InitialUpper(targetName);
                 break;
             case ScriptNamingDispose.AllLower:
-                targetName = componentBindInfo.name.ToLower();
+                targetName = bindData.name.ToLower();
                 break;
             case ScriptNamingDispose.AllUppe:
-                targetName = componentBindInfo.name.ToUpper();
+                targetName = bindData.name.ToUpper();
                 break;
         }
 
         if (nameSetting.isAddClassName)
         {
-            if (nameSetting.isFrontOrBehind) { targetName = componentBindInfo.GetTypeName() + componentBindInfo.name; }
-            else { targetName = componentBindInfo.name + componentBindInfo.GetTypeName(); }
+            if (nameSetting.isFrontOrBehind) { targetName = bindData.GetTypeName() + bindData.name; }
+            else { targetName = bindData.name + bindData.GetTypeName(); }
         }
 
-        if (nameSetting.isAddFront) targetName = nameSetting.frontName + componentBindInfo.name;
-        if (nameSetting.isAddBehind) targetName = componentBindInfo.name + nameSetting.behindName;
-        return targetName;
-    }
-
-    public static string NameSettingByName(DataBindInfo dataBindInfo, NameSetting nameSetting)
-    {
-        return NameSettingByName(dataBindInfo.name, dataBindInfo, nameSetting);
-    }
-
-    public static string NameSettingByName(string targetName, DataBindInfo dataBindInfo, NameSetting nameSetting)
-    {
-        switch (nameSetting.namingDispose)
-        {
-            case ScriptNamingDispose.InitialLower:
-                targetName = CommonTools.InitialLower(targetName);
-                break;
-            case ScriptNamingDispose.InitialUpper:
-                targetName = CommonTools.InitialUpper(targetName);
-                break;
-            case ScriptNamingDispose.AllLower:
-                targetName = dataBindInfo.name.ToLower();
-                break;
-            case ScriptNamingDispose.AllUppe:
-                targetName = dataBindInfo.name.ToUpper();
-                break;
-        }
-
-        if (nameSetting.isAddClassName)
-        {
-            if (nameSetting.isFrontOrBehind) { targetName = dataBindInfo.typeString.typeName + dataBindInfo.name; }
-            else { targetName = dataBindInfo.name + dataBindInfo.typeString.typeName; }
-        }
-
-        if (nameSetting.isAddFront) targetName = nameSetting.frontName + dataBindInfo.name;
-        if (nameSetting.isAddBehind) targetName = dataBindInfo.name + nameSetting.behindName;
+        if (nameSetting.isAddFront) targetName = nameSetting.frontName + bindData.name;
+        if (nameSetting.isAddBehind) targetName = bindData.name + nameSetting.behindName;
         return targetName;
     }
 

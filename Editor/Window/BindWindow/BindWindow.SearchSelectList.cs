@@ -1,6 +1,5 @@
 using System;
 using BindTool;
-using Sirenix.Utilities.Editor;
 using UnityEngine;
 
 public partial class BindWindow
@@ -8,10 +7,8 @@ public partial class BindWindow
     void SearchSelectList()
     {
         if (this.showAmount == 0) { return; }
-        this.selectComponentList.Clear();
-        this.selectDataList.Clear();
-        this.selectComponentCollectionList.Clear();
-        this.selectDataCollectionList.Clear();
+        this.selectBindDataList.Clear();
+        this.selectbindCollectionList.Clear();
 
         switch (this.searchType)
         {
@@ -29,10 +26,8 @@ public partial class BindWindow
                 break;
         }
 
-        this.selectComponentAmount = this.selectComponentList.Count;
-        this.selectDataAmount = this.selectDataList.Count;
-        this.selectComponentCollectionAmount = this.selectComponentCollectionList.Count;
-        this.selectDataCollectionAmount = this.selectDataCollectionList.Count;
+        this.selectBindAmount = selectBindDataList.Count;
+        this.selectbindCollectionAmount = this.selectbindCollectionList.Count;
 
         switch (this.bindTypeIndex)
         {
@@ -47,27 +42,27 @@ public partial class BindWindow
 
     void ItemIndexSetting()
     {
-        if (this.selectComponentAmount + this.selectDataAmount == 0)
+        if (selectBindAmount == 0)
         {
             this.maxIndex = 0;
             this.currentIndex = 0;
             return;
         }
 
-        this.maxIndex = (int) Math.Ceiling((this.selectComponentAmount + this.selectDataAmount)/ (double) this.showAmount);
+        this.maxIndex = (int) Math.Ceiling(this.selectBindAmount / (double) this.showAmount);
         this.currentIndex = Mathf.Clamp(this.currentIndex, 1, this.maxIndex);
     }
 
     void CollectionIndexSetting()
     {
-        if (this.selectComponentCollectionAmount + this.selectDataCollectionAmount == 0)
+        if (selectbindCollectionAmount == 0)
         {
             this.maxIndex = 0;
             this.currentIndex = 0;
             return;
         }
 
-        this.maxIndex = (int) Math.Ceiling((this.selectComponentCollectionAmount + this.selectDataCollectionAmount) / (double) this.showAmount);
+        this.maxIndex = (int) Math.Ceiling(this.selectbindCollectionAmount / (double) this.showAmount);
         this.currentIndex = Mathf.Clamp(this.currentIndex, 1, this.maxIndex);
     }
 
@@ -76,107 +71,61 @@ public partial class BindWindow
         switch (bindTypeIndex)
         {
             case BindTypeIndex.Item:
-                SearchAllItem();
+                SearchItem();
                 break;
             case BindTypeIndex.Collection:
-                SearchAllCollection();
+                SearchCollection();
                 break;
         }
     }
 
-    void SearchAllItem()
+    void SearchItem()
     {
-        int bindComponentAmount = this.editorObjectInfo.gameObjectBindInfoList.Count;
-        int bindDataAmount = this.editorObjectInfo.dataBindInfoList.Count;
-
-        for (int i = 0; i < bindComponentAmount; i++)
+        int searchAmount = this.editorObjectInfo.bindDataList.Count;
+        for (int i = 0; i < searchAmount; i++)
         {
-            ComponentBindInfo info = this.editorObjectInfo.gameObjectBindInfoList[i];
-            if (CommonTools.Search(info.GetTypeName(), this.bindInputString))
+            BindData bindData = this.editorObjectInfo.bindDataList[i];
+            if (CommonTools.Search(bindData.GetTypeName(), this.bindInputString))
             {
-                this.selectComponentList.Add(info);
+                this.selectBindDataList.Add(bindData);
                 continue;
             }
 
-            if (CommonTools.Search(info.GetObject().name, this.bindInputString))
+            if (CommonTools.Search(bindData.GetValue().name, this.bindInputString))
             {
-                this.selectComponentList.Add(info);
+                this.selectBindDataList.Add(bindData);
                 continue;
             }
 
-            if (CommonTools.Search(info.name, this.bindInputString))
+            if (CommonTools.Search(bindData.name, this.bindInputString))
             {
-                this.selectComponentList.Add(info);
-                continue;
-            }
-        }
-        for (int i = 0; i < bindDataAmount; i++)
-        {
-            DataBindInfo info = this.editorObjectInfo.dataBindInfoList[i];
-
-            if (CommonTools.Search(info.typeString.typeName, this.bindInputString))
-            {
-                this.selectDataList.Add(info);
-                continue;
-            }
-            if (CommonTools.Search(info.bindObject.name, this.bindInputString))
-            {
-                this.selectDataList.Add(info);
-                continue;
-            }
-
-            if (CommonTools.Search(info.name, this.bindInputString))
-            {
-                this.selectDataList.Add(info);
+                this.selectBindDataList.Add(bindData);
                 continue;
             }
         }
     }
 
-    void SearchAllCollection()
+    void SearchCollection()
     {
-        int componentCollectionAmount = this.editorObjectInfo.componentCollectionBindInfoList.Count;
-        int dataCollectionAmount = this.editorObjectInfo.dataCollectionBindInfoList.Count;
-
-        for (int i = 0; i < componentCollectionAmount; i++)
+        int searchAmount = this.editorObjectInfo.bindCollectionList.Count;
+        for (int i = 0; i < searchAmount; i++)
         {
-            ComponentCollectionBindInfo info = this.editorObjectInfo.componentCollectionBindInfoList[i];
-            if (CommonTools.Search(info.GetTypeString().typeName, this.bindInputString))
+            BindCollection bindCollection = this.editorObjectInfo.bindCollectionList[i];
+            if (CommonTools.Search(bindCollection.GetTypeString().typeName, this.bindInputString))
             {
-                this.selectComponentCollectionList.Add(info);
+                this.selectbindCollectionList.Add(bindCollection);
                 continue;
             }
 
-            if (CommonTools.Search(info.collectionType.ToString(), this.bindInputString))
+            if (CommonTools.Search(bindCollection.collectionType.ToString(), this.bindInputString))
             {
-                this.selectComponentCollectionList.Add(info);
+                this.selectbindCollectionList.Add(bindCollection);
                 continue;
             }
 
-            if (CommonTools.Search(info.name, this.bindInputString))
+            if (CommonTools.Search(bindCollection.name, this.bindInputString))
             {
-                this.selectComponentCollectionList.Add(info);
-                continue;
-            }
-        }
-        for (int i = 0; i < dataCollectionAmount; i++)
-        {
-            DataCollectionBindInfo info = this.editorObjectInfo.dataCollectionBindInfoList[i];
-
-            if (CommonTools.Search(info.targetType.typeName, this.bindInputString))
-            {
-                this.selectDataCollectionList.Add(info);
-                continue;
-            }
-            if (CommonTools.Search(info.collectionType.ToString(), this.bindInputString))
-            {
-                this.selectDataCollectionList.Add(info);
-                continue;
-            }
-
-            if (CommonTools.Search(info.name, this.bindInputString))
-            {
-                this.selectDataCollectionList.Add(info);
+                this.selectbindCollectionList.Add(bindCollection);
                 continue;
             }
         }
@@ -197,41 +146,23 @@ public partial class BindWindow
 
     void SearchTypeNameItem()
     {
-        int bindComponentAmount = this.editorObjectInfo.gameObjectBindInfoList.Count;
-        int bindDataAmount = this.editorObjectInfo.dataBindInfoList.Count;
-
-        for (int i = 0; i < bindComponentAmount; i++)
+        int searchAmount = this.editorObjectInfo.bindDataList.Count;
+        for (int i = 0; i < searchAmount; i++)
         {
-            ComponentBindInfo info = this.editorObjectInfo.gameObjectBindInfoList[i];
-            if (! CommonTools.Search(info.GetTypeName(), this.bindInputString)) continue;
-            this.selectComponentList.Add(info);
-        }
-        for (int i = 0; i < bindDataAmount; i++)
-        {
-            DataBindInfo info = this.editorObjectInfo.dataBindInfoList[i];
-
-            if (! CommonTools.Search(info.typeString.typeName, this.bindInputString)) continue;
-            this.selectDataList.Add(info);
+            BindData bindData = this.editorObjectInfo.bindDataList[i];
+            if (! CommonTools.Search(bindData.GetTypeName(), this.bindInputString)) continue;
+            this.selectBindDataList.Add(bindData);
         }
     }
 
     void SearchTypeNameCollection()
     {
-        int componentCollectionAmount = this.editorObjectInfo.componentCollectionBindInfoList.Count;
-        int dataCollectionAmount = this.editorObjectInfo.dataCollectionBindInfoList.Count;
-
-        for (int i = 0; i < componentCollectionAmount; i++)
+        int searchAmount = this.editorObjectInfo.bindCollectionList.Count;
+        for (int i = 0; i < searchAmount; i++)
         {
-            ComponentCollectionBindInfo info = this.editorObjectInfo.componentCollectionBindInfoList[i];
-            if (! CommonTools.Search(info.GetTypeString().typeName, this.bindInputString)) continue;
-            this.selectComponentCollectionList.Add(info);
-        }
-        for (int i = 0; i < dataCollectionAmount; i++)
-        {
-            DataCollectionBindInfo info = this.editorObjectInfo.dataCollectionBindInfoList[i];
-
-            if (! CommonTools.Search(info.targetType.typeName, this.bindInputString)) continue;
-            this.selectDataCollectionList.Add(info);
+            BindCollection bindCollection = this.editorObjectInfo.bindCollectionList[i];
+            if (! CommonTools.Search(bindCollection.GetTypeString().typeName, this.bindInputString)) continue;
+            this.selectbindCollectionList.Add(bindCollection);
         }
     }
 
@@ -250,43 +181,23 @@ public partial class BindWindow
 
     void SearchGameObjectNameItem()
     {
-        int bindComponentAmount = this.editorObjectInfo.gameObjectBindInfoList.Count;
-        int bindDataAmount = this.editorObjectInfo.dataBindInfoList.Count;
-
-        for (int i = 0; i < bindComponentAmount; i++)
+        int searchAmount = this.editorObjectInfo.bindDataList.Count;
+        for (int i = 0; i < searchAmount; i++)
         {
-            ComponentBindInfo info = this.editorObjectInfo.gameObjectBindInfoList[i];
-
-            if (! CommonTools.Search(info.GetObject().name, this.bindInputString)) continue;
-            this.selectComponentList.Add(info);
-        }
-        for (int i = 0; i < bindDataAmount; i++)
-        {
-            DataBindInfo info = this.editorObjectInfo.dataBindInfoList[i];
-
-            if (! CommonTools.Search(info.bindObject.name, this.bindInputString)) continue;
-            this.selectDataList.Add(info);
+            BindData bindData = this.editorObjectInfo.bindDataList[i];
+            if (! CommonTools.Search(bindData.GetValue().name, this.bindInputString)) continue;
+            this.selectBindDataList.Add(bindData);
         }
     }
 
     void SearchGameObjectNameCollection()
     {
-        int componentCollectionAmount = this.editorObjectInfo.componentCollectionBindInfoList.Count;
-        int dataCollectionAmount = this.editorObjectInfo.dataCollectionBindInfoList.Count;
-
-        for (int i = 0; i < componentCollectionAmount; i++)
+        int searchAmount = this.editorObjectInfo.bindCollectionList.Count;
+        for (int i = 0; i < searchAmount; i++)
         {
-            ComponentCollectionBindInfo info = this.editorObjectInfo.componentCollectionBindInfoList[i];
-
-            if (! CommonTools.Search(info.collectionType.ToString(), this.bindInputString)) continue;
-            this.selectComponentCollectionList.Add(info);
-        }
-        for (int i = 0; i < dataCollectionAmount; i++)
-        {
-            DataCollectionBindInfo info = this.editorObjectInfo.dataCollectionBindInfoList[i];
-
-            if (! CommonTools.Search(info.collectionType.ToString(), this.bindInputString)) continue;
-            this.selectDataCollectionList.Add(info);
+            BindCollection bindCollection = this.editorObjectInfo.bindCollectionList[i];
+            if (! CommonTools.Search(bindCollection.collectionType.ToString(), this.bindInputString)) continue;
+            this.selectbindCollectionList.Add(bindCollection);
         }
     }
 
@@ -305,43 +216,23 @@ public partial class BindWindow
 
     void SearchVariableNameItem()
     {
-        int bindComponentAmount = this.editorObjectInfo.gameObjectBindInfoList.Count;
-        int bindDataAmount = this.editorObjectInfo.dataBindInfoList.Count;
-
-        for (int i = 0; i < bindComponentAmount; i++)
+        int searchAmount = this.editorObjectInfo.bindDataList.Count;
+        for (int i = 0; i < searchAmount; i++)
         {
-            ComponentBindInfo info = this.editorObjectInfo.gameObjectBindInfoList[i];
-
-            if (! CommonTools.Search(info.name, this.bindInputString)) continue;
-            this.selectComponentList.Add(info);
-        }
-        for (int i = 0; i < bindDataAmount; i++)
-        {
-            DataBindInfo info = this.editorObjectInfo.dataBindInfoList[i];
-
-            if (! CommonTools.Search(info.name, this.bindInputString)) continue;
-            this.selectDataList.Add(info);
+            BindData bindData = this.editorObjectInfo.bindDataList[i];
+            if (! CommonTools.Search(bindData.name, this.bindInputString)) continue;
+            this.selectBindDataList.Add(bindData);
         }
     }
 
     void SearchVariableNameCollection()
     {
-        int componentCollectionAmount = this.editorObjectInfo.componentCollectionBindInfoList.Count;
-        int dataCollectionAmount = this.editorObjectInfo.dataCollectionBindInfoList.Count;
-
-        for (int i = 0; i < componentCollectionAmount; i++)
+        int searchAmount = this.editorObjectInfo.bindCollectionList.Count;
+        for (int i = 0; i < searchAmount; i++)
         {
-            ComponentCollectionBindInfo info = this.editorObjectInfo.componentCollectionBindInfoList[i];
-
-            if (! CommonTools.Search(info.name, this.bindInputString)) continue;
-            this.selectComponentCollectionList.Add(info);
-        }
-        for (int i = 0; i < dataCollectionAmount; i++)
-        {
-            DataCollectionBindInfo info = this.editorObjectInfo.dataCollectionBindInfoList[i];
-
-            if (! CommonTools.Search(info.name, this.bindInputString)) continue;
-            this.selectDataCollectionList.Add(info);
+            BindCollection bindCollection = this.editorObjectInfo.bindCollectionList[i];
+            if (! CommonTools.Search(bindCollection.name, this.bindInputString)) continue;
+            this.selectbindCollectionList.Add(bindCollection);
         }
     }
 }

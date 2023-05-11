@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using BindTool;
 using UnityEditor;
 using UnityEngine;
@@ -15,21 +14,13 @@ public partial class BindWindow
     private SearchType searchType;
     private BindTypeIndex bindTypeIndex;
 
-    private int componentBindAmount;
-    private List<ComponentBindInfo> selectComponentList;
-    private int selectComponentAmount;
+    private int bindAmount;
+    private List<BindData> selectBindDataList;
+    private int selectBindAmount;
 
-    private int dataBindAmount;
-    private List<DataBindInfo> selectDataList;
-    private int selectDataAmount;
-
-    private int componentCollectionBindAmount;
-    private List<ComponentCollectionBindInfo> selectComponentCollectionList;
-    private int selectComponentCollectionAmount;
-
-    private int dataCollectionBindAmount;
-    private List<DataCollectionBindInfo> selectDataCollectionList;
-    private int selectDataCollectionAmount;
+    private int bindCollectionAmount;
+    private List<BindCollection> selectbindCollectionList;
+    private int selectbindCollectionAmount;
 
     private int showAmount;
     private int currentIndex;
@@ -41,10 +32,8 @@ public partial class BindWindow
         this.searchType = SearchType.All;
         this.bindTypeIndex = BindTypeIndex.Item;
 
-        this.selectComponentList = new List<ComponentBindInfo>();
-        this.selectDataList = new List<DataBindInfo>();
-        this.selectComponentCollectionList = new List<ComponentCollectionBindInfo>();
-        this.selectDataCollectionList = new List<DataCollectionBindInfo>();
+        selectBindDataList = new List<BindData>();
+        selectbindCollectionList = new List<BindCollection>();
 
         GetData();
         SearchSelectList();
@@ -52,6 +41,7 @@ public partial class BindWindow
 
     void DrawBindInfoListGUI()
     {
+        Chack();
         GetData();
         DrawOperate();
         DrawBindArea();
@@ -60,16 +50,26 @@ public partial class BindWindow
 
     void GetData()
     {
-        if (this.selectComponentList == null)
-        {
-            this.selectComponentList = new List<ComponentBindInfo>();
-            SearchSelectList();
-        }
-
         int tempAmount = (int) ((position.height - ContentHight) / (ItemHight + ItemInterval));
         if (tempAmount == this.showAmount) return;
         this.showAmount = tempAmount;
         SearchSelectList();
+    }
+
+    void Chack()
+    {
+        if (this.bindTypeIndex == BindTypeIndex.Item)
+        {
+            if (this.selectBindDataList != null) return;
+            this.selectBindDataList = new List<BindData>();
+            SearchSelectList();
+        }
+        else if (this.bindTypeIndex == BindTypeIndex.Collection)
+        {
+            if (this.selectbindCollectionList != null) return;
+            this.selectbindCollectionList = new List<BindCollection>();
+            SearchSelectList();
+        }
     }
 
     void DrawOperate()
@@ -152,131 +152,18 @@ public partial class BindWindow
     {
         if (bindTargets.Length == 0) return;
 
-        switch (this.bindTypeIndex)
-        {
-            case BindTypeIndex.Item:
-                BindItem(bindTargets);
-                break;
-            case BindTypeIndex.Collection:
-                BindCollection(bindTargets);
-                break;
-        }
-        SearchSelectList();
-    }
-
-    void BindItem(Object[] bindTargets)
-    {
-        if (bindTargets.Length == 1) BindSingle(bindTargets.First());
-        else BindMulti(bindTargets);
-    }
-
-    void BindSingle(Object target)
-    {
-        if (target is GameObject)
-        {
-            ComponentBindInfo componentBindInfo = new ComponentBindInfo(target);
-
-            GenericMenu menu = new GenericMenu();
-
-            int typeAmount = componentBindInfo.typeStrings.Length;
-            for (int i = 0; i < typeAmount; i++)
-            {
-                string content = componentBindInfo.typeStrings[i].typeName;
-                menu.AddItem(new GUIContent(content), false, BindComponent, i);
-            }
-
-            void BindComponent(object index)
-            {
-                componentBindInfo.index = (int) index;
-                ObjectInfoHelper.BindComponent(this.editorObjectInfo, componentBindInfo, this.bindSetting.selectCompositionSetting);
-            }
-
-            menu.ShowAsContext();
-            return;
-        }
-        else if (target is Component)
-        {
-            ComponentBindInfo componentBindInfo = new ComponentBindInfo(target);
-            componentBindInfo.SetIndex(new TypeString(target.GetType()));
-            ObjectInfoHelper.BindComponent(this.editorObjectInfo, componentBindInfo, this.bindSetting.selectCompositionSetting);
-            return;
-        }
-        DataBindInfo dataBindInfo = new DataBindInfo(target);
-        ObjectInfoHelper.BindData(this.editorObjectInfo, dataBindInfo, this.bindSetting.selectCompositionSetting);
-    }
-
-    void BindMulti(Object[] bindTargets)
-    {
-        List<TypeString> bindTypeList = new List<TypeString>();
-
-        int bindAmount = bindTargets.Length;
-        for (int i = 0; i < bindAmount; i++)
-        {
-            Object bindTarget = bindTargets[i];
-
-            if (bindTarget is GameObject bindGameObject)
-            {
-                TypeString[] addTypeString = BindHelper.GetTypeStringByGameObject(bindGameObject);
-                bindTypeList = bindTypeList.Intersect(addTypeString).ToList();
-            }
-            else if (bindTarget is Component)
-            {
-                ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindTarget);
-                componentBindInfo.SetIndex(new TypeString(bindTarget.GetType()));
-                ObjectInfoHelper.BindComponent(this.editorObjectInfo, componentBindInfo, this.bindSetting.selectCompositionSetting);
-            }
-
-            DataBindInfo dataBindInfo = new DataBindInfo(bindTarget);
-            ObjectInfoHelper.BindData(this.editorObjectInfo, dataBindInfo, this.bindSetting.selectCompositionSetting);
-        }
-
-        int bindTypeAmount = bindTypeList.Count;
-        if (bindTypeAmount == 0) return;
-
         GenericMenu menu = new GenericMenu();
 
-        for (int i = 0; i < bindTypeAmount; i++)
-        {
-            TypeString typeString = bindTypeList[i];
-            menu.AddItem(new GUIContent(typeString.typeName), false, BindComponent, typeString);
-        }
-        menu.AddItem(new GUIContent("自动获取类型"), false, AutoBindComponent);
-
-        menu.ShowAsContext();
-
-        void BindComponent(object bindType)
-        {
-            TypeString typeString = (TypeString) bindType;
-            for (int i = 0; i < bindAmount; i++)
-            {
-                Object bindTarget = bindTargets[i];
-                ComponentBindInfo componentBindInfo = new ComponentBindInfo(bindTarget);
-                componentBindInfo.SetIndex(typeString);
-                ObjectInfoHelper.BindComponent(this.editorObjectInfo, componentBindInfo, this.bindSetting.selectCompositionSetting);
-            }
-        }
-
-        void AutoBindComponent()
-        {
-            for (int i = 0; i < bindAmount; i++)
-            {
-                Object bindTarget = bindTargets[i];
-                ObjectInfoHelper.StartNameBind(this.editorObjectInfo, bindTarget, this.bindSetting.selectCompositionSetting);
-            }
-        }
-    }
-
-    void BindCollection(Object[] bindTargets)
-    {
         int amount = bindTargets.Length;
         for (int i = 0; i < amount; i++)
         {
             Object bindTarget = bindTargets[i];
-            if (bindTarget is GameObject or Component)
-            {
-                
-            }
+            BindData bindData = BindDataHelper.CreateBindData(bindTarget);
         }
+
+        menu.ShowAsContext();
+
+        SearchSelectList();
     }
 
     void DrawBindInfo()
@@ -310,10 +197,10 @@ public partial class BindWindow
 
     void ListOperate()
     {
-        GenericMenu menu = new GenericMenu(); 
+        GenericMenu menu = new GenericMenu();
         menu.AddItem(new GUIContent("重置搜索名称"), false, ResetSearchContent);
         menu.AddItem(new GUIContent("查找重复名称的Item"), false, FindRepetitionNameItem);
-        menu.ShowAsContext(); 
+        menu.ShowAsContext();
     }
 
     void ResetSearchContent()
@@ -371,65 +258,33 @@ public partial class BindWindow
             for (int i = 0; i < this.showAmount; i++)
             {
                 int showIndex = (this.currentIndex - 1) * this.showAmount + i;
-                if (showIndex >= this.selectComponentAmount + this.selectDataAmount) break;
-                if (this.selectComponentAmount + this.selectDataAmount == 0) break;
+                if (showIndex >= selectBindAmount) break;
+                if (selectBindAmount == 0) break;
 
-                if (showIndex < this.selectComponentAmount) { DrawComponentInfoItem(showIndex); }
-                else { DrawDataInfoItem(showIndex - this.selectComponentAmount); }
+                DrawBindInfoItem(showIndex);
             }
             GUILayout.Space(1);
         }
         EditorGUILayout.EndVertical();
     }
 
-    void DrawComponentInfoItem(int index)
+    void DrawBindInfoItem(int index)
     {
-        ComponentBindInfo componentBindInfo = this.selectComponentList[index];
+        BindData bindData = this.selectBindDataList[index];
         EditorGUILayout.BeginHorizontal("frameBox");
         {
             EditorGUILayout.BeginVertical();
             {
-                componentBindInfo.index = EditorGUILayout.Popup(componentBindInfo.index, componentBindInfo.GetTypeStrings());
-                EditorGUILayout.ObjectField(componentBindInfo.GetValue(), componentBindInfo.GetValue().GetType(), true);
+                bindData.index = EditorGUILayout.Popup(bindData.index, bindData.GetTypeStrings());
+                EditorGUILayout.ObjectField(bindData.GetValue(), bindData.GetValue().GetType(), true);
             }
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical(GUILayout.MinWidth(200f));
             {
                 GUILayout.Label("名称");
-                string tempComponentBindInfoName = GUILayout.TextField(componentBindInfo.name);
-                if (tempComponentBindInfoName != componentBindInfo.name) componentBindInfo.name = CommonTools.GetNumberAlpha(componentBindInfo.name);
-            }
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.BeginVertical();
-            {
-                if (GUILayout.Button("操作", GUILayout.Width(100))) { }
-                if (GUILayout.Button("删除", GUILayout.Width(100))) { }
-            }
-            EditorGUILayout.EndVertical();
-        }
-        EditorGUILayout.EndHorizontal();
-    }
-
-    void DrawDataInfoItem(int index)
-    {
-        DataBindInfo dataInfo = this.selectDataList[index];
-
-        EditorGUILayout.BeginHorizontal("frameBox");
-        {
-            EditorGUILayout.BeginVertical();
-            {
-                GUILayout.Label(dataInfo.typeString.typeName);
-                EditorGUILayout.ObjectField(dataInfo.bindObject, dataInfo.typeString.ToType(), true);
-            }
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.BeginVertical(GUILayout.MinWidth(200f));
-            {
-                GUILayout.Label("名称");
-                string tempComponentBindInfoName = GUILayout.TextField(dataInfo.name);
-                if (tempComponentBindInfoName != dataInfo.name) dataInfo.name = CommonTools.GetNumberAlpha(dataInfo.name);
+                string tempComponentBindInfoName = GUILayout.TextField(bindData.name);
+                if (tempComponentBindInfoName != bindData.name) bindData.name = CommonTools.GetNumberAlpha(bindData.name);
             }
             EditorGUILayout.EndVertical();
 
@@ -450,64 +305,33 @@ public partial class BindWindow
             for (int i = 0; i < this.showAmount; i++)
             {
                 int showIndex = (this.currentIndex - 1) * this.showAmount + i;
-                if (showIndex >= this.selectComponentCollectionAmount + this.selectDataCollectionAmount) break;
-                if (this.selectComponentCollectionAmount + this.selectDataCollectionAmount == 0) break;
+                if (showIndex >= selectbindCollectionAmount) break;
+                if (selectbindCollectionAmount == 0) break;
 
-                if (showIndex < this.selectComponentCollectionAmount) { DrawDataCollectionList(showIndex); }
-                else { DrawComponentCollectionInfoItem(showIndex - this.selectComponentCollectionAmount); }
+                DrawBindCollection(showIndex);
             }
             GUILayout.Space(1);
         }
         EditorGUILayout.EndVertical();
     }
 
-    void DrawDataCollectionList(int index)
+    void DrawBindCollection(int index)
     {
-        ComponentCollectionBindInfo componentCollectionBindInfo = this.selectComponentCollectionList[index];
+        BindCollection bindCollection = this.selectbindCollectionList[index];
         EditorGUILayout.BeginHorizontal("frameBox");
         {
             EditorGUILayout.BeginVertical();
             {
-                componentCollectionBindInfo.index = EditorGUILayout.Popup(componentCollectionBindInfo.index, componentCollectionBindInfo.GetTypeStrings());
-                GUILayout.Label(componentCollectionBindInfo.collectionType.ToString());
+                bindCollection.index = EditorGUILayout.Popup(bindCollection.index, bindCollection.GetTypeStrings());
+                GUILayout.Label(bindCollection.collectionType.ToString());
             }
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical(GUILayout.MinWidth(200f));
             {
                 GUILayout.Label("名称");
-                string tempComponentBindInfoName = GUILayout.TextField(componentCollectionBindInfo.name);
-                if (tempComponentBindInfoName != componentCollectionBindInfo.name) componentCollectionBindInfo.name = CommonTools.GetNumberAlpha(componentCollectionBindInfo.name);
-            }
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.BeginVertical();
-            {
-                if (GUILayout.Button("编辑", GUILayout.Width(100))) { }
-                if (GUILayout.Button("删除", GUILayout.Width(100))) { }
-            }
-            EditorGUILayout.EndVertical();
-        }
-        EditorGUILayout.EndHorizontal();
-    }
-
-    void DrawComponentCollectionInfoItem(int index)
-    {
-        DataCollectionBindInfo dataCollectionBindInfo = this.selectDataCollectionList[index];
-        EditorGUILayout.BeginHorizontal("frameBox");
-        {
-            EditorGUILayout.BeginVertical();
-            {
-                GUILayout.Label(dataCollectionBindInfo.targetType.typeName);
-                GUILayout.Label(dataCollectionBindInfo.collectionType.ToString());
-            }
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.BeginVertical(GUILayout.MinWidth(200f));
-            {
-                GUILayout.Label("名称");
-                string tempComponentBindInfoName = GUILayout.TextField(dataCollectionBindInfo.name);
-                if (tempComponentBindInfoName != dataCollectionBindInfo.name) dataCollectionBindInfo.name = CommonTools.GetNumberAlpha(dataCollectionBindInfo.name);
+                string tempComponentBindInfoName = GUILayout.TextField(bindCollection.name);
+                if (tempComponentBindInfoName != bindCollection.name) bindCollection.name = CommonTools.GetNumberAlpha(bindCollection.name);
             }
             EditorGUILayout.EndVertical();
 

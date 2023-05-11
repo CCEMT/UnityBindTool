@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 #endregion
 
@@ -12,10 +11,8 @@ namespace BindTool
     public class ObjectInfo
     {
         public TypeString typeString;
-        public ComponentBindInfo rootBindInfo;
-        public List<ComponentBindInfo> gameObjectBindInfoList=new List<ComponentBindInfo>();
-        public List<DataBindInfo> dataBindInfoList=new List<DataBindInfo>();
-        public List<ComponentCollectionBindInfo> componentCollectionBindInfoList=new List<ComponentCollectionBindInfo>();
-        public List<DataCollectionBindInfo> dataCollectionBindInfoList=new List<DataCollectionBindInfo>();
+        public BindData rootData;
+        public List<BindData> bindDataList = new List<BindData>();
+        public List<BindCollection> bindCollectionList = new List<BindCollection>();
     }
 }
