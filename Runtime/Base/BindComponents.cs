@@ -3,8 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Sirenix.Serialization;
-using Unity.Collections;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -12,19 +11,23 @@ using Object = UnityEngine.Object;
 
 namespace BindTool
 {
-    public class BindComponents : MonoBehaviour
+    public class BindComponents : SerializedMonoBehaviour
     {
 #if UNITY_EDITOR
         [HideInInspector]
         public Type targetType;
 
+        [HideInInspector]
         public List<string> bindName = new List<string>();
+
+        [HideInInspector]
+        public List<string> bindCollectionName = new List<string>();
 #endif
 
-        [ReadOnly]
+        [ListDrawerSettings(IsReadOnly = true)]
         public List<Object> bindComponentList = new List<Object>();
 
-        [ReadOnly, NonSerialized, OdinSerialize]
-        public List<IEnumerator> bindCollectionList = new List<IEnumerator>();
+        [ListDrawerSettings(IsReadOnly = true)]
+        public List<IEnumerable> bindCollectionList = new List<IEnumerable>();
     }
 }

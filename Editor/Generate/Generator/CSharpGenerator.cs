@@ -363,12 +363,6 @@ public class CSharpGenerator : IGenerator
         AttributeSyntax serializeFieldAttribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(SerializeField).FullName));
         AttributeSyntax autoGenerateAttributeAttribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(AutoGenerate).FullName));
 
-        IdentifierNameSyntax enumType = SyntaxFactory.IdentifierName(typeof(AutoGenerateType).FullName);
-        IdentifierNameSyntax enumOption = SyntaxFactory.IdentifierName(nameof(AutoGenerateType.OriginalField));
-        MemberAccessExpressionSyntax enumAccess = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, enumType, enumOption);
-        AttributeArgumentSyntax autoGenerateArg = SyntaxFactory.AttributeArgument(enumAccess);
-        autoGenerateAttributeAttribute = autoGenerateAttributeAttribute.WithArgumentList(SyntaxFactory.AttributeArgumentList(SyntaxFactory.SingletonSeparatedList(autoGenerateArg)));
-
         attributeList = attributeList.AddAttributes(serializeFieldAttribute, autoGenerateAttributeAttribute);
         field = field.AddAttributeLists(attributeList);
         return field;

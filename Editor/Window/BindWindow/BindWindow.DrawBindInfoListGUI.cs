@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using BindTool;
+using Sirenix.Serialization;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public partial class BindWindow
 {
@@ -14,12 +18,16 @@ public partial class BindWindow
     private SearchType searchType;
     private BindTypeIndex bindTypeIndex;
 
-    private int bindAmount;
+    [NonSerialized, OdinSerialize]
     private List<BindData> selectBindDataList;
+
+    [NonSerialized, OdinSerialize]
+    private List<BindCollection> selectbindCollectionList;
+
+    private int bindAmount;
     private int selectBindAmount;
 
     private int bindCollectionAmount;
-    private List<BindCollection> selectbindCollectionList;
     private int selectbindCollectionAmount;
 
     private int showAmount;
@@ -152,17 +160,55 @@ public partial class BindWindow
     {
         if (bindTargets.Length == 0) return;
 
-        GenericMenu menu = new GenericMenu();
+        List<TypeString> typeStringList = new List<TypeString>();
 
+        List<BindData> bindDataList = new List<BindData>();
         int amount = bindTargets.Length;
         for (int i = 0; i < amount; i++)
         {
             Object bindTarget = bindTargets[i];
-            BindData bindData = BindDataHelper.CreateBindData(bindTarget);
+            BindData bindData = BindDataFactory.CreateBindData(bindTarget);
+            TypeString[] typeStrings = bindData.GetAllTypeString();
+            if (typeStringList.Count == 0) { typeStringList.AddRange(typeStrings); }
+            else { typeStringList = typeStringList.Intersect(typeStrings).ToList(); }
+            bindDataList.Add(bindData);
+        }
+
+        GenericMenu menu = new GenericMenu();
+
+        menu.AddItem(new GUIContent("自动获取类型"), false, () => { AutoBindSelectTarget(bindTargets); });
+        menu.AddItem(new GUIContent("添加到集合"), false, () => { AddCollectionWindow.AddToCollection(this.editorObjectInfo, bindDataList, typeStringList, SearchSelectList); });
+
+        int typeStringAmount = typeStringList.Count;
+        for (int i = 0; i < typeStringAmount; i++)
+        {
+            TypeString typeString = typeStringList[i];
+            menu.AddItem(new GUIContent(typeString.typeName), false, SetIndex, typeString);
         }
 
         menu.ShowAsContext();
 
+        void SetIndex(object targetType)
+        {
+            int bindDataAmount = bindDataList.Count;
+            for (int i = 0; i < bindDataAmount; i++)
+            {
+                BindData bindData = bindDataList[i];
+                bindData.SetIndexByAll((TypeString) targetType);
+                ObjectInfoHelper.BindDataToObjectInfo(this.editorObjectInfo, bindData, this.bindSetting.selectCompositionSetting);
+            }
+            SearchSelectList();
+        }
+    }
+
+    void AutoBindSelectTarget(Object[] bindTargets)
+    {
+        int amount = bindTargets.Length;
+        for (int i = 0; i < amount; i++)
+        {
+            Object bindTarget = bindTargets[i];
+            ObjectInfoHelper.StartNameBind(this.editorObjectInfo, bindTarget, this.bindSetting.selectCompositionSetting);
+        }
         SearchSelectList();
     }
 
@@ -275,7 +321,7 @@ public partial class BindWindow
         {
             EditorGUILayout.BeginVertical();
             {
-                bindData.index = EditorGUILayout.Popup(bindData.index, bindData.GetTypeStrings());
+                if (GUILayout.Button(bindData.GetTypeName(), "MiniPopup")) BindDataHelper.DropDownBinDataTypeSwitch(bindData);
                 EditorGUILayout.ObjectField(bindData.GetValue(), bindData.GetValue().GetType(), true);
             }
             EditorGUILayout.EndVertical();
@@ -323,7 +369,7 @@ public partial class BindWindow
             EditorGUILayout.BeginVertical();
             {
                 bindCollection.index = EditorGUILayout.Popup(bindCollection.index, bindCollection.GetTypeStrings());
-                GUILayout.Label(bindCollection.collectionType.ToString());
+                bindCollection.collectionType = (CollectionType) EditorGUILayout.EnumPopup(bindCollection.collectionType);
             }
             EditorGUILayout.EndVertical();
 

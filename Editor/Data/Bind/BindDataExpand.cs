@@ -1,5 +1,8 @@
+using System;
+using System.Collections.Generic;
 using BindTool;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public static class BindDataExpand
 {
@@ -30,11 +33,6 @@ public static class BindDataExpand
         return bindData.GetTypeString().typeName;
     }
 
-    public static string[] GetTypeStrings(this BindData bindData)
-    {
-        return default;
-    }
-
     public static GameObject GetGameObject(this BindData bindData)
     {
         BindComponent bindComponent = bindData.GetBindInfo<BindComponent>();
@@ -52,31 +50,66 @@ public static class BindDataExpand
         return false;
     }
 
-    public static void SetBindInfo<T>(this BindData bindData)
+    public static void SetBindInfo<T>(this BindData bindData) where T : BindInfo
+    {
+        SetBindInfo(bindData, typeof(T));
+    }
+
+    public static void SetBindInfo(this BindData bindData, Type targetType)
     {
         int amount = bindData.bindInfos.Count;
         for (int i = 0; i < amount; i++)
         {
             BindInfo bindInfo = bindData.bindInfos[i];
             if (bindInfo == null) continue;
-            if (bindInfo.GetType() != typeof(T)) continue;
+            if (bindInfo.GetType() != targetType) continue;
             bindData.bindTarget = bindInfo;
             return;
         }
     }
 
-    public static void SetBindComponentIndex(this BindData bindData, TypeString typeString)
+    public static void SetIndex(this BindData bindData, TypeString typeString)
     {
-        BindComponent bindComponent = bindData.GetBindInfo<BindComponent>();
-        if (bindComponent == null) { return; }
-        bindData.bindTarget = bindComponent;
-        int componentAmount = bindComponent.componentTypeStrings.Length;
+        TypeString[] typeStrings = bindData.bindTarget.GetTypeStrings();
+        int componentAmount = typeStrings.Length;
         for (int i = 0; i < componentAmount; i++)
         {
-            TypeString componentType = bindComponent.componentTypeStrings[i];
-            if (! componentType.Equals(typeString)) continue;
+            TypeString type = typeStrings[i];
+            if (! type.Equals(typeString)) continue;
             bindData.index = i;
             return;
         }
+    }
+
+    public static void SetIndexByAll(this BindData bindData, TypeString targetType)
+    {
+        int bindAmount = bindData.bindInfos.Count;
+        for (int i = 0; i < bindAmount; i++)
+        {
+            BindInfo bindInfo = bindData.bindInfos[i];
+            TypeString[] typeStrings = bindInfo.GetTypeStrings();
+            int typeStringAmount = typeStrings.Length;
+            for (int j = 0; j < typeStringAmount; j++)
+            {
+                TypeString typeString = typeStrings[j];
+                if (! typeString.Equals(targetType)) continue;
+                bindData.bindTarget = bindInfo;
+                bindData.index = j;
+            }
+        }
+    }
+
+    public static TypeString[] GetAllTypeString(this BindData bindData)
+    {
+        List<TypeString> typeStringList = new List<TypeString>();
+
+        int bindAmount = bindData.bindInfos.Count;
+        for (int i = 0; i < bindAmount; i++)
+        {
+            BindInfo bindInfo = bindData.bindInfos[i];
+            typeStringList.AddRange(bindInfo.GetTypeStrings());
+        }
+
+        return typeStringList.ToArray();
     }
 }

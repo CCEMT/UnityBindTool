@@ -1,11 +1,15 @@
+using System;
 using System.Linq;
 using BindTool;
+using Sirenix.OdinInspector.Editor;
+using Sirenix.Serialization;
 using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
-public partial class BindWindow : EditorWindow
+public partial class BindWindow : OdinEditorWindow
 {
     private static BindWindow bindWindow;
 
@@ -37,8 +41,10 @@ public partial class BindWindow : EditorWindow
 
     private BindSetting bindSetting;
     private GameObject bindObject;
-    private ObjectInfo editorObjectInfo;
     private GenerateData generateData;
+    
+    [NonSerialized, OdinSerialize]
+    private ObjectInfo editorObjectInfo;
 
     void Init()
     {
@@ -57,7 +63,7 @@ public partial class BindWindow : EditorWindow
         Repaint();
     }
 
-    private void OnGUI()
+    protected override void OnGUI()
     {
         switch (this.bindWindowState)
         {

@@ -1,6 +1,8 @@
+using System;
 using BindTool;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
+[Serializable]
 public class BindBase : BindInfo
 {
     public Object target;

@@ -5,7 +5,6 @@ namespace BindTool
     public enum AutoGenerateType
     {
         Content,
-        OriginalField,
     }
 
     public class AutoGenerate : Attribute

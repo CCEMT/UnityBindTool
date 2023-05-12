@@ -120,7 +120,7 @@ public partial class BindWindow
     {
         GenericMenu menu = new GenericMenu();
 
-        BindData bindData = BindDataHelper.CreateBindData(go);
+        BindData bindData = BindDataFactory.CreateBindData(go);
         bindData.SetBindInfo<BindComponent>();
         TypeString[] typeStrings = bindData.bindTarget.GetTypeStrings();
 

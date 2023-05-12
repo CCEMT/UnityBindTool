@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -101,7 +100,24 @@ namespace BindTool
 
         public static bool Search(string check, string input)
         {
-            return string.IsNullOrEmpty(input) || FuzzySearch.Contains(check, input);
+            return string.IsNullOrEmpty(input) || Bdt(check.ToLower(), input.ToLower());
+        }
+
+        public static bool Bdt(string text, string str)
+        {
+            int i = 0;
+            bool reu = false;
+            foreach (var temp in str)
+            {
+                reu = false;
+                for (; i < text.Length; i++)
+                {
+                    if (temp != text[i]) continue;
+                    reu = true;
+                    break;
+                }
+            }
+            return reu;
         }
 
         public static bool SearchNumber(string checkNumber, string input)

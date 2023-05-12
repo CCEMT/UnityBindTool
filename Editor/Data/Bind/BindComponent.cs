@@ -3,6 +3,7 @@ using BindTool;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
+[Serializable]
 public class BindComponent : BindInfo
 {
     public GameObject bindGameObject;

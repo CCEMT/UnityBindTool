@@ -30,6 +30,12 @@ MonoBehaviour:
     - Name: commonSetting
       Entry: 7
       Data: 1|CommonSetting, UnityBindTool.Editor
+    - Name: isDetachMode
+      Entry: 5
+      Data: false
+    - Name: isCreateScript
+      Entry: 5
+      Data: false
     - Name: isCreateScriptFolder
       Entry: 5
       Data: true

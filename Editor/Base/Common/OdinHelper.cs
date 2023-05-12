@@ -18,12 +18,12 @@ public static class OdinHelper
             string enumLable = GetEnumLableText(enumTargetValue);
             if (GUILayout.Button(enumLable, "MiniPopup"))
             {
-                Dictionary<string, Enum> DataForDraw = new Dictionary<string, Enum>() { };
+                Dictionary<string, Enum> dataForDraw = new Dictionary<string, Enum>();
                 Enum[] enums = Enum.GetValues(enumTargetValue.GetType()).OfType<Enum>().ToArray();
-                enums.ForEach((enumValue) => { DataForDraw.Add(GetEnumLableText(enumValue), enumValue); });
+                enums.ForEach((enumValue) => { dataForDraw.Add(GetEnumLableText(enumValue), enumValue); });
 
-                IEnumerable<GenericSelectorItem<Enum>> customCollection = DataForDraw.Keys.Select(itemName =>
-                    new GenericSelectorItem<Enum>($"{itemName}", DataForDraw[itemName]));
+                IEnumerable<GenericSelectorItem<Enum>> customCollection = dataForDraw.Keys.Select(itemName =>
+                    new GenericSelectorItem<Enum>($"{itemName}", dataForDraw[itemName]));
 
                 GenericSelector<Enum> CustomGenericSelector = new(serachName, false, customCollection);
                 CustomGenericSelector.EnableSingleClickToSelect();
@@ -49,12 +49,12 @@ public static class OdinHelper
         return name;
     }
 
-    public static void InputDropDown(Action<string> inputCallback)
+    public static void InputDropDown(Action<string> inputCallback, float width = 300)
     {
         OdinEditorWindow window = null;
         inputCallback += (_) => { window.Close(); };
         InputData inputData = new InputData(inputCallback);
-        Rect rect = new Rect(Event.current.mousePosition.x, Event.current.mousePosition.y, 0, 0);
-        window = OdinEditorWindow.InspectObjectInDropDown(inputData, rect, 300);
+        Rect rect = new Rect(Event.current.mousePosition.x - width / 2f, Event.current.mousePosition.y, 0, 0);
+        window = OdinEditorWindow.InspectObjectInDropDown(inputData, rect, width);
     }
 }
