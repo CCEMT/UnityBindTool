@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BindTool;
 using Sirenix.Utilities.Editor;
 using UnityEditor;
@@ -31,7 +30,7 @@ public partial class BindWindow
 
         if (GUILayout.Button("返回")) { this.bindWindowState = BindWindowState.BindInfoListGUI; }
 
-        if (GUILayout.Button("开始生成")) { }
+        if (GUILayout.Button("开始生成")) BindBuild.Build(this.bindSetting.selectCompositionSetting, this.generateData);
 
         EditorGUILayout.BeginHorizontal("box");
         {

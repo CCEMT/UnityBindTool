@@ -12,7 +12,7 @@ public class BindCollectionFactory
         BindCollection bindCollection = new BindCollection();
         bindCollection.name = name;
         bindCollection.collectionType = CollectionType.Array;
-        bindCollection.BindDataList = new List<BindData>();
+        bindCollection.bindDataList = new List<BindData>();
         bindCollection.index = 0;
         bindCollection.typeStrings = new[] {new TypeString(typeof(Object))};
         return bindCollection;
@@ -35,11 +35,11 @@ public class BindCollectionFactory
     public static Array GetBindArray(BindCollection bindCollection)
     {
         Type type = bindCollection.GetTypeString().ToType();
-        int amount = bindCollection.BindDataList.Count;
+        int amount = bindCollection.bindDataList.Count;
         Array array = (Array) Activator.CreateInstance(type.MakeArrayType(), amount);
         for (int i = 0; i < amount; i++)
         {
-            BindData bindData = bindCollection.BindDataList[i];
+            BindData bindData = bindCollection.bindDataList[i];
             array.SetValue(bindData.GetValue(), i);
         }
         Debug.Log(array.GetType());
@@ -52,10 +52,10 @@ public class BindCollectionFactory
         Type listType = typeof(List<>).MakeGenericType(elementType);
         IList list = (IList) Activator.CreateInstance(listType);
 
-        int amount = bindCollection.BindDataList.Count;
+        int amount = bindCollection.bindDataList.Count;
         for (int i = 0; i < amount; i++)
         {
-            BindData bindData = bindCollection.BindDataList[i];
+            BindData bindData = bindCollection.bindDataList[i];
             list.Add(bindData.GetValue());
         }
 
@@ -69,10 +69,10 @@ public class BindCollectionFactory
         Type dictionaryType = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
         IDictionary dictionary = (IDictionary) Activator.CreateInstance(dictionaryType);
 
-        int amount = bindCollection.BindDataList.Count;
+        int amount = bindCollection.bindDataList.Count;
         for (int i = 0; i < amount; i++)
         {
-            BindData bindData = bindCollection.BindDataList[i];
+            BindData bindData = bindCollection.bindDataList[i];
             dictionary.Add(bindData.name, bindData.GetValue());
         }
 

@@ -26,6 +26,8 @@ public class BindSettingWindow : OdinMenuEditorWindow
     {
         OdinMenuTree odinMenuTree = new OdinMenuTree();
 
+        odinMenuTree.Add(nameof(BaseSetting), this.bindSetting.baseSetting);
+
         int amount = this.bindSetting.compositionSettingList.Count;
         for (int i = 0; i < amount; i++)
         {

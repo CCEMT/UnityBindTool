@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
 #endregion
@@ -25,7 +26,7 @@ namespace BindTool
 #endif
 
         [ListDrawerSettings(IsReadOnly = true)]
-        public List<Object> bindComponentList = new List<Object>();
+        public List<Object> bindDataList = new List<Object>();
 
         [ListDrawerSettings(IsReadOnly = true)]
         public List<IEnumerable> bindCollectionList = new List<IEnumerable>();

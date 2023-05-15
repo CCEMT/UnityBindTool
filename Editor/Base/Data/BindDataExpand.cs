@@ -28,6 +28,11 @@ public static class BindDataExpand
         return bindData.bindTarget.GetTypeStrings()[bindData.index];
     }
 
+    public static string GetTypeFullName(this BindData bindData)
+    {
+        return bindData.GetTypeString().GetVisitString();
+    }
+
     public static string GetTypeName(this BindData bindData)
     {
         return bindData.GetTypeString().typeName;

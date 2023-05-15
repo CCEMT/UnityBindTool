@@ -5,7 +5,6 @@ using BindTool;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using UnityEditor;
 using UnityEngine;
 
 public class CSharpGenerator : IGenerator
@@ -34,10 +33,6 @@ public class CSharpGenerator : IGenerator
         this.scriptPath = scriptPath;
         if (csharpScriptSetting.isGenerateNew) { GenerateNewFile(); }
         else { ModifyFile(); }
-
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-
     }
 
     void GenerateNewFile()
@@ -243,103 +238,79 @@ public class CSharpGenerator : IGenerator
         EndIfDirectiveTriviaSyntax endIfNode = SyntaxFactory.EndIfDirectiveTrivia(true);
 
         string bindMethodName = CommonConst.DefaultBindMethodName;
+        string bindMethodParameterName = CommonConst.DefaultBindMethodParameterName;
         generateData.getBindDataMethodName = bindMethodName;
         MethodDeclarationSyntax getMethod = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName(CommonConst.MethodVoid), bindMethodName);
         getMethod = getMethod.AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
+        ParameterSyntax parameter = SyntaxFactory.Parameter(SyntaxFactory.Identifier(bindMethodParameterName)).WithType(SyntaxFactory.ParseTypeName(typeof(BindComponents).FullName));
+        getMethod = getMethod.AddParameterListParameters(parameter);
 
         AttributeSyntax autoGenerateAttributeAttribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(AutoGenerate).FullName));
         getMethod = getMethod.AddAttributeLists(SyntaxFactory.AttributeList().AddAttributes(autoGenerateAttributeAttribute));
 
-        SyntaxList<ExpressionStatementSyntax> componentList = SyntaxFactory.List<ExpressionStatementSyntax>();
+        SyntaxList<ExpressionStatementSyntax> getExpressionList = SyntaxFactory.List<ExpressionStatementSyntax>();
 
-        //TODO 
         int bindAmount = this.generateData.objectInfo.bindDataList.Count;
         for (int i = 0; i < bindAmount; i++)
         {
             BindData bindData = this.generateData.objectInfo.bindDataList[i];
-            string typeString = bindData.GetTypeString().GetVisitString();
-            string fieldName=fieldNameDisposer.DisposeName(this.nameDisposeCentre, bindData.name);
+            string typeString = bindData.GetTypeFullName();
+            string fieldName = fieldNameDisposer.DisposeName(this.nameDisposeCentre, bindData.name);
             string propertyName = NameHelper.SetPropertyName(fieldName, this.selectSetting.nameGenerateSetting.csharpNameGenerateSetting);
             propertyName = NameHelper.NameSettingByName(propertyName, bindData, this.csharpScriptSetting.propertyNameSetting);
             propertyName = propertyNameDisposer.DisposeName(this.nameDisposeCentre, propertyName);
-            
-            FieldDeclarationSyntax field = GenerateField(typeString, fieldName);
+
+            TypeSyntax itemType = SyntaxFactory.ParseTypeName(typeString);
+            FieldDeclarationSyntax field = GenerateField(itemType, fieldName);
+            PropertyDeclarationSyntax property = GenerateProperty(itemType, propertyName, fieldName);
+            ExpressionStatementSyntax expression = GenerateItemExpression(bindData, fieldName, bindMethodParameterName, i);
+
+            bool isEditorAsset = typeString.Contains(CommonConst.UntiyEditorNameSpace);
+            if (isEditorAsset)
+            {
+                field = field.WithLeadingTrivia(SyntaxFactory.Trivia(ifNode));
+                field = field.WithTrailingTrivia(SyntaxFactory.Trivia(endIfNode));
+                property = property.WithLeadingTrivia(SyntaxFactory.Trivia(ifNode));
+                property = property.WithTrailingTrivia(SyntaxFactory.Trivia(endIfNode));
+                expression = expression.WithLeadingTrivia(SyntaxFactory.Trivia(ifNode));
+                expression = expression.WithTrailingTrivia(SyntaxFactory.Trivia(endIfNode));
+            }
             targetClass = targetClass.AddMembers(field);
-            
-            PropertyDeclarationSyntax property = GenerateProperty(typeString, propertyName, fieldName);
             targetClass = targetClass.AddMembers(property);
-
-            ExpressionStatementSyntax expression = null;
-            componentList = componentList.Add(expression);
+            getExpressionList = getExpressionList.Add(expression);
         }
-        
-        // int componentBindAmount = generateData.objectInfo.gameObjectBindInfoList.Count;
-        // for (int i = 0; i < componentBindAmount; i++)
-        // {
-        //     ComponentBindInfo componentInfo = generateData.objectInfo.gameObjectBindInfoList[i];
-        //     string typeString = componentInfo.GetTypeString().GetVisitString();
-        //     string fieldName = fieldNameDisposer.DisposeName(this.nameDisposeCentre, componentInfo.name);
-        //     string propertyName = NameHelper.SetPropertyName(fieldName, this.selectSetting.nameGenerateSetting.csharpNameGenerateSetting);
-        //     propertyName = NameHelper.NameSettingByName(propertyName, componentInfo, this.csharpScriptSetting.propertyNameSetting);
-        //     propertyName = propertyNameDisposer.DisposeName(this.nameDisposeCentre, propertyName);
-        //
-        //     FieldDeclarationSyntax field = GenerateField(typeString, fieldName);
-        //     targetClass = targetClass.AddMembers(field);
-        //
-        //     PropertyDeclarationSyntax property = GenerateProperty(typeString, propertyName, fieldName);
-        //     targetClass = targetClass.AddMembers(property);
-        //
-        //     ExpressionStatementSyntax expression = GenerateComponentExpression(componentInfo, typeString, fieldName);
-        //     componentList = componentList.Add(expression);
-        // }
 
-        SyntaxList<ExpressionStatementSyntax> dataList = SyntaxFactory.List<ExpressionStatementSyntax>();
-        // int dataInfoAmount = this.generateData.objectInfo.dataBindInfoList.Count;
-        // for (int i = 0; i < dataInfoAmount; i++)
-        // {
-        //     DataBindInfo dataInfo = this.generateData.objectInfo.dataBindInfoList[i];
-        //
-        //     string typeString = dataInfo.typeString.GetVisitString();
-        //     string fieldName = fieldNameDisposer.DisposeName(this.nameDisposeCentre, dataInfo.name);
-        //     string propertyName = NameHelper.SetPropertyName(fieldName, this.selectSetting.nameGenerateSetting.csharpNameGenerateSetting);
-        //     propertyName = NameHelper.NameSettingByName(propertyName, dataInfo, this.csharpScriptSetting.propertyNameSetting);
-        //     propertyName = propertyNameDisposer.DisposeName(this.nameDisposeCentre, propertyName);
-        //
-        //     bool isEditorAsset = typeString.Contains(CommonConst.UntiyEditorNameSpace);
-        //
-        //     FieldDeclarationSyntax field = GenerateField(typeString, fieldName);
-        //     PropertyDeclarationSyntax property = GenerateProperty(typeString, propertyName, fieldName);
-        //
-        //     if (isEditorAsset)
-        //     {
-        //         field = field.WithLeadingTrivia(SyntaxFactory.Trivia(ifNode));
-        //         field = field.WithTrailingTrivia(SyntaxFactory.Trivia(endIfNode));
-        //         property = property.WithLeadingTrivia(SyntaxFactory.Trivia(ifNode));
-        //         property = property.WithTrailingTrivia(SyntaxFactory.Trivia(endIfNode));
-        //     }
-        //
-        //     targetClass = targetClass.AddMembers(property);
-        //     targetClass = targetClass.AddMembers(field);
-        //
-        //     ExpressionStatementSyntax expression = GenerateDataExpression(dataInfo, typeString, fieldName);
-        //     dataList = dataList.Add(expression);
-        //
-        //     if (isEditorAsset) { Debug.LogWarning($"警告：绑定数据为UntiyEditor中的类型,这将发布后失效：{dataInfo.name}"); }
-        // }
-
-        if (dataList.Count > 0)
+        int collectionAmount = this.generateData.objectInfo.bindCollectionList.Count;
+        for (int i = 0; i < collectionAmount; i++)
         {
-            ExpressionStatementSyntax rawFirst = dataList.First();
-            ExpressionStatementSyntax first = rawFirst.WithLeadingTrivia(SyntaxFactory.Trivia(ifNode));
-            dataList = dataList.Replace(rawFirst, first);
+            BindCollection collection = this.generateData.objectInfo.bindCollectionList[i];
+            string typeString = collection.GetTypeString().GetVisitString();
+            string fieldName = fieldNameDisposer.DisposeName(this.nameDisposeCentre, collection.name);
+            string propertyName = NameHelper.SetPropertyName(fieldName, this.selectSetting.nameGenerateSetting.csharpNameGenerateSetting);
+            propertyName = NameHelper.NameSettingByName(propertyName, collection, this.csharpScriptSetting.propertyNameSetting);
+            propertyName = propertyNameDisposer.DisposeName(this.nameDisposeCentre, propertyName);
 
-            ExpressionStatementSyntax rawLast = dataList.Last();
-            ExpressionStatementSyntax last = rawLast.WithTrailingTrivia(SyntaxFactory.Trivia(endIfNode));
-            dataList = dataList.Replace(rawLast, last);
+            TypeSyntax collectionType = GetCollectioinTypeSyntax(collection);
+            FieldDeclarationSyntax field = GenerateField(collectionType, fieldName);
+            PropertyDeclarationSyntax property = GenerateProperty(collectionType, propertyName, fieldName);
+            ExpressionStatementSyntax expression = GenerateCollectionExpression(collectionType, fieldName, bindMethodParameterName, i);
+
+            bool isEditorAsset = typeString.Contains(CommonConst.UntiyEditorNameSpace);
+            if (isEditorAsset)
+            {
+                field = field.WithLeadingTrivia(SyntaxFactory.Trivia(ifNode));
+                field = field.WithTrailingTrivia(SyntaxFactory.Trivia(endIfNode));
+                property = property.WithLeadingTrivia(SyntaxFactory.Trivia(ifNode));
+                property = property.WithTrailingTrivia(SyntaxFactory.Trivia(endIfNode));
+                expression = expression.WithLeadingTrivia(SyntaxFactory.Trivia(ifNode));
+                expression = expression.WithTrailingTrivia(SyntaxFactory.Trivia(endIfNode));
+            }
+            targetClass = targetClass.AddMembers(field);
+            targetClass = targetClass.AddMembers(property);
+            getExpressionList = getExpressionList.Add(expression);
         }
 
-        SyntaxList<ExpressionStatementSyntax> newList = componentList.AddRange(dataList);
-        BlockSyntax newBlock = SyntaxFactory.Block(newList);
+        BlockSyntax newBlock = SyntaxFactory.Block(getExpressionList);
         getMethod = getMethod.WithBody(newBlock);
         targetClass = targetClass.AddMembers(getMethod);
 
@@ -352,9 +323,9 @@ public class CSharpGenerator : IGenerator
         mainWriter.Close();
     }
 
-    FieldDeclarationSyntax GenerateField(string typeString, string fieldName)
+    FieldDeclarationSyntax GenerateField(TypeSyntax typeSyntax, string fieldName)
     {
-        VariableDeclarationSyntax variable = SyntaxFactory.VariableDeclaration(SyntaxFactory.ParseTypeName(typeString));
+        VariableDeclarationSyntax variable = SyntaxFactory.VariableDeclaration(typeSyntax);
         variable = variable.AddVariables(SyntaxFactory.VariableDeclarator(fieldName));
 
         SyntaxKind fieldVisitKey = ObjectInfoHelper.VisitTypeToSyntaxKind(this.csharpScriptSetting.variableVisitType);
@@ -368,13 +339,13 @@ public class CSharpGenerator : IGenerator
         return field;
     }
 
-    PropertyDeclarationSyntax GenerateProperty(string typeString, string propertyName, string fieldName)
+    PropertyDeclarationSyntax GenerateProperty(TypeSyntax typeSyntax, string propertyName, string fieldName)
     {
         IdentifierNameSyntax fieldSyntax = SyntaxFactory.IdentifierName(fieldName);
         MemberAccessExpressionSyntax fieldExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ThisExpression(), fieldSyntax);
         SyntaxKind propertyVisitKey = ObjectInfoHelper.VisitTypeToSyntaxKind(this.csharpScriptSetting.propertyVisitType);
 
-        PropertyDeclarationSyntax property = SyntaxFactory.PropertyDeclaration(SyntaxFactory.ParseTypeName(typeString), propertyName);
+        PropertyDeclarationSyntax property = SyntaxFactory.PropertyDeclaration(typeSyntax, propertyName);
         property = property.AddModifiers(SyntaxFactory.Token(propertyVisitKey));
 
         AttributeSyntax autoGenerateAttributeAttribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(AutoGenerate).FullName));
@@ -404,78 +375,77 @@ public class CSharpGenerator : IGenerator
         return property;
     }
 
-    // ExpressionStatementSyntax GenerateComponentExpression(ComponentBindInfo componentInfo, string typeString, string fieldName)
-    // {
-    //     IdentifierNameSyntax fieldSyntax = SyntaxFactory.IdentifierName(fieldName);
-    //     MemberAccessExpressionSyntax fieldExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ThisExpression(), fieldSyntax);
-    //
-    //     string findPath = CommonTools.GetWholePath(componentInfo.instanceObject.transform, generateData.bindObject);
-    //
-    //     LiteralExpressionSyntax stringArg = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(findPath));
-    //     ArgumentListSyntax memberArg = SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(stringArg)));
-    //
-    //     IdentifierNameSyntax transformName = SyntaxFactory.IdentifierName(nameof(Component.transform));
-    //     MemberAccessExpressionSyntax baseMmember = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.BaseExpression(), transformName);
-    //     MemberAccessExpressionSyntax findMember = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, baseMmember, SyntaxFactory.IdentifierName(nameof(Transform.Find)));
-    //     InvocationExpressionSyntax findExpression = SyntaxFactory.InvocationExpression(findMember, memberArg);
-    //
-    //     ExpressionSyntax expression = null;
-    //     if (componentInfo.instanceObject == generateData.bindObject)
-    //     {
-    //         if (componentInfo.GetTypeString().ToType() == typeof(GameObject))
-    //         {
-    //             IdentifierNameSyntax gameObjectName = SyntaxFactory.IdentifierName(nameof(Component.gameObject));
-    //             MemberAccessExpressionSyntax baseGameObjectMmember = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.BaseExpression(), gameObjectName);
-    //             expression = baseGameObjectMmember;
-    //         }
-    //         else
-    //         {
-    //             TypeArgumentListSyntax typeArgs = SyntaxFactory.TypeArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.ParseTypeName(typeString)));
-    //             GenericNameSyntax getComponent = SyntaxFactory.GenericName(SyntaxFactory.Identifier(nameof(Component.GetComponent))).WithTypeArgumentList(typeArgs);
-    //             expression = SyntaxFactory.InvocationExpression(getComponent);
-    //         }
-    //     }
-    //     else
-    //     {
-    //         if (componentInfo.GetTypeString().ToType() == typeof(GameObject))
-    //         {
-    //             IdentifierNameSyntax gameObjectName = SyntaxFactory.IdentifierName(nameof(Component.gameObject));
-    //             expression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, findExpression, gameObjectName);
-    //         }
-    //         else
-    //         {
-    //             TypeArgumentListSyntax typeArgs = SyntaxFactory.TypeArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.ParseTypeName(typeString)));
-    //             GenericNameSyntax getComponent = SyntaxFactory.GenericName(SyntaxFactory.Identifier(nameof(Component.GetComponent))).WithTypeArgumentList(typeArgs);
-    //             MemberAccessExpressionSyntax target = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, findExpression, getComponent);
-    //             expression = SyntaxFactory.InvocationExpression(target);
-    //         }
-    //     }
-    //
-    //     AssignmentExpressionSyntax assignmentexpression = SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, fieldExpression, expression);
-    //     return SyntaxFactory.ExpressionStatement(assignmentexpression);
-    // }
-    //
-    // ExpressionStatementSyntax GenerateDataExpression(DataBindInfo dataInfo, string typeString, string fieldName)
-    // {
-    //     IdentifierNameSyntax fieldSyntax = SyntaxFactory.IdentifierName(fieldName);
-    //     MemberAccessExpressionSyntax fieldExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ThisExpression(), fieldSyntax);
-    //     string findPath = AssetDatabase.GetAssetPath(dataInfo.bindObject);
-    //
-    //     LiteralExpressionSyntax stringArg = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(findPath));
-    //     ArgumentListSyntax memberArg = SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(stringArg)));
-    //
-    //     IdentifierNameSyntax ediotrName = SyntaxFactory.IdentifierName(nameof(UnityEditor));
-    //     IdentifierNameSyntax assetDatabaseName = SyntaxFactory.IdentifierName(nameof(AssetDatabase));
-    //     MemberAccessExpressionSyntax findMember = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, ediotrName, assetDatabaseName);
-    //
-    //     TypeArgumentListSyntax typeArgs = SyntaxFactory.TypeArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.ParseTypeName(typeString)));
-    //     GenericNameSyntax getComponent = SyntaxFactory.GenericName(SyntaxFactory.Identifier(nameof(AssetDatabase.LoadAssetAtPath))).WithTypeArgumentList(typeArgs);
-    //     MemberAccessExpressionSyntax target = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, findMember, getComponent);
-    //     ExpressionSyntax expression = SyntaxFactory.InvocationExpression(target, memberArg);
-    //
-    //     AssignmentExpressionSyntax assignmentexpression = SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, fieldExpression, expression);
-    //     return SyntaxFactory.ExpressionStatement(assignmentexpression);
-    // }
+    ExpressionStatementSyntax GenerateItemExpression(BindData bindData, string fieldName, string bindComponentsArgName, int index)
+    {
+        TypeSyntax typeSyntax = SyntaxFactory.ParseTypeName(bindData.GetTypeFullName());
+        IdentifierNameSyntax fieldSyntax = SyntaxFactory.IdentifierName(fieldName);
+        MemberAccessExpressionSyntax fieldExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ThisExpression(), fieldSyntax);
+
+        IdentifierNameSyntax bindComponents = SyntaxFactory.IdentifierName(bindComponentsArgName);
+        IdentifierNameSyntax bindDataList = SyntaxFactory.IdentifierName(nameof(BindComponents.bindDataList));
+        MemberAccessExpressionSyntax acccessExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, bindComponents, bindDataList);
+        ArgumentSyntax indexArg = SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(index)));
+        BracketedArgumentListSyntax indexArgList = SyntaxFactory.BracketedArgumentList(SyntaxFactory.SingletonSeparatedList(indexArg));
+
+        ElementAccessExpressionSyntax arrayAccessExpression = SyntaxFactory.ElementAccessExpression(acccessExpression, indexArgList);
+
+        CastExpressionSyntax rightExpression = SyntaxFactory.CastExpression(typeSyntax, arrayAccessExpression);
+
+        AssignmentExpressionSyntax assignmentExpression = SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, fieldExpression, rightExpression);
+
+        return SyntaxFactory.ExpressionStatement(assignmentExpression);
+    }
+
+    ExpressionStatementSyntax GenerateCollectionExpression(TypeSyntax collectioinTypeSyntax, string fieldName, string bindComponentsArgName, int index)
+    {
+        IdentifierNameSyntax fieldSyntax = SyntaxFactory.IdentifierName(fieldName);
+        MemberAccessExpressionSyntax fieldExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ThisExpression(), fieldSyntax);
+
+        IdentifierNameSyntax bindComponents = SyntaxFactory.IdentifierName(bindComponentsArgName);
+        IdentifierNameSyntax bindCollectionList = SyntaxFactory.IdentifierName(nameof(BindComponents.bindCollectionList));
+        MemberAccessExpressionSyntax acccessExpression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, bindComponents, bindCollectionList);
+
+        ArgumentSyntax indexArg = SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(index)));
+        BracketedArgumentListSyntax indexArgList = SyntaxFactory.BracketedArgumentList(SyntaxFactory.SingletonSeparatedList(indexArg));
+
+        ElementAccessExpressionSyntax arrayAccessExpression = SyntaxFactory.ElementAccessExpression(acccessExpression, indexArgList);
+        CastExpressionSyntax rightExpression = SyntaxFactory.CastExpression(collectioinTypeSyntax, arrayAccessExpression);
+
+        AssignmentExpressionSyntax assignmentExpression = SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, fieldExpression, rightExpression);
+
+        return SyntaxFactory.ExpressionStatement(assignmentExpression);
+    }
+
+    TypeSyntax GetCollectioinTypeSyntax(BindCollection collection)
+    {
+        TypeSyntax typeSyntax = SyntaxFactory.ParseTypeName(collection.GetTypeFullNmae());
+        TypeSyntax collectioinTypeSyntax = null;
+        switch (collection.collectionType)
+        {
+            case CollectionType.Array:
+            {
+                ArrayRankSpecifierSyntax array = SyntaxFactory.ArrayRankSpecifier(SyntaxFactory.SingletonSeparatedList<ExpressionSyntax>(SyntaxFactory.OmittedArraySizeExpression()));
+                collectioinTypeSyntax = SyntaxFactory.ArrayType(typeSyntax).WithRankSpecifiers(SyntaxFactory.SingletonList(array));
+                break;
+            }
+            case CollectionType.List:
+            {
+                TypeArgumentListSyntax typeList = SyntaxFactory.TypeArgumentList(SyntaxFactory.SingletonSeparatedList(typeSyntax));
+                collectioinTypeSyntax = SyntaxFactory.GenericName(SyntaxFactory.Identifier(typeof(List<>).FullName), typeList);
+                break;
+            }
+            case CollectionType.Dictionary:
+            {
+                TypeSyntax stringSyntax = SyntaxFactory.ParseTypeName(typeof(string).FullName);
+                SeparatedSyntaxList<TypeSyntax> typeList = SyntaxFactory.SeparatedList<TypeSyntax>();
+                typeList = typeList.Add(stringSyntax);
+                typeList = typeList.Add(typeSyntax);
+                collectioinTypeSyntax = SyntaxFactory.GenericName(SyntaxFactory.Identifier(typeof(Dictionary<,>).FullName), SyntaxFactory.TypeArgumentList(typeList));
+                break;
+            }
+        }
+        return collectioinTypeSyntax;
+    }
 
     void GenerateTemplateContent(string mainFilePath, string partialFilePath, bool isPartial)
     {
@@ -495,6 +465,6 @@ public class CSharpGenerator : IGenerator
 
         ClassDeclarationSyntax targetClass = classDeclarationSyntaxs.First();
         ClassDeclarationSyntax oldNode = targetClass;
-
+        //TODO 处理模板信息
     }
 }

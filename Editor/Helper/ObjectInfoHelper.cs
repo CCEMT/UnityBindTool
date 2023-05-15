@@ -42,10 +42,10 @@ public static class ObjectInfoHelper
                 objectInfo.rootData = rootData;
                 objectInfo.rootData.name = objectInfo.typeString.typeName;
 
-                int bindAmount = bindComponents.bindComponentList.Count;
+                int bindAmount = bindComponents.bindDataList.Count;
                 for (int i = 0; i < bindAmount; i++)
                 {
-                    Object bindTarget = bindComponents.bindComponentList[i];
+                    Object bindTarget = bindComponents.bindDataList[i];
                     BindData bindData = BindDataFactory.CreateBindData(bindTarget);
                     bindData.name = bindComponents.bindName[i];
                     objectInfo.bindDataList.Add(bindData);
@@ -172,7 +172,7 @@ public static class ObjectInfoHelper
             for (int i = 0; i < sequenceAmount; i++)
             {
                 StreamingBindData data = streamingBindSetting.streamingBindDataList[i];
-                
+
                 if (data.isElse)
                 {
                     if (elseType.Count <= 0) continue;
@@ -246,10 +246,15 @@ public static class ObjectInfoHelper
 
     public static void BindDataToObjectInfo(ObjectInfo objectInfo, BindData info, CompositionSetting setting)
     {
-        if (setting.nameGenerateSetting.isBindAutoGenerateName) info.name = NameHelper.SetVariableName(info.GetValue().name, setting.nameGenerateSetting);
+        if (setting.nameGenerateSetting.isBindAutoGenerateName) BindDataSetName(info, setting);
+        if (objectInfo.bindDataList.Contains(info) == false) objectInfo.bindDataList.Add(info);
+    }
+
+    public static void BindDataSetName(BindData info, CompositionSetting setting)
+    {
+        info.name = NameHelper.SetVariableName(info.GetValue().name, setting.nameGenerateSetting);
         info.name = NameHelper.NameSettingByName(info, setting.scriptSetting.nameSetting);
         info.name = CommonTools.GetNumberAlpha(info.name);
-        if (objectInfo.bindDataList.Contains(info) == false) objectInfo.bindDataList.Add(info);
     }
 
     public static void RemoveBindInfo(ObjectInfo objectInfo, GameObject removeObject, RemoveType removeType)
@@ -306,5 +311,10 @@ public static class ObjectInfoHelper
                 break;
             }
         }
+    }
+
+    public static void BindDataAddToBindCollection(ObjectInfo objectInfo, BindData bindData)
+    {
+        AddCollectionWindow.AddToCollection(objectInfo, new List<BindData>() {bindData}, bindData.GetAllTypeString().ToList());
     }
 }

@@ -15,7 +15,7 @@ namespace BindTool
     {
         public const string CSharpBuildGenerateDataKey = "CSharpBuildGenerateData";
 
-        public static void Build(CompositionSetting setting, GenerateData generateData, GeneratorType generatorType)
+        public static void Build(CompositionSetting setting, GenerateData generateData)
         {
             CommonSetting commonSetting = setting.commonSetting;
 
@@ -35,21 +35,22 @@ namespace BindTool
 
             Debug.Log("脚本生成路径：" + path);
 
-            IGenerator generator = GeneratorFactory.GetGenerator(generatorType, setting, generateData);
             BindComponentsHelper.AddBindComponent(generateData);
-            switch (generatorType)
+
+            if (commonSetting.isCreateScript)
             {
-                case GeneratorType.CSharp:
-                    CSharpBuild(generator, path, generateData);
-                    break;
-                case GeneratorType.Lua:
-                    LuaBuild(generator, path, setting, generateData);
-                    break;
-                default:
-                    Debug.LogError("生成失败,没有对应的生成器");
-                    break;
+                IGenerator generator = GeneratorFactory.GetGenerator(GeneratorType.CSharp, setting, generateData);
+                CSharpBuild(generator, path, generateData);
             }
 
+            if (commonSetting.isCreateLua)
+            {
+                IGenerator generator = GeneratorFactory.GetGenerator(GeneratorType.Lua, setting, generateData);
+                LuaBuild(generator, path, setting, generateData);
+            }
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
             Debug.Log("Create ScriptSetting Finish.");
         }
 
@@ -62,7 +63,7 @@ namespace BindTool
         [DidReloadScripts]
         static void CSharpDispose()
         {
-            if (EditorPrefs.HasKey(CSharpBuildGenerateDataKey) == false) { return; }
+            if (EditorPrefs.HasKey(CSharpBuildGenerateDataKey) == false) return;
             BindSetting bindSetting = BindSetting.Get();
             CommonSetting commonSetting = bindSetting.selectCompositionSetting.commonSetting;
 

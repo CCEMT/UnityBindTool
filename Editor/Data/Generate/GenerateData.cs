@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Sirenix.Serialization;
 using UnityEngine;
 
 #endregion
@@ -20,6 +21,7 @@ namespace BindTool
         public GameObject bindObject;
 
         //绑定信息
+        [NonSerialized, OdinSerialize]
         public ObjectInfo objectInfo;
 
         //获取绑定数据的函数名称

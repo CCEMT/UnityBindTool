@@ -6,7 +6,7 @@ using BindTool;
 public class BindCollection
 {
     public string name;
-    public List<BindData> BindDataList = new List<BindData>();
+    public List<BindData> bindDataList = new List<BindData>();
     public CollectionType collectionType;
 
     public int index;

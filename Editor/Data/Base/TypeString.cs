@@ -1,9 +1,6 @@
 ﻿#region Using
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 #endregion
 
@@ -21,55 +18,6 @@ namespace BindTool
             typeName = type.Name;
             typeNameSpace = type.Namespace;
             assemblyName = type.Assembly.GetName().Name;
-        }
-
-        public bool IsEmpty()
-        {
-            if (string.IsNullOrEmpty(typeName) || string.IsNullOrEmpty(assemblyName)) return true;
-            return false;
-        }
-
-        public static bool IsExist(string typeName, string typeNameSpace, string assemblyName)
-        {
-            TypeString typeString = new TypeString();
-            typeString.typeName = typeName;
-            typeString.typeNameSpace = typeNameSpace;
-            typeString.assemblyName = assemblyName;
-            Type type = typeString.ToType();
-            return type != null;
-        }
-
-        public Type ToType()
-        {
-            Assembly assembly = GetAssemblyByName(assemblyName);
-            if (assembly == null) return null;
-            List<Type> types = assembly.GetTypes().Where(CheckTypeNamespace).ToList();
-            Type find = types.Find(CheckTypeName);
-            return find;
-        }
-
-        bool CheckTypeNamespace(Type type)
-        {
-            if (string.Equals(type.Namespace, typeNameSpace, StringComparison.Ordinal)) return true;
-            if (string.IsNullOrEmpty(type.Namespace) && string.IsNullOrEmpty(typeNameSpace)) return true;
-            return false;
-        }
-
-        bool CheckTypeName(Type type)
-        {
-            if (string.Equals(type.Name, typeName, StringComparison.Ordinal)) return true;
-            return false;
-        }
-
-        Assembly GetAssemblyByName(string assemblyName)
-        {
-            return AppDomain.CurrentDomain.GetAssemblies().SingleOrDefault(assembly => assembly.GetName().Name == assemblyName);
-        }
-
-        public string GetVisitString()
-        {
-            if (string.IsNullOrEmpty(typeNameSpace)) { return typeName; }
-            else { return $"{typeNameSpace}.{typeName}"; }
         }
 
         #region Equals

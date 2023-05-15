@@ -12,6 +12,7 @@
         public const string DefaultAssembly = "Assembly-CSharp";
         public const string DefaultName = "Auto Generate";
         public const string DefaultBindMethodName = "GetBind";
+        public const string DefaultBindMethodParameterName = "bindComponents";
 
         public const string TemplateAssembly = "UnityBindTool.Editor";
         public const string TemplateNamespace = "BindTool.Template";

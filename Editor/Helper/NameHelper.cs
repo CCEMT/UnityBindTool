@@ -63,6 +63,35 @@ public static class NameHelper
         return targetName;
     }
 
+    public static string NameSettingByName(string targetName, BindCollection bindCollection, NameSetting nameSetting)
+    {
+        switch (nameSetting.namingDispose)
+        {
+            case ScriptNamingDispose.InitialLower:
+                targetName = CommonTools.InitialLower(targetName);
+                break;
+            case ScriptNamingDispose.InitialUpper:
+                targetName = CommonTools.InitialUpper(targetName);
+                break;
+            case ScriptNamingDispose.AllLower:
+                targetName = bindCollection.name.ToLower();
+                break;
+            case ScriptNamingDispose.AllUppe:
+                targetName = bindCollection.name.ToUpper();
+                break;
+        }
+
+        if (nameSetting.isAddClassName)
+        {
+            if (nameSetting.isFrontOrBehind) { targetName = bindCollection.GetTypeName() + bindCollection.name; }
+            else { targetName = bindCollection.name + bindCollection.GetTypeName(); }
+        }
+
+        if (nameSetting.isAddFront) targetName = nameSetting.frontName + bindCollection.name;
+        if (nameSetting.isAddBehind) targetName = bindCollection.name + nameSetting.behindName;
+        return targetName;
+    }
+
     public static bool NameCheckContent(NameCheck nameCheck, string content, out string matchingContent)
     {
         matchingContent = "";

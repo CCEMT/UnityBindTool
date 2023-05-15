@@ -7,48 +7,46 @@ using UnityEditor;
 [Serializable]
 public class CSharpScriptSetting
 {
-    [LabelText("是否构建新的代码")]
+    [LabelText("是否构建新的代码"), BoxGroup("基础设置")]
     public bool isGenerateNew;
 
-    [LabelText("继承的类")]
+    [LabelText("继承的类"), BoxGroup("基础设置")]
     public TypeString inheritClass;
 
-    [LabelText("目标程序集")]
+    [LabelText("目标程序集"), BoxGroup("基础设置")]
     public string createScriptAssembly;
 
-    [LabelText("是否分文件生成")]
+    [LabelText("是否分文件生成"), BoxGroup("基础设置")]
     public bool isGeneratePartial;
 
-    [LabelText("子文件拓展名")]
+    [LabelText("子文件拓展名"), BoxGroup("基础设置")]
     public string partialName;
 
-    [LabelText("是否使用命名空间")]
+    [LabelText("是否使用命名空间"), BoxGroup("基础设置")]
     public bool isSpecifyNamespace;
 
-    [LabelText("使用的命名空间")]
+    [LabelText("使用的命名空间"), BoxGroup("基础设置")]
     public string useNamespace;
 
-    [LabelText("字段访问类型")]
+    [LabelText("字段访问类型"), BoxGroup("基础设置")]
     public VisitType variableVisitType;
 
-
-
-    [LabelText("是否创建属性")]
+    [LabelText("是否创建属性"), BoxGroup("属性设置")]
     public bool isAddProperty;
 
-    [LabelText("属性访问类型")]
+    [LabelText("属性访问类型"), BoxGroup("属性设置")]
     public VisitType propertyVisitType;
 
-    [LabelText("属性设置")]
+    [LabelText("属性设置"), BoxGroup("属性设置")]
     public PropertyType propertyType;
 
-    [LabelText("属性命名设置")]
+    [BoxGroup("属性设置"), HideLabel]
     public NameSetting propertyNameSetting = new NameSetting();
 
-    [LabelText("模板脚本保存路径")]
+    [LabelText("模板脚本保存路径"), BoxGroup("模板脚本设置")]
     public DefaultAsset templateScriptSavaFolderPath;
 
-    [LabelText("模板脚本命名设置")]
+    [BoxGroup("模板脚本设置"), HideLabel]
     public NameSetting methodNameSetting = new NameSetting();
 
     [LabelText("模板列表")]

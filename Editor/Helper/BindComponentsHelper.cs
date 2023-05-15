@@ -7,9 +7,9 @@ public static class BindComponentsHelper
     {
         GameObject root = generateData.objectInfo.rootData.GetBindInfo<BindComponent>().bindGameObject;
         BindComponents bindComponents = root.GetComponent<BindComponents>();
-        if (bindComponents == null)
+        if (bindComponents != null)
         {
-            bindComponents.bindComponentList.Clear();
+            bindComponents.bindDataList.Clear();
             bindComponents.bindCollectionList.Clear();
         }
         bindComponents = root.AddComponent<BindComponents>();
@@ -18,7 +18,7 @@ public static class BindComponentsHelper
         for (int i = 0; i < bindAmount; i++)
         {
             BindData bindData = generateData.objectInfo.bindDataList[i];
-            bindComponents.bindComponentList.Add(bindData.GetValue());
+            bindComponents.bindDataList.Add(bindData.GetValue());
         }
 
         int collectionAmount = generateData.objectInfo.bindCollectionList.Count;

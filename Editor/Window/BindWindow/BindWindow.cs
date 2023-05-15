@@ -41,6 +41,8 @@ public partial class BindWindow : OdinEditorWindow
 
     private BindSetting bindSetting;
     private GameObject bindObject;
+    
+    [NonSerialized, OdinSerialize]
     private GenerateData generateData;
     
     [NonSerialized, OdinSerialize]
@@ -54,6 +56,9 @@ public partial class BindWindow : OdinEditorWindow
         this.bindSetting = BindSetting.Get();
         editorObjectInfo = ObjectInfoHelper.GetObjectInfo(bindObject);
         generateData = new GenerateData();
+        generateData.objectInfo = this.editorObjectInfo;
+        generateData.bindObject = this.bindObject;
+        generateData.newScriptName = this.bindObject.name;
 
         BindInfoListInit();
     }

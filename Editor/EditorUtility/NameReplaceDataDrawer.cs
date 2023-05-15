@@ -7,7 +7,6 @@ public class NameReplaceDataDrawer : OdinValueDrawer<NameReplaceData>
 {
     protected override void DrawPropertyLayout(GUIContent label)
     {
-
         NameReplaceData nameReplaceData = ValueEntry.SmartValue;
 
         EditorGUILayout.BeginHorizontal();

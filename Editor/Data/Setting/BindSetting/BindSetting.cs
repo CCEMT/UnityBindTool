@@ -4,16 +4,29 @@ using BindTool;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 //[CreateAssetMenu(fileName = "BindSetting", menuName = "BindSetting", order = 0)]
 public class BindSetting : SingletonScriptableObject<BindSetting>
 {
+    public BaseSetting baseSetting = new BaseSetting();
+
     [NonSerialized, OdinSerialize]
     public CompositionSetting selectCompositionSetting;
 
     [NonSerialized, OdinSerialize]
     public List<CompositionSetting> compositionSettingList = new List<CompositionSetting>();
+}
+
+[Serializable]
+public class BaseSetting
+{
+    [LabelText("扫描的程序集列表(名称)")]
+    public List<string> scanAssemblyList = new List<string>();
+
+    [LabelText("扫描的程序集列表(Asset)")]
+    public List<AssemblyDefinitionAsset> scanAssemblyAssetList = new List<AssemblyDefinitionAsset>();
 }
 
 [Serializable]
@@ -78,7 +91,7 @@ public class ScriptSetting
     [LabelText("旧脚本文件夹")]
     public DefaultAsset oldScriptFolderPath;
 
-    [LabelText("命名设置")]
+    [BoxGroup("命名设置"), HideLabel]
     public NameSetting nameSetting = new NameSetting();
 
     [HideInInspector]

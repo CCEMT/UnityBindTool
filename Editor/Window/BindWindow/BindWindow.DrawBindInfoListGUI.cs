@@ -24,6 +24,12 @@ public partial class BindWindow
     [NonSerialized, OdinSerialize]
     private List<BindCollection> selectbindCollectionList;
 
+    [NonSerialized, OdinSerialize]
+    private List<BindData> removeBindDataList;
+
+    [NonSerialized, OdinSerialize]
+    private List<BindCollection> removeBindCollectionList;
+
     private int bindAmount;
     private int selectBindAmount;
 
@@ -42,6 +48,8 @@ public partial class BindWindow
 
         selectBindDataList = new List<BindData>();
         selectbindCollectionList = new List<BindCollection>();
+        removeBindDataList = new List<BindData>();
+        removeBindCollectionList = new List<BindCollection>();
 
         GetData();
         SearchSelectList();
@@ -54,6 +62,7 @@ public partial class BindWindow
         DrawOperate();
         DrawBindArea();
         DrawBindInfo();
+        ChackRemove();
     }
 
     void GetData()
@@ -336,12 +345,38 @@ public partial class BindWindow
 
             EditorGUILayout.BeginVertical();
             {
-                if (GUILayout.Button("操作", GUILayout.Width(100))) { }
-                if (GUILayout.Button("删除", GUILayout.Width(100))) { }
+                if (GUILayout.Button("操作", GUILayout.Width(100))) DrawBindInfoOperate(bindData);
+                if (GUILayout.Button("删除", GUILayout.Width(100))) this.removeBindDataList.Add(bindData);
             }
             EditorGUILayout.EndVertical();
         }
         EditorGUILayout.EndHorizontal();
+    }
+
+    void DrawBindInfoOperate(BindData bindData)
+    {
+        GenericMenu menu = new GenericMenu();
+        menu.AddItem(new GUIContent("重置名称"), false, ResetName, bindData);
+        menu.AddItem(new GUIContent("拷贝到指定集合"), false, CopyToCollection, bindData);
+        menu.AddItem(new GUIContent("移动到指定集合"), false, MoveToCollection, bindData);
+        menu.ShowAsContext();
+    }
+
+    void ResetName(object bindData)
+    {
+        ObjectInfoHelper.BindDataSetName((BindData) bindData, this.bindSetting.selectCompositionSetting);
+    }
+
+    void CopyToCollection(object bindData)
+    {
+        ObjectInfoHelper.BindDataAddToBindCollection(this.editorObjectInfo, (BindData) bindData);
+    }
+
+    void MoveToCollection(object bindData)
+    {
+        BindData data = (BindData) bindData;
+        this.removeBindDataList.Add(data);
+        ObjectInfoHelper.BindDataAddToBindCollection(this.editorObjectInfo, data);
     }
 
     void DrawBindCollection()
@@ -383,11 +418,41 @@ public partial class BindWindow
 
             EditorGUILayout.BeginVertical();
             {
-                if (GUILayout.Button("编辑", GUILayout.Width(100))) { }
-                if (GUILayout.Button("删除", GUILayout.Width(100))) { }
+                if (GUILayout.Button("编辑", GUILayout.Width(100))) EditorCollectionWindow.EditorCollection(bindCollection);
+                if (GUILayout.Button("删除", GUILayout.Width(100))) this.removeBindCollectionList.Add(bindCollection);
             }
             EditorGUILayout.EndVertical();
         }
         EditorGUILayout.EndHorizontal();
+    }
+
+    void ChackRemove()
+    {
+        if (this.removeBindDataList.Count > 0)
+        {
+            int amount = this.removeBindDataList.Count;
+            for (int i = 0; i < amount; i++)
+            {
+                BindData removeItem = this.removeBindDataList[i];
+                this.editorObjectInfo.bindDataList.Remove(removeItem);
+            }
+
+            SearchSelectList();
+        }
+
+        if (this.removeBindCollectionList.Count > 0)
+        {
+            int amount = this.removeBindCollectionList.Count;
+            for (int i = 0; i < amount; i++)
+            {
+                BindCollection removeItem = this.removeBindCollectionList[i];
+                this.editorObjectInfo.bindCollectionList.Remove(removeItem);
+            }
+
+            SearchSelectList();
+        }
+
+        this.removeBindDataList.Clear();
+        this.removeBindCollectionList.Clear();
     }
 }
