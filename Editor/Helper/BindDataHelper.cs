@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BindTool;
 using Sirenix.OdinInspector.Editor;
-using UnityEditor;
-using UnityEngine;
 
 public static class BindDataHelper
 {
@@ -14,7 +12,7 @@ public static class BindDataHelper
         public TypeString typeString;
     }
 
-    public static void DropDownBinDataTypeSwitch(BindData bindData)
+    public static void DropDownBinDataTypeSwitch(BindData bindData, Action<TypeString> endCallback = null)
     {
         Dictionary<string, TypeSelectData> dataForDraw = new Dictionary<string, TypeSelectData>();
 
@@ -49,13 +47,11 @@ public static class BindDataHelper
             if (result == null) return;
             bindData.SetBindInfo(result.type);
             bindData.SetIndex(result.typeString);
+            endCallback?.Invoke(result.typeString);
         };
 
         CustomGenericSelector.ShowInPopup();
     }
 
-    public static void BindDataList(ObjectInfo objectInfo, List<BindData> bindDataList, Action endCallback)
-    {
-       
-    }
+    public static void BindDataList(ObjectInfo objectInfo, List<BindData> bindDataList, Action endCallback) { }
 }

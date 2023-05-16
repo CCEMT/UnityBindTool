@@ -51,9 +51,6 @@ public class CompositionSetting
 [Serializable]
 public class CommonSetting
 {
-    [LabelText("是否为分离模式"), PropertyTooltip("分离模式：不会将绑定的内容的内容自动关联到生成的内容上")]
-    public bool isDetachMode;
-
     [LabelText("是否创建脚本")]
     public bool isCreateScript;
 
@@ -65,6 +62,9 @@ public class CommonSetting
 
     [LabelText("是否创建预制体")]
     public bool isCreatePrefab;
+    
+    [LabelText("是否分离预制体")]
+    public bool isDetachPrefab;
 
     [LabelText("是否创建预制体文件夹")]
     public bool isCreatePrefabFolder;

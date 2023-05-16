@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using UnityEngine;
 
-public class CSharpGenerator : IGenerator
+public partial class CSharpGenerator : IGenerator
 {
     private CompositionSetting selectSetting;
     private ScriptSetting scriptSetting;
@@ -190,19 +190,7 @@ public class CSharpGenerator : IGenerator
                     break;
             }
 
-            bool isFind = false;
-            foreach (AttributeListSyntax attribute in attributeListSyntax)
-            {
-                if (isFind) { break; }
-                foreach (AttributeSyntax attributeAttribute in attribute.Attributes)
-                {
-                    var typeName = attributeAttribute.Name.GetLastToken().ToString();
-                    if (! string.Equals(typeName, nameof(AutoGenerate))) continue;
-                    isFind = true;
-                    deleteNodeList.Add(node);
-                    break;
-                }
-            }
+            if (IsDelect(attributeListSyntax)) deleteNodeList.Add(node);
         }
 
         root = root.RemoveNodes(deleteNodeList, SyntaxRemoveOptions.KeepExteriorTrivia);
@@ -212,6 +200,33 @@ public class CSharpGenerator : IGenerator
         StreamWriter mainWriter = File.CreateText(filePath);
         mainWriter.Write(newCode);
         mainWriter.Close();
+    }
+
+    bool IsDelect(SyntaxList<AttributeListSyntax> attributeListSyntax)
+    {
+        foreach (AttributeListSyntax attribute in attributeListSyntax)
+        {
+            foreach (AttributeSyntax attributeAttribute in attribute.Attributes)
+            {
+                var typeName = attributeAttribute.Name.GetLastToken().ToString();
+                if (! string.Equals(typeName, nameof(AutoGenerate))) continue;
+                if (IsFixedContent(attributeAttribute)) continue;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool IsFixedContent(AttributeSyntax attributeSyntax)
+    {
+        SeparatedSyntaxList<AttributeArgumentSyntax> arguments = attributeSyntax.ArgumentList.Arguments;
+        foreach (AttributeArgumentSyntax argument in arguments)
+        {
+            ExpressionSyntax expression = argument.Expression;
+            if (expression is not IdentifierNameSyntax nameSyntax) continue;
+            if (nameSyntax.Identifier.ValueText.Contains(nameof(AutoGenerateType.FixedContent))) return true;
+        }
+        return false;
     }
 
     void GenerateFixedContent(string filePath)
@@ -333,6 +348,11 @@ public class CSharpGenerator : IGenerator
         AttributeListSyntax attributeList = SyntaxFactory.AttributeList();
         AttributeSyntax serializeFieldAttribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(SerializeField).FullName));
         AttributeSyntax autoGenerateAttributeAttribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(AutoGenerate).FullName));
+        IdentifierNameSyntax enumType = SyntaxFactory.IdentifierName(typeof(AutoGenerateType).FullName);
+        IdentifierNameSyntax enumOption = SyntaxFactory.IdentifierName(nameof(AutoGenerateType.OriginalField));
+        MemberAccessExpressionSyntax enumAccess = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, enumType, enumOption);
+        AttributeArgumentSyntax autoGenerateArg = SyntaxFactory.AttributeArgument(enumAccess);
+        autoGenerateAttributeAttribute = autoGenerateAttributeAttribute.WithArgumentList(SyntaxFactory.AttributeArgumentList(SyntaxFactory.SingletonSeparatedList(autoGenerateArg)));
 
         attributeList = attributeList.AddAttributes(serializeFieldAttribute, autoGenerateAttributeAttribute);
         field = field.AddAttributeLists(attributeList);
@@ -445,26 +465,5 @@ public class CSharpGenerator : IGenerator
             }
         }
         return collectioinTypeSyntax;
-    }
-
-    void GenerateTemplateContent(string mainFilePath, string partialFilePath, bool isPartial)
-    {
-        string targetFilePath = isPartial ? partialFilePath : mainFilePath;
-
-        string code = File.ReadAllText(targetFilePath);
-        SyntaxTree tree = CSharpSyntaxTree.ParseText(code);
-        CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-
-        ClassDeclarationSyntax[] classDeclarationSyntaxs =
-            root.DescendantNodes().OfType<ClassDeclarationSyntax>().Where((c) => string.Equals(c.Identifier.ValueText, this.generateData.newScriptName)).ToArray();
-        if (classDeclarationSyntaxs.Length == 0)
-        {
-            Debug.LogError("原主文件未包含对应的类");
-            return;
-        }
-
-        ClassDeclarationSyntax targetClass = classDeclarationSyntaxs.First();
-        ClassDeclarationSyntax oldNode = targetClass;
-        //TODO 处理模板信息
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
@@ -8,18 +7,6 @@ using UnityEngine;
 
 public class EditorCollectionWindow : OdinEditorWindow
 {
-    [Serializable]
-    public class EditorCollectionItemDraw
-    {
-        [HideInInspector]
-        public BindData drawData;
-
-        public EditorCollectionItemDraw(BindData bindData)
-        {
-            drawData = bindData;
-        }
-    }
-
     public static void EditorCollection(BindCollection bindCollection)
     {
         EditorCollectionWindow window = GetWindow<EditorCollectionWindow>("EditorCollectionWindow");
@@ -31,7 +18,7 @@ public class EditorCollectionWindow : OdinEditorWindow
     private BindCollection editorCollection;
 
     [LabelText("Item列表"), ListDrawerSettings(HideRemoveButton = true, HideAddButton = true), ExecuteAlways]
-    public List<EditorCollectionItemDraw> editorCollectionItemDrawList = new List<EditorCollectionItemDraw>();
+    public List<EditorCollectionItemDrawData> editorCollectionItemDrawList = new List<EditorCollectionItemDrawData>();
 
     void Init(BindCollection bindCollection)
     {
@@ -41,9 +28,15 @@ public class EditorCollectionWindow : OdinEditorWindow
         int amount = bindCollection.bindDataList.Count;
         for (int i = 0; i < amount; i++)
         {
-            BindData bindData=bindCollection.bindDataList[i];
-            EditorCollectionItemDraw drawItem = new EditorCollectionItemDraw(bindData);
-            editorCollectionItemDrawList.Add(drawItem);
+            BindData bindData = bindCollection.bindDataList[i];
+            EditorCollectionItemDrawData drawDataItem = new EditorCollectionItemDrawData(bindData, RemoveItem);
+            editorCollectionItemDrawList.Add(drawDataItem);
         }
+    }
+
+    void RemoveItem(EditorCollectionItemDrawData item)
+    {
+        editorCollectionItemDrawList.Remove(item);
+        this.editorCollection.bindDataList.Remove(item.drawData);
     }
 }

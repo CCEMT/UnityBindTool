@@ -38,7 +38,8 @@ public partial class BindWindow
             GUI.Label(r, "★", style);
             return;
         }
-        BindData findData = bindWindow.editorObjectInfo.bindDataList.Find((info) => info.GetGameObject() == go || CommonTools.GetPrefabAsset(go) == info.GetGameObject());
+        
+        BindData findData = bindWindow.editorObjectInfo.bindDataList.Find((info) => info.GameObjectEquals(go));
         if (findData == null) return;
         Rect targetRect = new Rect(rect);
         targetRect.x = 34;

@@ -32,18 +32,12 @@ public static class BindCollectionExpand
 
     public static void AddBindData(this BindCollection bindCollection, List<BindData> addBindDataList)
     {
-        int amount = bindCollection.bindDataList.Count;
-        for (int i = 0; i < amount; i++)
-        {
-            BindData bindData = bindCollection.bindDataList[i];
-            bindData.SetIndexByAll(bindCollection.GetTypeString());
-            bindData.name = bindData.GetValue().name;
-        }
-
-        bindCollection.bindDataList.AddRange(addBindDataList);
+        TypeString selectTypeString = bindCollection.GetTypeString();
 
         List<TypeString> typeStringList = new List<TypeString>();
 
+        bindCollection.bindDataList.AddRange(addBindDataList);
+        
         int bindAmount = bindCollection.bindDataList.Count;
         for (int i = 0; i < bindAmount; i++)
         {
@@ -54,5 +48,39 @@ public static class BindCollectionExpand
         }
 
         bindCollection.typeStrings = typeStringList.ToArray();
+
+        int amount = bindCollection.bindDataList.Count;
+        for (int i = 0; i < amount; i++)
+        {
+            BindData bindData = bindCollection.bindDataList[i];
+            bindData.SetIndexByAll(selectTypeString);
+            bindData.name = bindData.GetValue().name;
+        }
+
+        bindCollection.SetIndex(selectTypeString);
+    }
+
+    public static void SetIndex(this BindCollection bindCollection, TypeString selectType)
+    {
+        int amount = bindCollection.typeStrings.Length;
+        for (int i = 0; i < amount; i++)
+        {
+            TypeString typeString = bindCollection.typeStrings[i];
+            if (! typeString.Equals(selectType)) continue;
+            bindCollection.index = i;
+            break;
+        }
+    }
+
+    public static void SetIndex(this BindCollection bindCollection, int index)
+    {
+        bindCollection.index = index;
+        TypeString typeString = bindCollection.GetTypeString();
+        int amount = bindCollection.bindDataList.Count;
+        for (int i = 0; i < amount; i++)
+        {
+            BindData bindData = bindCollection.bindDataList[i];
+            bindData.SetIndex(typeString);
+        }
     }
 }

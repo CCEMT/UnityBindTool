@@ -2,33 +2,36 @@ using System;
 using System.Collections.Generic;
 using BindTool;
 using Sirenix.OdinInspector;
-using UnityEditor;
+using UnityEngine;
 
 [Serializable]
 public class CSharpScriptSetting
 {
-    [LabelText("是否构建新的代码"), BoxGroup("基础设置")]
+    [LabelText("是否构建新的代码")]
     public bool isGenerateNew;
 
-    [LabelText("继承的类"), BoxGroup("基础设置")]
+    [LabelText("BindComponents是否绑定到预制体上")]
+    public bool isBindComponentsBindPrefab;
+
+    [LabelText("继承的类")]
     public TypeString inheritClass;
 
-    [LabelText("目标程序集"), BoxGroup("基础设置")]
+    [LabelText("目标程序集"), HorizontalGroup("Assembly")]
     public string createScriptAssembly;
 
-    [LabelText("是否分文件生成"), BoxGroup("基础设置")]
+    [LabelText("是否分文件生成")]
     public bool isGeneratePartial;
 
-    [LabelText("子文件拓展名"), BoxGroup("基础设置")]
+    [LabelText("子文件拓展名")]
     public string partialName;
 
-    [LabelText("是否使用命名空间"), BoxGroup("基础设置")]
+    [LabelText("是否使用命名空间")]
     public bool isSpecifyNamespace;
 
-    [LabelText("使用的命名空间"), BoxGroup("基础设置")]
+    [LabelText("使用的命名空间")]
     public string useNamespace;
 
-    [LabelText("字段访问类型"), BoxGroup("基础设置")]
+    [LabelText("字段访问类型")]
     public VisitType variableVisitType;
 
     [LabelText("是否创建属性"), BoxGroup("属性设置")]
@@ -43,22 +46,21 @@ public class CSharpScriptSetting
     [BoxGroup("属性设置"), HideLabel]
     public NameSetting propertyNameSetting = new NameSetting();
 
-    [LabelText("模板脚本保存路径"), BoxGroup("模板脚本设置")]
-    public DefaultAsset templateScriptSavaFolderPath;
-
     [BoxGroup("模板脚本设置"), HideLabel]
     public NameSetting methodNameSetting = new NameSetting();
 
-    [LabelText("模板列表")]
-    public List<TemplateData> templateDataList = new List<TemplateData>();
-}
+    [BoxGroup("模板脚本设置"), LabelText("模板列表")]
+    public List<TextAsset> templateDataList = new List<TextAsset>();
 
-[Serializable]
-public class TemplateData
-{
-    public TypeString targetType;
-    public TypeString temlateType;
-    public TypeString temlateBaseType;
+    #region Helper
+
+    [Button("搜索"), HorizontalGroup("Assembly", Width = 50f)]
+    void SearchAssembly()
+    {
+        AssemblySelectHelper.DrawAssemblySelect((value) => createScriptAssembly = value);
+    }
+
+    #endregion
 }
 
 [Serializable]

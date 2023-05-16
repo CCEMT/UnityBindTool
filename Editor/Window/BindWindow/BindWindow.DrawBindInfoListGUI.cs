@@ -264,7 +264,32 @@ public partial class BindWindow
         SearchSelectList();
     }
 
-    void FindRepetitionNameItem() { }
+    void FindRepetitionNameItem()
+    {
+        Dictionary<string, List<BindData>> repetitionNameBindDataDic = new Dictionary<string, List<BindData>>();
+        int amount = this.editorObjectInfo.bindDataList.Count;
+        for (int i = 0; i < amount; i++)
+        {
+            BindData bindData = this.editorObjectInfo.bindDataList[i];
+            string bindName = bindData.name;
+            if (repetitionNameBindDataDic.ContainsKey(bindName) == false) { repetitionNameBindDataDic.Add(bindName, new List<BindData>()); }
+            else { repetitionNameBindDataDic[bindName].Add(bindData); }
+        }
+
+        List<BindData> repetitionBindDataList = new List<BindData>();
+
+        foreach (var value in repetitionNameBindDataDic.Values)
+        {
+            if (value.Count > 1) { repetitionBindDataList.AddRange(value); }
+        }
+
+        this.selectBindDataList.Clear();
+        this.selectBindDataList.AddRange(repetitionBindDataList);
+
+        this.selectBindAmount = selectBindDataList.Count;
+
+        ItemIndexSetting();
+    }
 
     void DrawBindList()
     {
@@ -339,7 +364,7 @@ public partial class BindWindow
             {
                 GUILayout.Label("名称");
                 string tempComponentBindInfoName = GUILayout.TextField(bindData.name);
-                if (tempComponentBindInfoName != bindData.name) bindData.name = CommonTools.GetNumberAlpha(bindData.name);
+                if (tempComponentBindInfoName != bindData.name) bindData.name = CommonTools.GetNumberAlpha(tempComponentBindInfoName);
             }
             EditorGUILayout.EndVertical();
 
@@ -403,7 +428,8 @@ public partial class BindWindow
         {
             EditorGUILayout.BeginVertical();
             {
-                bindCollection.index = EditorGUILayout.Popup(bindCollection.index, bindCollection.GetTypeStrings());
+                int tempIndex = EditorGUILayout.Popup(bindCollection.index, bindCollection.GetTypeStrings());
+                if (tempIndex != bindCollection.index) bindCollection.SetIndex(tempIndex);
                 bindCollection.collectionType = (CollectionType) EditorGUILayout.EnumPopup(bindCollection.collectionType);
             }
             EditorGUILayout.EndVertical();
@@ -412,7 +438,7 @@ public partial class BindWindow
             {
                 GUILayout.Label("名称");
                 string tempComponentBindInfoName = GUILayout.TextField(bindCollection.name);
-                if (tempComponentBindInfoName != bindCollection.name) bindCollection.name = CommonTools.GetNumberAlpha(bindCollection.name);
+                if (tempComponentBindInfoName != bindCollection.name) bindCollection.name = CommonTools.GetNumberAlpha(tempComponentBindInfoName);
             }
             EditorGUILayout.EndVertical();
 

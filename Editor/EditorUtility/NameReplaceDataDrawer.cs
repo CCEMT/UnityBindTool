@@ -13,14 +13,14 @@ public class NameReplaceDataDrawer : OdinValueDrawer<NameReplaceData>
         {
             EditorGUILayout.BeginVertical();
             {
-                SirenixEditorFields.TextField("替换名称", nameReplaceData.targetName);
-                SirenixEditorFields.TextField("检查名称", nameReplaceData.nameCheck.name);
+                nameReplaceData.targetName = SirenixEditorFields.TextField("替换名称", nameReplaceData.targetName);
+                nameReplaceData.nameCheck.name = SirenixEditorFields.TextField("检查名称", nameReplaceData.nameCheck.name);
             }
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical();
             {
-                EditorGUILayout.Toggle("是否大小写", nameReplaceData.nameCheck.nameRule.isCaseSensitive);
+                nameReplaceData.nameCheck.nameRule.isCaseSensitive = EditorGUILayout.Toggle("是否大小写", nameReplaceData.nameCheck.nameRule.isCaseSensitive);
 
                 OdinHelper.DrawOdinEnum("匹配规则", nameReplaceData.nameCheck.nameRule.nameMatchingRule, (result) => { nameReplaceData.nameCheck.nameRule.nameMatchingRule = (NameMatchingRule) result; });
             }

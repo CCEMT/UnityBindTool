@@ -1,12 +1,19 @@
+using System;
 using BindTool;
 using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public partial class BindWindow
 {
     private GUIStyle preivewStyle;
     private GUIStyle contentStyle;
+
+    private bool isError;
+    private TypeString chackTypeString;
+    private bool isNull;
+    private bool isTypeError;
 
     void GetDrawBuildGUIGUIStyle()
     {
@@ -30,7 +37,11 @@ public partial class BindWindow
 
         if (GUILayout.Button("返回")) { this.bindWindowState = BindWindowState.BindInfoListGUI; }
 
-        if (GUILayout.Button("开始生成")) BindBuild.Build(this.bindSetting.selectCompositionSetting, this.generateData);
+        if (GUILayout.Button("开始生成"))
+        {
+            if (this.isError == false) { BindBuild.Build(this.bindSetting.selectCompositionSetting, this.generateData); }
+            else { Debug.LogError("生成失败，请先解决错误"); }
+        }
 
         EditorGUILayout.BeginHorizontal("box");
         {
@@ -41,6 +52,12 @@ public partial class BindWindow
         }
         EditorGUILayout.EndHorizontal();
 
+        if (this.bindSetting.selectCompositionSetting.commonSetting.isCreateScript)
+        {
+            if (this.bindSetting.selectCompositionSetting.scriptSetting.csharpScriptSetting.isGenerateNew) { DrawNewScript(); }
+            else { DrawSelectScript(); }
+        }
+
         EditorGUILayout.BeginVertical("box");
         {
             GUILayout.Label("生成配置预览", this.preivewStyle);
@@ -49,11 +66,11 @@ public partial class BindWindow
 
             CommonSetting commonSetting = this.bindSetting.selectCompositionSetting.commonSetting;
 
-            GUILayout.Label($"{GetBoolInfo(commonSetting.isDetachMode)}分离模式", contentStyle);
 
             GUILayout.Label($"{GetBoolInfo(commonSetting.isCreatePrefab)}生成预制体", contentStyle);
             if (commonSetting.isCreatePrefab)
             {
+                GUILayout.Label($"{GetBoolInfo(commonSetting.isDetachPrefab)}分离预制体", contentStyle);
                 GUILayout.Label($"{GetBoolInfo(commonSetting.isCreatePrefabFolder)}创建预制体文件夹", contentStyle);
                 GUILayout.Label($"预制体生成路径：{commonSetting.createPrefabPath}");
             }
@@ -71,6 +88,63 @@ public partial class BindWindow
             }
         }
         EditorGUILayout.EndVertical();
+    }
+
+    void DrawSelectScript()
+    {
+        EditorGUILayout.BeginHorizontal("box");
+        {
+            GUILayout.Label("选择要附加信息的脚本：");
+            if (GUILayout.Button(this.generateData.mergeTypeString.typeName))
+            {
+                BindDataHelper.DropDownBinDataTypeSwitch(this.editorObjectInfo.rootData, (select) => this.generateData.mergeTypeString = select);
+            }
+        }
+        EditorGUILayout.EndHorizontal();
+
+        ChackBuildError();
+    }
+
+    void ChackBuildError()
+    {
+        if (chackTypeString.Equals(this.generateData.mergeTypeString) == false)
+        {
+            chackTypeString = this.generateData.mergeTypeString;
+
+            if (generateData.mergeTypeString.IsEmpty())
+            {
+                isNull = true;
+                isError = true;
+                return;
+            }
+            else { isNull = false; }
+
+            Type monoType = typeof(MonoBehaviour);
+            Type objectType = typeof(Object);
+            if (monoType.IsSubclassOf(this.generateData.mergeTypeString.ToType()) == false || objectType == chackTypeString.ToType())
+            {
+                SirenixEditorGUI.ErrorMessageBox("选择的类型必须继承MonoBehaviour!!!");
+                isTypeError = true;
+                isError = true;
+                return;
+            }
+            else { isTypeError = false; }
+
+            this.isError = false;
+        }
+        if (this.isNull) { SirenixEditorGUI.ErrorMessageBox("选择的类型为空!!!"); }
+        if (this.isTypeError) { SirenixEditorGUI.ErrorMessageBox("选择的类型必须继承MonoBehaviour!!!"); }
+    }
+
+    void DrawNewScript()
+    {
+        EditorGUILayout.BeginHorizontal("box");
+        {
+            GUILayout.Label("新建脚本名：");
+            string tempString = GUILayout.TextField(this.generateData.newScriptName);
+            if (tempString.Equals(this.generateData.newScriptName) == false) this.generateData.newScriptName = CommonTools.GetNumberAlpha(this.generateData.newScriptName);
+        }
+        EditorGUILayout.EndHorizontal();
     }
 
     string GetBoolInfo(bool isEnable)

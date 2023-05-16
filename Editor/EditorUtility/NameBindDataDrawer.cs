@@ -22,13 +22,13 @@ public class NameBindDataDrawer : OdinValueDrawer<NameBindData>
                 }
                 EditorGUILayout.EndHorizontal();
 
-                SirenixEditorFields.TextField("检查名称", nameBindData.nameCheck.name);
+                nameBindData.nameCheck.name = SirenixEditorFields.TextField("检查名称", nameBindData.nameCheck.name);
             }
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical();
             {
-                EditorGUILayout.Toggle("是否大小写", nameBindData.nameCheck.nameRule.isCaseSensitive);
+                nameBindData.nameCheck.nameRule.isCaseSensitive = EditorGUILayout.Toggle("是否大小写", nameBindData.nameCheck.nameRule.isCaseSensitive);
 
                 OdinHelper.DrawOdinEnum("匹配规则", nameBindData.nameCheck.nameRule.nameMatchingRule, (result) => { nameBindData.nameCheck.nameRule.nameMatchingRule = (NameMatchingRule) result; });
             }

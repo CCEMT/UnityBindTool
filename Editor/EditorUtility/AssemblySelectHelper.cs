@@ -27,6 +27,6 @@ public class AssemblySelectHelper
             if (result != null) { endCallback?.Invoke(result); }
         };
 
-        CustomGenericSelector.ShowInPopup(200);
+        CustomGenericSelector.ShowInPopup(300);
     }
 }

@@ -48,11 +48,11 @@ public static class BindDataExpand
     public static bool GameObjectEquals(this BindData bindData, GameObject target)
     {
         if (target == null) return false;
+        if (bindData.GetBindInfo<BindComponent>() == null) return false;
         GameObject bindGameObject = bindData.GetGameObject();
         if (target == bindGameObject) return true;
         GameObject targetPrefab = CommonTools.GetPrefabAsset(target);
-        if (targetPrefab == bindGameObject) return true;
-        return false;
+        return targetPrefab == bindGameObject;
     }
 
     public static void SetBindInfo<T>(this BindData bindData) where T : BindInfo
