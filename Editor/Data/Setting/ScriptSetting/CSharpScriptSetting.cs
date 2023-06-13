@@ -16,7 +16,7 @@ public class CSharpScriptSetting
     [LabelText("继承的类")]
     public TypeString inheritClass;
 
-    [LabelText("目标程序集"), HorizontalGroup("Assembly")]
+    [LabelText("目标程序集"), InlineButton(nameof(SearchAssembly), "搜索")]
     public string createScriptAssembly;
 
     [LabelText("是否分文件生成")]
@@ -54,7 +54,6 @@ public class CSharpScriptSetting
 
     #region Helper
 
-    [Button("搜索"), HorizontalGroup("Assembly", Width = 50f)]
     void SearchAssembly()
     {
         AssemblySelectHelper.DrawAssemblySelect((value) => createScriptAssembly = value);

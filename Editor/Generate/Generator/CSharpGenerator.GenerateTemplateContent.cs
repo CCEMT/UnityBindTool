@@ -37,10 +37,6 @@ public partial class CSharpGenerator
             templateTreeList.Add(templateTree);
         }
 
-        //TODO 生成必要生成的内容
-
-        //TODO 根据数据生成内容
-        
         root = root.ReplaceNode(oldNode, targetClass);
         string newCode = root.NormalizeWhitespace().ToFullString();
 

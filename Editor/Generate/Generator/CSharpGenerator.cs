@@ -454,15 +454,6 @@ public partial class CSharpGenerator : IGenerator
                 collectioinTypeSyntax = SyntaxFactory.GenericName(SyntaxFactory.Identifier(typeof(List<>).FullName), typeList);
                 break;
             }
-            case CollectionType.Dictionary:
-            {
-                TypeSyntax stringSyntax = SyntaxFactory.ParseTypeName(typeof(string).FullName);
-                SeparatedSyntaxList<TypeSyntax> typeList = SyntaxFactory.SeparatedList<TypeSyntax>();
-                typeList = typeList.Add(stringSyntax);
-                typeList = typeList.Add(typeSyntax);
-                collectioinTypeSyntax = SyntaxFactory.GenericName(SyntaxFactory.Identifier(typeof(Dictionary<,>).FullName), SyntaxFactory.TypeArgumentList(typeList));
-                break;
-            }
         }
         return collectioinTypeSyntax;
     }

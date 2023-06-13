@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BindTool;
@@ -50,8 +51,16 @@ public static class ObjectInfoHelper
                     bindData.name = bindComponents.bindName[i];
                     objectInfo.bindDataList.Add(bindData);
                 }
-            }
 
+                int bindCollectionAmount = bindComponents.bindCollectionList.Count;
+                for (int i = 0; i < bindCollectionAmount; i++)
+                {
+                    IEnumerable bindTarget = bindComponents.bindCollectionList[i];
+                    string name = bindComponents.bindCollectionName[i];
+                    BindCollection bindCollection = BindCollectionFactory.CreateBindCollection(name, bindTarget);
+                    objectInfo.bindCollectionList.Add(bindCollection);
+                }
+            }
         }
 
         if (objectInfo != null) return objectInfo;
@@ -208,41 +217,6 @@ public static class ObjectInfoHelper
             }
         }
     }
-
-    // public void Bind(ComponentBindInfo bindInfo, int index)
-    // {
-    //     bindInfo.index = index;
-    //     gameObjectBindInfoList.Add(bindInfo);
-    // }
-
-    // public void SetRootObject(GameObject instanceObject)
-    // {
-    //     rootBindInfo = new ComponentBindInfo(instanceObject);
-    // }
-
-    // public void AgainGet()
-    // {
-    //     if (rootBindInfo.AgainGet() == false)
-    //     {
-    //         if (rootBindInfo.autoBindSetting != null) ComponentBind(rootBindInfo, rootBindInfo.autoBindSetting);
-    //     }
-    //
-    //     int amount = gameObjectBindInfoList.Count;
-    //     for (int i = 0; i < amount; i++)
-    //     {
-    //         ComponentBindInfo info = gameObjectBindInfoList[i];
-    //         if (info.AgainGet() != false) continue;
-    //         if (info.autoBindSetting != null) ComponentBind(info, info.autoBindSetting);
-    //     }
-    // }
-
-    // public ComponentBindInfo AddObject(GameObject instanceObject)
-    // {
-    //     ComponentBindInfo componentBindInfo = new ComponentBindInfo(instanceObject);
-    //     gameObjectBindInfoList.Add(componentBindInfo);
-    //     return componentBindInfo;
-    // }
-    //
 
     public static void BindDataToObjectInfo(ObjectInfo objectInfo, BindData info, CompositionSetting setting)
     {
