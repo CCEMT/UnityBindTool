@@ -3,16 +3,21 @@ using UnityEngine.UI;
 
 namespace BindTool.Template
 {
-    public class ButtonTemplate : MonoBehaviour,ITemplate<Button>
+    
+    public class ButtonTemplate : MonoBehaviour
     {
-        public Button TemplateValue { get; }
+        [TemplateField]
+        public Button TemplateValue;
 
-        [GenerateSingle(true)]
+        [GenerateSingle]
         public void AddButtonAllClick()
         {
             this.TemplateValue.onClick.AddListener(Click);
         }
 
-        public void Click() { }
+        public void Click()
+        {
+            
+        }
     }
 }

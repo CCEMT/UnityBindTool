@@ -18,6 +18,7 @@ public static class BindComponentsHelper
         for (int i = 0; i < bindAmount; i++)
         {
             BindData bindData = generateData.objectInfo.bindDataList[i];
+            bindComponents.bindName.Add(bindData.name);
             bindComponents.bindDataList.Add(bindData.GetValue());
         }
 
@@ -25,6 +26,7 @@ public static class BindComponentsHelper
         for (int i = 0; i < collectionAmount; i++)
         {
             BindCollection bindCollection = generateData.objectInfo.bindCollectionList[i];
+            bindComponents.bindCollectionName.Add(bindCollection.name);
             bindComponents.bindCollectionList.Add(bindCollection.GetValue());
         }
         return bindComponents;

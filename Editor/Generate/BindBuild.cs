@@ -3,9 +3,12 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
+using Sirenix.Serialization;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
+using SerializationUtility = Sirenix.Serialization.SerializationUtility;
 
 #endregion
 
@@ -57,7 +60,9 @@ namespace BindTool
         static void CSharpBuild(IGenerator generator, string path, GenerateData generateData)
         {
             generator.Write(path);
-            EditorPrefs.SetString(CSharpBuildGenerateDataKey, JsonUtility.ToJson(generateData));
+            byte[] content = SerializationUtility.SerializeValue(generateData, DataFormat.JSON);
+            string json = Encoding.UTF8.GetString(content);
+            EditorPrefs.SetString(CSharpBuildGenerateDataKey, json);
         }
 
         [DidReloadScripts]
@@ -67,7 +72,9 @@ namespace BindTool
             BindSetting bindSetting = BindSetting.Get();
             CommonSetting commonSetting = bindSetting.selectCompositionSetting.commonSetting;
 
-            GenerateData generateData = JsonUtility.FromJson<GenerateData>(EditorPrefs.GetString(CSharpBuildGenerateDataKey));
+            string json = EditorPrefs.GetString(CSharpBuildGenerateDataKey);
+            byte[] content = Encoding.UTF8.GetBytes(json);
+            GenerateData generateData = SerializationUtility.DeserializeValue<GenerateData>(content, DataFormat.JSON);
 
             if (generateData == null) return;
             EditorPrefs.DeleteKey(CSharpBuildGenerateDataKey);
