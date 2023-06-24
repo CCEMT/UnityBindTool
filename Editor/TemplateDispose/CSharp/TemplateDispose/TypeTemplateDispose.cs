@@ -91,10 +91,13 @@ namespace UnityBindTool
 
         DisposeCotentData ReplaceField(DisposeCotentData disposeCotentData, string replaceName)
         {
+            DisposeCotentData newDispose = new DisposeCotentData();
+            newDispose.generateContent = disposeCotentData.generateContent;
+            newDispose.generateTarget = disposeCotentData.generateTarget;
             string templateFieldName = templateField.Declaration.Variables.First().Identifier.ValueText;
-            IdentifierNameSyntaxRewriter rewriter = new IdentifierNameSyntaxRewriter(templateFieldName);
-            disposeCotentData.generateContent = (MemberDeclarationSyntax) rewriter.Visit(disposeCotentData.generateContent);
-            return disposeCotentData;
+            IdentifierRewriter rewriter = new IdentifierRewriter(templateFieldName, replaceName);
+            newDispose.generateContent = (MemberDeclarationSyntax) rewriter.Visit(newDispose.generateContent);
+            return newDispose;
         }
 
         private void DisposeField(FieldInfo fieldInfo)

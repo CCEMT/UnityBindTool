@@ -2,17 +2,20 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-public class IdentifierNameSyntaxRewriter : CSharpSyntaxRewriter
+public class IdentifierRewriter : CSharpSyntaxRewriter
 {
-    private readonly string _targetName;
+    private readonly string _oldName;
+    private readonly string _newName;
 
-    public IdentifierNameSyntaxRewriter(string targetName)
+    public IdentifierRewriter(string oldName, string newName)
     {
-        _targetName = targetName;
+        _oldName = oldName;
+        _newName = newName;
     }
 
     public override SyntaxNode VisitIdentifierName(IdentifierNameSyntax node)
     {
-        return node.WithIdentifier(SyntaxFactory.Identifier(_targetName));
+        if (node.Identifier.ValueText == _oldName) return node.WithIdentifier(SyntaxFactory.Identifier(_newName));
+        return base.VisitIdentifierName(node);
     }
 }
