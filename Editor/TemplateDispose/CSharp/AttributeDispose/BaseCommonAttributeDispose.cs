@@ -1,6 +1,8 @@
 ﻿namespace UnityBindTool
 {
-    public class BaseCommonAttributeDispose : BaseAttributeDispose
+    public abstract class BaseCommonAttributeDispose : BaseAttributeDispose
     {
+        public bool isSingle;
+        
     }
 }

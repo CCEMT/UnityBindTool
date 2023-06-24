@@ -1,6 +1,4 @@
 ﻿using System;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace UnityBindTool
 {
@@ -9,11 +7,8 @@ namespace UnityBindTool
         public BaseTemplateDispose templateDispose;
         public Attribute attributeValue;
 
-        public SyntaxNode generateContent;
-        public ClassDeclarationSyntax generateTarget;
+        public DisposeCotentData disposeCotentData;
 
-        public virtual void DisposeField() { }
-        public virtual void DisposeProperty() { }
-        public virtual void DisposeMethod() { }
+        public abstract void Dispose();
     }
 }

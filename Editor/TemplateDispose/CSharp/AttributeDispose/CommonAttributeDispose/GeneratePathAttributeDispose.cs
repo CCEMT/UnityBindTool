@@ -3,9 +3,9 @@
     [AssignTemplate(typeof(GeneratePathAttribute))]
     public class GeneratePathAttributeDispose : BaseCommonAttributeDispose
     {
-        public override void DisposeField()
+        public override void Dispose()
         {
-            base.DisposeField();
+            
         }
     }
 }

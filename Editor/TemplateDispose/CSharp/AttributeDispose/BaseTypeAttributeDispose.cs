@@ -1,9 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace UnityBindTool
+﻿namespace UnityBindTool
 {
-    public class BaseTypeAttributeDispose : BaseAttributeDispose
-    {
-        public FieldDeclarationSyntax templateField;
-    }
+    public abstract class BaseTypeAttributeDispose : BaseAttributeDispose { }
 }

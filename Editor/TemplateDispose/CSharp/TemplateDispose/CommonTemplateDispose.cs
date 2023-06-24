@@ -8,11 +8,11 @@ namespace UnityBindTool
 {
     public class CommonTemplateDispose : BaseTemplateDispose
     {
-        private List<BaseCommonAttributeDispose> commonAttributeDisposes;
+        private List<DisposeCotentData> disposes;
 
         public override void Dispose()
         {
-            commonAttributeDisposes = new List<BaseCommonAttributeDispose>();
+            this.disposes = new List<DisposeCotentData>();
             string typeName = this.templateClass.Identifier.ValueText;
             Type templateType = Type.GetType(typeName);
 
@@ -26,7 +26,21 @@ namespace UnityBindTool
             foreach (MethodInfo methodInfo in methodInfos) DisposeMethod(methodInfo);
         }
 
-        public override void Generate() { }
+        public override void Generate()
+        {
+            ClassDeclarationSyntax generateMain = mainTargetClass;
+            ClassDeclarationSyntax generatePartial = partialTargetClass;
+
+            int amount = this.disposes.Count;
+            for (int i = 0; i < amount; i++)
+            {
+                DisposeCotentData disposeCotentData = this.disposes[i];
+                if (disposeCotentData.generateTarget == this.mainTargetClass) { generateMain = generateMain.AddMembers(disposeCotentData.generateContent); }
+                else { generatePartial = generatePartial.AddMembers(disposeCotentData.generateContent); }
+            }
+            mainTargetClass = generateMain;
+            partialTargetClass = generatePartial;
+        }
 
         private void DisposeField(FieldInfo fieldInfo)
         {
@@ -34,11 +48,15 @@ namespace UnityBindTool
             FieldDeclarationSyntax fieldDeclarationSyntax = this.templateClass.DescendantNodes().OfType<FieldDeclarationSyntax>().FirstOrDefault((field) => {
                 return field.Declaration.Variables.Any((variable) => variable.Identifier.ValueText == fieldName);
             });
-            TemplateDisposeHelper.Dispose<BaseCommonAttributeDispose>(this, fieldInfo.GetCustomAttributes().ToArray(), (dispose) => {
-                dispose.generateContent = fieldDeclarationSyntax;
-                dispose.DisposeField();
-                commonAttributeDisposes.Add(dispose);
-            });
+
+            Attribute[] attributes = fieldInfo.GetCustomAttributes().ToArray();
+
+            DisposeCotentData disposeCotentData = new DisposeCotentData();
+            disposeCotentData.generateContent = fieldDeclarationSyntax;
+            disposeCotentData.generateTarget = this.partialTargetClass ?? this.mainTargetClass;
+
+            TemplateDisposeHelper.Dispose<BaseCommonAttributeDispose>(this, disposeCotentData, attributes);
+            this.disposes.Add(disposeCotentData);
         }
 
         private void DisposeProperty(PropertyInfo propertyInfo)
@@ -47,11 +65,14 @@ namespace UnityBindTool
             PropertyDeclarationSyntax propertyDeclarationSyntax =
                 this.templateClass.DescendantNodes().OfType<PropertyDeclarationSyntax>().FirstOrDefault((property) => property.Identifier.ValueText == propertyName);
 
-            TemplateDisposeHelper.Dispose<BaseCommonAttributeDispose>(this, propertyInfo.GetCustomAttributes().ToArray(), (dispose) => {
-                dispose.generateContent = propertyDeclarationSyntax;
-                dispose.DisposeProperty();
-                commonAttributeDisposes.Add(dispose);
-            });
+            Attribute[] attributes = propertyInfo.GetCustomAttributes().ToArray();
+
+            DisposeCotentData disposeCotentData = new DisposeCotentData();
+            disposeCotentData.generateContent = propertyDeclarationSyntax;
+            disposeCotentData.generateTarget = this.partialTargetClass ?? this.mainTargetClass;
+
+            TemplateDisposeHelper.Dispose<BaseCommonAttributeDispose>(this, disposeCotentData, attributes);
+            this.disposes.Add(disposeCotentData);
         }
 
         private void DisposeMethod(MethodInfo methodInfo)
@@ -60,11 +81,15 @@ namespace UnityBindTool
             MethodDeclarationSyntax methodDeclarationSyntax =
                 this.templateClass.DescendantNodes().OfType<MethodDeclarationSyntax>().FirstOrDefault((method) => method.Identifier.ValueText == methodName);
 
-            TemplateDisposeHelper.Dispose<BaseCommonAttributeDispose>(this, methodInfo.GetCustomAttributes().ToArray(), (dispose) => {
-                dispose.generateContent = methodDeclarationSyntax;
-                dispose.DisposeMethod();
-                commonAttributeDisposes.Add(dispose);
-            });
+            Attribute[] attributes = methodInfo.GetCustomAttributes().ToArray();
+
+            DisposeCotentData disposeCotentData = new DisposeCotentData();
+            disposeCotentData.generateContent = methodDeclarationSyntax;
+            disposeCotentData.generateTarget = this.partialTargetClass ?? this.mainTargetClass;
+
+            TemplateDisposeHelper.Dispose<BaseCommonAttributeDispose>(this, disposeCotentData, attributes);
+
+            this.disposes.Add(disposeCotentData);
         }
     }
 }

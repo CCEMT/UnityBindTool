@@ -68,12 +68,13 @@ public partial class CSharpGenerator
         {
             ClassDeclarationSyntax templateClass = templateClassList[i];
             CSharpTemplateType templateType = GetCSharpTemplateType(templateClass);
-            BaseTemplateDispose baseTemplateDispose = CSharpTemplateDisposeFactory.GetTemplateDispose(templateType);
-            baseTemplateDispose.generateData = this.generateData;
-            baseTemplateDispose.templateClass = templateClass;
-            baseTemplateDispose.mainTargetClass = mainClass;
-            baseTemplateDispose.partialTargetClass = partialClass;
-            baseTemplateDispose.Dispose();
+            BaseTemplateDispose templateDispose = CSharpTemplateDisposeFactory.GetTemplateDispose(templateType);
+            templateDispose.generateData = this.generateData;
+            templateDispose.templateClass = templateClass;
+            templateDispose.mainTargetClass = mainClass;
+            templateDispose.partialTargetClass = partialClass;
+            templateDispose.Dispose();
+            templateDispose.Generate();
         }
 
         if (isPartial)

@@ -6,7 +6,7 @@ namespace UnityBindTool
 {
     public class TemplateDisposeHelper
     {
-        public static void Dispose<T>(BaseTemplateDispose templateDispose, Attribute[] attributes, Action<T> callback) where T : BaseAttributeDispose
+        public static void Dispose<T>(BaseTemplateDispose templateDispose, DisposeCotentData disposeCotentData, Attribute[] attributes) where T : BaseAttributeDispose
         {
             int amount = attributes.Length;
             for (int i = 0; i < amount; i++)
@@ -18,9 +18,10 @@ namespace UnityBindTool
                 T attributeDispose = Activator.CreateInstance(firstOrDefault) as T;
                 attributeDispose.templateDispose = templateDispose;
                 attributeDispose.attributeValue = attribute;
-                attributeDispose.generateTarget = templateDispose.partialTargetClass;
-                if (attributeDispose.generateTarget == null) attributeDispose.generateTarget = templateDispose.mainTargetClass;
-                callback?.Invoke(attributeDispose);
+
+                attributeDispose.disposeCotentData = disposeCotentData;
+
+                attributeDispose.Dispose();
             }
         }
 
