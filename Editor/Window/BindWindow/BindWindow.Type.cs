@@ -2,12 +2,6 @@ using Sirenix.OdinInspector;
 
 public partial class BindWindow
 {
-    enum BindWindowState
-    {
-        BindInfoListGUI,
-        BuildGUI
-    }
-
     enum SearchType
     {
         [LabelText("搜索全部")]

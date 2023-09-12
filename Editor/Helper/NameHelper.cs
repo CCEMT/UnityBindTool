@@ -1,40 +1,28 @@
 using System;
+using System.Collections.Generic;
 using BindTool;
 
 public static class NameHelper
 {
-    public static string SetVariableName(string content, NameGenerateSetting nameGenerateSetting)
+    public static string SetName(string content,List<NameReplaceData> nameReplaceDataList)
     {
         string newName = CommonTools.GetNumberAlpha(content);
-        int amount = nameGenerateSetting.nameReplaceDataList.Count;
+        int amount = nameReplaceDataList.Count;
         for (int i = 0; i < amount; i++)
         {
-            NameReplaceData nameReplaceData = nameGenerateSetting.nameReplaceDataList[i];
+            NameReplaceData nameReplaceData = nameReplaceDataList[i];
             if (NameCheckContent(nameReplaceData.nameCheck, newName, out string matchingContent)) { newName = content.Replace(matchingContent, nameReplaceData.targetName); }
         }
 
         return newName;
     }
-
-    public static string SetPropertyName(string content, CSharpNameGenerateSetting createNameSetting)
-    {
-        string newName = CommonTools.GetNumberAlpha(content);
-        int amount = createNameSetting.propertyNameReplaceDataList.Count;
-        for (int i = 0; i < amount; i++)
-        {
-            NameReplaceData nameReplaceData = createNameSetting.propertyNameReplaceDataList[i];
-            if (NameCheckContent(nameReplaceData.nameCheck, newName, out string matchingContent)) { newName = content.Replace(matchingContent, nameReplaceData.targetName); }
-        }
-
-        return newName;
-    }
-
+    
     public static string NameSettingByName(BindData bindData, NameSetting nameSetting)
     {
-        return NameSettingByName(bindData.name, bindData, nameSetting);
+        return NameSettingByName(bindData.name, bindData.GetTypeName(), nameSetting);
     }
 
-    public static string NameSettingByName(string targetName, BindData bindData, NameSetting nameSetting)
+    public static string NameSettingByName(string targetName, string typeName, NameSetting nameSetting)
     {
         switch (nameSetting.namingDispose)
         {
@@ -45,50 +33,21 @@ public static class NameHelper
                 targetName = CommonTools.InitialUpper(targetName);
                 break;
             case ScriptNamingDispose.AllLower:
-                targetName = bindData.name.ToLower();
+                targetName = targetName.ToLower();
                 break;
             case ScriptNamingDispose.AllUppe:
-                targetName = bindData.name.ToUpper();
+                targetName = targetName.ToUpper();
                 break;
         }
 
         if (nameSetting.isAddClassName)
         {
-            if (nameSetting.isFrontOrBehind) { targetName = bindData.GetTypeName() + bindData.name; }
-            else { targetName = bindData.name + bindData.GetTypeName(); }
+            if (nameSetting.isFrontOrBehind) { targetName = typeName + targetName; }
+            else { targetName = targetName + typeName; }
         }
 
-        if (nameSetting.isAddFront) targetName = nameSetting.frontName + bindData.name;
-        if (nameSetting.isAddBehind) targetName = bindData.name + nameSetting.behindName;
-        return targetName;
-    }
-
-    public static string NameSettingByName(string targetName, BindCollection bindCollection, NameSetting nameSetting)
-    {
-        switch (nameSetting.namingDispose)
-        {
-            case ScriptNamingDispose.InitialLower:
-                targetName = CommonTools.InitialLower(targetName);
-                break;
-            case ScriptNamingDispose.InitialUpper:
-                targetName = CommonTools.InitialUpper(targetName);
-                break;
-            case ScriptNamingDispose.AllLower:
-                targetName = bindCollection.name.ToLower();
-                break;
-            case ScriptNamingDispose.AllUppe:
-                targetName = bindCollection.name.ToUpper();
-                break;
-        }
-
-        if (nameSetting.isAddClassName)
-        {
-            if (nameSetting.isFrontOrBehind) { targetName = bindCollection.GetTypeName() + bindCollection.name; }
-            else { targetName = bindCollection.name + bindCollection.GetTypeName(); }
-        }
-
-        if (nameSetting.isAddFront) targetName = nameSetting.frontName + bindCollection.name;
-        if (nameSetting.isAddBehind) targetName = bindCollection.name + nameSetting.behindName;
+        if (nameSetting.isAddFront) targetName = nameSetting.frontName + targetName;
+        if (nameSetting.isAddBehind) targetName = targetName + nameSetting.behindName;
         return targetName;
     }
 

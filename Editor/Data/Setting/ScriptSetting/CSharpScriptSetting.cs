@@ -46,7 +46,7 @@ public class CSharpScriptSetting
     [BoxGroup("属性设置"), HideLabel]
     public NameSetting propertyNameSetting = new NameSetting();
 
-    [BoxGroup("模板脚本设置"), HideLabel]
+    [BoxGroup("方法设置"), HideLabel]
     public NameSetting methodNameSetting = new NameSetting();
 
     [BoxGroup("模板脚本设置"), LabelText("模板列表")]

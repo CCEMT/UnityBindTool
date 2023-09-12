@@ -1,23 +1,18 @@
+using UnityBindTool;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace BindTool.Template
+[TemplateClass(CSharpTemplateType.Type)]
+public class ButtonTemplate : MonoBehaviour
 {
-    
-    public class ButtonTemplate : MonoBehaviour
+    [TemplateField]
+    public Button TemplateValue;
+
+    [GenerateSingle]
+    public void AddButtonAllClick()
     {
-        [TemplateField]
-        public Button TemplateValue;
-
-        [GenerateSingle]
-        public void AddButtonAllClick()
-        {
-            this.TemplateValue.onClick.AddListener(Click);
-        }
-
-        public void Click()
-        {
-            
-        }
+        this.TemplateValue.onClick.AddListener(Click);
     }
+
+    public void Click() { }
 }

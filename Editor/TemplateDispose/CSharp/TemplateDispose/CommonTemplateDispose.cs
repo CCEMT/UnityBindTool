@@ -49,6 +49,8 @@ namespace UnityBindTool
                 return field.Declaration.Variables.Any((variable) => variable.Identifier.ValueText == fieldName);
             });
 
+            if (fieldDeclarationSyntax == null) return;
+
             Attribute[] attributes = fieldInfo.GetCustomAttributes().ToArray();
 
             DisposeCotentData disposeCotentData = new DisposeCotentData();
@@ -65,6 +67,8 @@ namespace UnityBindTool
             PropertyDeclarationSyntax propertyDeclarationSyntax =
                 this.templateClass.DescendantNodes().OfType<PropertyDeclarationSyntax>().FirstOrDefault((property) => property.Identifier.ValueText == propertyName);
 
+            if (propertyDeclarationSyntax == null) return;
+
             Attribute[] attributes = propertyInfo.GetCustomAttributes().ToArray();
 
             DisposeCotentData disposeCotentData = new DisposeCotentData();
@@ -80,6 +84,8 @@ namespace UnityBindTool
             string methodName = methodInfo.Name;
             MethodDeclarationSyntax methodDeclarationSyntax =
                 this.templateClass.DescendantNodes().OfType<MethodDeclarationSyntax>().FirstOrDefault((method) => method.Identifier.ValueText == methodName);
+
+            if (methodDeclarationSyntax == null) return;
 
             Attribute[] attributes = methodInfo.GetCustomAttributes().ToArray();
 
