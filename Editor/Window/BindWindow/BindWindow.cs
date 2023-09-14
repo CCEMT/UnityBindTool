@@ -37,21 +37,17 @@ public partial class BindWindow : OdinEditorWindow
         return gameObject != null;
     }
 
-    private BindWindowState bindWindowState;
-
     private BindSetting bindSetting;
     private GameObject bindObject;
-    
+
     [NonSerialized, OdinSerialize]
     private GenerateData generateData;
-    
+
     [NonSerialized, OdinSerialize]
     private ObjectInfo editorObjectInfo;
 
     void Init()
     {
-        bindWindowState = BindWindowState.BindInfoListGUI;
-
         bindObject = Selection.objects.First() as GameObject;
         this.bindSetting = BindSetting.Get();
         editorObjectInfo = ObjectInfoHelper.GetObjectInfo(bindObject);
@@ -66,18 +62,5 @@ public partial class BindWindow : OdinEditorWindow
     private void OnInspectorUpdate()
     {
         Repaint();
-    }
-
-    protected override void OnGUI()
-    {
-        switch (this.bindWindowState)
-        {
-            case BindWindowState.BindInfoListGUI:
-                DrawBindInfoListGUI();
-                break;
-            case BindWindowState.BuildGUI:
-                DrawBuildGUI();
-                break;
-        }
     }
 }

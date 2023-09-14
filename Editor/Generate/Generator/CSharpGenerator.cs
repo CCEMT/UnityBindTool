@@ -271,8 +271,8 @@ public partial class CSharpGenerator : IGenerator
             BindData bindData = this.generateData.objectInfo.bindDataList[i];
             string typeString = bindData.GetTypeFullName();
             string fieldName = fieldNameDisposer.DisposeName(this.nameDisposeCentre, bindData.name);
-            string propertyName = NameHelper.SetPropertyName(fieldName, this.selectSetting.nameGenerateSetting.csharpNameGenerateSetting);
-            propertyName = NameHelper.NameSettingByName(propertyName, bindData, this.csharpScriptSetting.propertyNameSetting);
+            string propertyName = NameHelper.SetName(fieldName, this.selectSetting.nameGenerateSetting.csharpNameGenerateSetting.propertyNameReplaceDataList);
+            propertyName = NameHelper.NameSettingByName(propertyName, bindData.GetTypeName(), this.csharpScriptSetting.propertyNameSetting);
             propertyName = propertyNameDisposer.DisposeName(this.nameDisposeCentre, propertyName);
 
             TypeSyntax itemType = SyntaxFactory.ParseTypeName(typeString);
@@ -301,8 +301,8 @@ public partial class CSharpGenerator : IGenerator
             BindCollection collection = this.generateData.objectInfo.bindCollectionList[i];
             string typeString = collection.GetTypeString().GetVisitString();
             string fieldName = fieldNameDisposer.DisposeName(this.nameDisposeCentre, collection.name);
-            string propertyName = NameHelper.SetPropertyName(fieldName, this.selectSetting.nameGenerateSetting.csharpNameGenerateSetting);
-            propertyName = NameHelper.NameSettingByName(propertyName, collection, this.csharpScriptSetting.propertyNameSetting);
+            string propertyName = NameHelper.SetName(fieldName, this.selectSetting.nameGenerateSetting.csharpNameGenerateSetting.propertyNameReplaceDataList);
+            propertyName = NameHelper.NameSettingByName(propertyName, collection.GetTypeName(), this.csharpScriptSetting.propertyNameSetting);
             propertyName = propertyNameDisposer.DisposeName(this.nameDisposeCentre, propertyName);
 
             TypeSyntax collectionType = GetCollectioinTypeSyntax(collection);

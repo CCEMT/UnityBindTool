@@ -32,7 +32,6 @@ public static class ObjectInfoHelper
 
         if (bindComponents != null)
         {
-            objectInfo = new ObjectInfo();
             if (bindComponents.targetType == null) { Object.DestroyImmediate(bindComponents); }
             else
             {
@@ -226,7 +225,8 @@ public static class ObjectInfoHelper
 
     public static void BindDataSetName(BindData info, CompositionSetting setting)
     {
-        info.name = NameHelper.SetVariableName(info.GetValue().name, setting.nameGenerateSetting);
+
+        info.name = NameHelper.SetName(info.GetValue().name, setting.nameGenerateSetting.nameReplaceDataList);
         info.name = NameHelper.NameSettingByName(info, setting.scriptSetting.nameSetting);
         info.name = CommonTools.GetNumberAlpha(info.name);
     }

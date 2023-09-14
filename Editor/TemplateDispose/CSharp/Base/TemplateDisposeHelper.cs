@@ -15,6 +15,7 @@ namespace UnityBindTool
                 Type attributeType = attribute.GetType();
 
                 Type firstOrDefault = GetDisposeType<T>(attributeType);
+                if (firstOrDefault == null) continue;
                 T attributeDispose = Activator.CreateInstance(firstOrDefault) as T;
                 attributeDispose.templateDispose = templateDispose;
                 attributeDispose.attributeValue = attribute;

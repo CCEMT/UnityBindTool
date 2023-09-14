@@ -12,7 +12,7 @@ public class GeneratePathAttribute : Attribute
 
     public PathType pathType;
 
-    public GeneratePathAttribute(PathType pathType = PathType.Prefab)
+    public GeneratePathAttribute(PathType pathType)
     {
         this.pathType = pathType;
     }

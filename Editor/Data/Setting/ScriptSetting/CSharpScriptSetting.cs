@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BindTool;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class CSharpScriptSetting
@@ -12,6 +13,9 @@ public class CSharpScriptSetting
 
     [LabelText("BindComponents是否绑定到预制体上")]
     public bool isBindComponentsBindPrefab;
+
+    [LabelText("是否连接到预制体上")]
+    public bool isConnectPrefab;
 
     [LabelText("继承的类")]
     public TypeString inheritClass;
@@ -46,7 +50,7 @@ public class CSharpScriptSetting
     [BoxGroup("属性设置"), HideLabel]
     public NameSetting propertyNameSetting = new NameSetting();
 
-    [BoxGroup("模板脚本设置"), HideLabel]
+    [BoxGroup("方法设置"), HideLabel]
     public NameSetting methodNameSetting = new NameSetting();
 
     [BoxGroup("模板脚本设置"), LabelText("模板列表")]

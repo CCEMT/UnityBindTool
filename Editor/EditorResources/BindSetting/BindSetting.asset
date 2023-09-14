@@ -130,7 +130,7 @@ MonoBehaviour:
       Data: 
     - Name: createScriptAssembly
       Entry: 1
-      Data: 
+      Data: Assembly-CSharp
     - Name: isGeneratePartial
       Entry: 5
       Data: false
@@ -190,7 +190,7 @@ MonoBehaviour:
       Data: NameSetting, UnityBindTool.Editor
     - Name: namingDispose
       Entry: 3
-      Data: 0
+      Data: 2
     - Name: repetitionNameDispose
       Entry: 3
       Data: 0
@@ -398,7 +398,7 @@ MonoBehaviour:
       Data: 17|StreamingBindData, UnityBindTool.Editor
     - Name: sequence
       Entry: 3
-      Data: 0
+      Data: 2
     - Name: isElse
       Entry: 5
       Data: false
@@ -407,13 +407,13 @@ MonoBehaviour:
       Data: BindTool.TypeString, UnityBindTool.Editor
     - Name: typeName
       Entry: 1
-      Data: RectTransform
+      Data: Button
     - Name: typeNameSpace
       Entry: 1
-      Data: UnityEngine
+      Data: UnityEngine.UI
     - Name: assemblyName
       Entry: 1
-      Data: UnityEngine.CoreModule
+      Data: UnityEngine.UI
     - Name: 
       Entry: 8
       Data: 
@@ -452,7 +452,7 @@ MonoBehaviour:
       Data: 19|StreamingBindData, UnityBindTool.Editor
     - Name: sequence
       Entry: 3
-      Data: 2
+      Data: 0
     - Name: isElse
       Entry: 5
       Data: false
@@ -461,13 +461,13 @@ MonoBehaviour:
       Data: BindTool.TypeString, UnityBindTool.Editor
     - Name: typeName
       Entry: 1
-      Data: Button
+      Data: RectTransform
     - Name: typeNameSpace
       Entry: 1
-      Data: UnityEngine.UI
+      Data: UnityEngine
     - Name: assemblyName
       Entry: 1
-      Data: UnityEngine.UI
+      Data: UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -557,7 +557,37 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 27|NameReplaceData, UnityBindTool.Editor
+    - Name: targetName
+      Entry: 1
+      Data: 
+    - Name: nameCheck
+      Entry: 7
+      Data: 28|NameCheck, UnityBindTool.Editor
+    - Name: name
+      Entry: 1
+      Data: m_
+    - Name: nameRule
+      Entry: 7
+      Data: NameRule, UnityBindTool.Editor
+    - Name: isCaseSensitive
+      Entry: 5
+      Data: false
+    - Name: nameMatchingRule
+      Entry: 3
       Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -569,7 +599,7 @@ MonoBehaviour:
       Data: 
     - Name: luaNameGenerateSetting
       Entry: 7
-      Data: 27|LuaNameGenerateSetting, UnityBindTool.Editor
+      Data: 29|LuaNameGenerateSetting, UnityBindTool.Editor
     - Name: 
       Entry: 8
       Data: 
@@ -581,7 +611,7 @@ MonoBehaviour:
       Data: 
     - Name: compositionSettingList
       Entry: 7
-      Data: 28|System.Collections.Generic.List`1[[CompositionSetting, UnityBindTool.Editor]],
+      Data: 30|System.Collections.Generic.List`1[[CompositionSetting, UnityBindTool.Editor]],
         mscorlib
     - Name: 
       Entry: 12

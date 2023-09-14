@@ -55,7 +55,7 @@ public partial class BindWindow
         SearchSelectList();
     }
 
-    void DrawBindInfoListGUI()
+    protected override void OnGUI()
     {
         Chack();
         GetData();
@@ -114,7 +114,7 @@ public partial class BindWindow
 
     void DrawBuild()
     {
-        if (GUILayout.Button("生成")) { this.bindWindowState = BindWindowState.BuildGUI; }
+        if (GUILayout.Button("生成")) BuildWindow.OpenWindow(this.generateData, new Vector2(position.x + position.width / 2f, position.y + position.height / 2f));
     }
 
     void DrawBind()

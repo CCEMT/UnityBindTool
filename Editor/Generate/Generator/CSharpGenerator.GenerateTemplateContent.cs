@@ -73,8 +73,13 @@ public partial class CSharpGenerator
             templateDispose.templateClass = templateClass;
             templateDispose.mainTargetClass = mainClass;
             templateDispose.partialTargetClass = partialClass;
+            templateDispose.scriptSetting = this.scriptSetting;
+            templateDispose.nameGenerateSetting = this.selectSetting.nameGenerateSetting;
+            templateDispose.nameDisposeCentre = this.nameDisposeCentre;
             templateDispose.Dispose();
             templateDispose.Generate();
+            mainClass = templateDispose.mainTargetClass;
+            partialClass = templateDispose.partialTargetClass;
         }
 
         if (isPartial)
@@ -119,8 +124,10 @@ public partial class CSharpGenerator
         foreach (AttributeArgumentSyntax argument in arguments)
         {
             ExpressionSyntax expression = argument.Expression;
-            if (expression is not IdentifierNameSyntax nameSyntax) continue;
-            if (nameSyntax.Identifier.ValueText.Contains(identifierName)) return true;
+            MemberAccessExpressionSyntax memberAccessExpressionSyntax = expression as MemberAccessExpressionSyntax;
+            if (memberAccessExpressionSyntax == null) continue;
+            string name = memberAccessExpressionSyntax.Name.Identifier.ValueText;
+            if (name.Contains(identifierName)) return true;
         }
         return false;
     }

@@ -38,7 +38,7 @@ public partial class BindWindow
             GUI.Label(r, "★", style);
             return;
         }
-        
+
         BindData findData = bindWindow.editorObjectInfo.bindDataList.Find((info) => info.GameObjectEquals(go));
         if (findData == null) return;
         Rect targetRect = new Rect(rect);
@@ -154,10 +154,7 @@ public partial class BindWindow
 
     static void BindWindowLook(object bindInfo)
     {
-        bindWindow.bindWindowState = BindWindowState.BindInfoListGUI;
-        bindWindow.bindTypeIndex = BindTypeIndex.Item;
-        bindWindow.selectBindDataList.Add((BindData) bindInfo);
-        bindWindow.Repaint();
+        bindWindow.SelectBindData((BindData) bindInfo);
     }
 
     static void HierarchyRemove(GameObject go)

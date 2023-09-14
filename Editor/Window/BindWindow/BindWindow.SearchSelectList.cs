@@ -4,6 +4,17 @@ using UnityEngine;
 
 public partial class BindWindow
 {
+    public void SelectBindData(BindData bindData)
+    {
+        this.selectBindDataList.Clear();
+        this.selectbindCollectionList.Clear();
+        selectBindAmount = 1;
+        selectBindDataList.Add(bindData);
+        searchType = SearchType.All;
+        bindTypeIndex = BindTypeIndex.Item;
+        Repaint();
+    }
+
     void SearchSelectList()
     {
         if (this.showAmount == 0) { return; }
