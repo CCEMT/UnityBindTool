@@ -11,7 +11,7 @@ public class BuildWindow : OdinEditorWindow
     public static void OpenWindow(GenerateData data, Vector2 position)
     {
         var window = GetWindow<BuildWindow>(true, "BuildWindow");
-        Vector2 size = new Vector2(400, 300);
+        Vector2 size = new Vector2(400, 350);
         window.position = new Rect(position - new Vector2(size.x / 2f, size.y / 2f), size);
         window.Init(data);
         window.Show();
@@ -89,12 +89,12 @@ public class BuildWindow : OdinEditorWindow
             else
             {
                 BindBuild.Build(bindSetting.selectCompositionSetting, this.generateData);
-                Close();
+                bindSetting = null;
             }
         }
         GUI.color = Color.white;
 
-        if (bindSetting.selectCompositionSetting.commonSetting.isCreateScript)
+        if (bindSetting != null && bindSetting.selectCompositionSetting.commonSetting.isCreateScript)
         {
             if (bindSetting.selectCompositionSetting.scriptSetting.csharpScriptSetting.isGenerateNew) { DrawNewScript(); }
             else { DrawSelectScript(); }
@@ -133,6 +133,7 @@ public class BuildWindow : OdinEditorWindow
 
     void DrawSetting()
     {
+        if (bindSetting == null) return;
         GUILayout.Space(5);
 
         EditorGUILayout.BeginHorizontal("box");
@@ -147,6 +148,7 @@ public class BuildWindow : OdinEditorWindow
 
     void DrawPreivewSetting()
     {
+        if (bindSetting == null) return;
         EditorGUILayout.BeginVertical("box");
         {
             GUILayout.Label("生成配置预览", this.preivewStyle);

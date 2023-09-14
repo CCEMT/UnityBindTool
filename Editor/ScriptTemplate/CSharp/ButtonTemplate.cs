@@ -11,7 +11,7 @@ public class ButtonTemplate : MonoBehaviour
     [GenerateSingle]
     public void AddButtonAllClick()
     {
-        this.TemplateValue.onClick.AddListener(Click);
+        //this.TemplateValue.onClick.AddListener(Click);
     }
 
     public void Click() { }

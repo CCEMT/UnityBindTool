@@ -9,8 +9,11 @@ using UnityEngine;
 namespace BindTool
 {
     [Serializable]
-    public class GenerateData
+    public class GenerateData : ISerializationCallbackReceiver
     {
+        [SerializeField]
+        private byte[] objectInfoBytes;
+
         //新脚本的名称
         public string newScriptName;
 
@@ -26,5 +29,15 @@ namespace BindTool
 
         //获取绑定数据的函数名称
         public string getBindDataMethodName;
+
+        public void OnBeforeSerialize()
+        {
+            objectInfoBytes = SerializationUtility.SerializeValue(objectInfo, DataFormat.Binary);
+        }
+
+        public void OnAfterDeserialize()
+        {
+            objectInfo = SerializationUtility.DeserializeValue<ObjectInfo>(objectInfoBytes, DataFormat.Binary);
+        }
     }
 }

@@ -130,7 +130,7 @@ MonoBehaviour:
       Data: 
     - Name: createScriptAssembly
       Entry: 1
-      Data: 
+      Data: Assembly-CSharp
     - Name: isGeneratePartial
       Entry: 5
       Data: false

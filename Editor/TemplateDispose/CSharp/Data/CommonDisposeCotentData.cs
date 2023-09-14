@@ -2,9 +2,8 @@
 
 namespace UnityBindTool
 {
-    public class DisposeCotentData
+    public class CommonDisposeCotentData : DisposeCotentData
     {
         public MemberDeclarationSyntax generateContent;
-        public ClassDeclarationSyntax generateTarget;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BindTool;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class CSharpScriptSetting
@@ -12,6 +13,9 @@ public class CSharpScriptSetting
 
     [LabelText("BindComponents是否绑定到预制体上")]
     public bool isBindComponentsBindPrefab;
+
+    [LabelText("是否连接到预制体上")]
+    public bool isConnectPrefab;
 
     [LabelText("继承的类")]
     public TypeString inheritClass;

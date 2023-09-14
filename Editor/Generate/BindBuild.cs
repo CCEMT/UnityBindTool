@@ -3,12 +3,9 @@
 using System;
 using System.IO;
 using System.Reflection;
-using System.Text;
-using Sirenix.Serialization;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
-using SerializationUtility = Sirenix.Serialization.SerializationUtility;
 
 #endregion
 
@@ -60,9 +57,7 @@ namespace BindTool
         static void CSharpBuild(IGenerator generator, string path, GenerateData generateData)
         {
             generator.Write(path);
-            byte[] content = SerializationUtility.SerializeValue(generateData, DataFormat.JSON);
-            string json = Encoding.UTF8.GetString(content);
-            EditorPrefs.SetString(CSharpBuildGenerateDataKey, json);
+            EditorPrefs.SetString(CSharpBuildGenerateDataKey, JsonUtility.ToJson(generateData));
         }
 
         [DidReloadScripts]
@@ -71,10 +66,9 @@ namespace BindTool
             if (EditorPrefs.HasKey(CSharpBuildGenerateDataKey) == false) return;
             BindSetting bindSetting = BindSetting.Get();
             CommonSetting commonSetting = bindSetting.selectCompositionSetting.commonSetting;
+            CSharpScriptSetting csharpScriptSetting = bindSetting.selectCompositionSetting.scriptSetting.csharpScriptSetting;
 
-            string json = EditorPrefs.GetString(CSharpBuildGenerateDataKey);
-            byte[] content = Encoding.UTF8.GetBytes(json);
-            GenerateData generateData = SerializationUtility.DeserializeValue<GenerateData>(content, DataFormat.JSON);
+            GenerateData generateData = JsonUtility.FromJson<GenerateData>(EditorPrefs.GetString(CSharpBuildGenerateDataKey));
 
             if (generateData == null) return;
             EditorPrefs.DeleteKey(CSharpBuildGenerateDataKey);
@@ -109,16 +103,19 @@ namespace BindTool
                 if (component == null) component = generateData.bindObject.AddComponent(addType);
                 bindComponents.targetType = component.GetType();
 
-                MethodInfo method = addType.GetMethod(generateData.getBindDataMethodName, new Type[] { });
-                method.Invoke(component, new object[] { });
+                MethodInfo method = addType.GetMethod(generateData.getBindDataMethodName, new[] {typeof(BindComponents)});
+                method.Invoke(component, new object[] {bindComponents});
             }
             else { Debug.Log("添加类型为空"); }
 
             if (commonSetting.isCreatePrefab)
             {
                 //创建预制体
-                if (File.Exists(path)) { path = path.Substring(path.IndexOf("Assets", StringComparison.Ordinal)); }
-                PrefabUtility.SaveAsPrefabAssetAndConnect(bindObject, path, InteractionMode.AutomatedAction);
+                path = path.Substring(path.IndexOf("Assets", StringComparison.Ordinal));
+
+                if (csharpScriptSetting.isConnectPrefab) PrefabUtility.SaveAsPrefabAssetAndConnect(bindObject, path, InteractionMode.AutomatedAction);
+                else PrefabUtility.SaveAsPrefabAsset(bindObject, path);
+
                 Debug.Log("Create Prefab Finish.");
             }
 

@@ -8,11 +8,11 @@ namespace UnityBindTool
 {
     public class CommonTemplateDispose : BaseTemplateDispose
     {
-        private List<DisposeCotentData> disposes;
+        private List<CommonDisposeCotentData> disposes;
 
         public override void Dispose()
         {
-            this.disposes = new List<DisposeCotentData>();
+            this.disposes = new List<CommonDisposeCotentData>();
             string typeName = this.templateClass.Identifier.ValueText;
             Type templateType = Type.GetType(typeName);
 
@@ -34,7 +34,7 @@ namespace UnityBindTool
             int amount = this.disposes.Count;
             for (int i = 0; i < amount; i++)
             {
-                DisposeCotentData disposeCotentData = this.disposes[i];
+                CommonDisposeCotentData disposeCotentData = this.disposes[i];
                 if (disposeCotentData.generateTarget == this.mainTargetClass) { generateMain = generateMain.AddMembers(disposeCotentData.generateContent); }
                 else { generatePartial = generatePartial.AddMembers(disposeCotentData.generateContent); }
             }
@@ -53,7 +53,7 @@ namespace UnityBindTool
 
             Attribute[] attributes = fieldInfo.GetCustomAttributes().ToArray();
 
-            DisposeCotentData disposeCotentData = new DisposeCotentData();
+            CommonDisposeCotentData disposeCotentData = new CommonDisposeCotentData();
             disposeCotentData.generateContent = fieldDeclarationSyntax;
             disposeCotentData.generateTarget = this.partialTargetClass ?? this.mainTargetClass;
 
@@ -71,7 +71,7 @@ namespace UnityBindTool
 
             Attribute[] attributes = propertyInfo.GetCustomAttributes().ToArray();
 
-            DisposeCotentData disposeCotentData = new DisposeCotentData();
+            CommonDisposeCotentData disposeCotentData = new CommonDisposeCotentData();
             disposeCotentData.generateContent = propertyDeclarationSyntax;
             disposeCotentData.generateTarget = this.partialTargetClass ?? this.mainTargetClass;
 
@@ -89,7 +89,7 @@ namespace UnityBindTool
 
             Attribute[] attributes = methodInfo.GetCustomAttributes().ToArray();
 
-            DisposeCotentData disposeCotentData = new DisposeCotentData();
+            CommonDisposeCotentData disposeCotentData = new CommonDisposeCotentData();
             disposeCotentData.generateContent = methodDeclarationSyntax;
             disposeCotentData.generateTarget = this.partialTargetClass ?? this.mainTargetClass;
 
