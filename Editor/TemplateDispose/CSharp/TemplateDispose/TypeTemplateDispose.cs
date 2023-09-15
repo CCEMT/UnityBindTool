@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BindTool;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -105,6 +106,10 @@ namespace UnityBindTool
                 for (int j = 0; j < memberAmount; j++)
                 {
                     MemberDeclarationSyntax memberDeclarationSyntax = typeDisposeData.memberDeclarationSyntaxs[j];
+
+                    AttributeSyntax autoGenerateAttributeAttribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(AutoGenerate).FullName));
+                    memberDeclarationSyntax = memberDeclarationSyntax.AddAttributeLists(SyntaxFactory.AttributeList().AddAttributes(autoGenerateAttributeAttribute));
+
                     if (typeDisposeData.generateTarget == this.mainTargetClass) { generateMain = generateMain.AddMembers(memberDeclarationSyntax); }
                     else { generatePartial = generatePartial.AddMembers(memberDeclarationSyntax); }
                 }

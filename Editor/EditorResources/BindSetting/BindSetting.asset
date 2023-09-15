@@ -113,6 +113,9 @@ MonoBehaviour:
     - Name: isBindComponentsBindPrefab
       Entry: 5
       Data: false
+    - Name: isConnectPrefab
+      Entry: 5
+      Data: false
     - Name: inheritClass
       Entry: 7
       Data: BindTool.TypeString, UnityBindTool.Editor

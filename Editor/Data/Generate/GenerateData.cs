@@ -1,8 +1,10 @@
 ﻿#region Using
 
 using System;
+using System.Collections.Generic;
 using Sirenix.Serialization;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 #endregion
 
@@ -13,6 +15,9 @@ namespace BindTool
     {
         [SerializeField]
         private byte[] objectInfoBytes;
+
+        [SerializeField]
+        private List<Object> unityObjects = new List<Object>();
 
         //新脚本的名称
         public string newScriptName;
@@ -32,12 +37,14 @@ namespace BindTool
 
         public void OnBeforeSerialize()
         {
-            objectInfoBytes = SerializationUtility.SerializeValue(objectInfo, DataFormat.Binary);
+            unityObjects.Clear();
+            objectInfoBytes = SerializationUtility.SerializeValue(objectInfo, DataFormat.Binary, out unityObjects);
+            
         }
 
         public void OnAfterDeserialize()
         {
-            objectInfo = SerializationUtility.DeserializeValue<ObjectInfo>(objectInfoBytes, DataFormat.Binary);
+            objectInfo = SerializationUtility.DeserializeValue<ObjectInfo>(objectInfoBytes, DataFormat.Binary, unityObjects);
         }
     }
 }

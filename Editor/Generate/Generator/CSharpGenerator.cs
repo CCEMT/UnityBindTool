@@ -44,9 +44,11 @@ public partial class CSharpGenerator : IGenerator
         nameDisposeCentre.useNames.Add(generateData.newScriptName);
 
         string mainFilePath = scriptPath + $"{generateData.newScriptName}{CommonConst.CSharpFileSuffix}";
+        if (File.Exists(mainFilePath)) DeleteOldContent(mainFilePath);
         if (this.csharpScriptSetting.isGeneratePartial)
         {
             string partialFilePath = scriptPath + $"{generateData.newScriptName}.{this.csharpScriptSetting.partialName}{CommonConst.CSharpFileSuffix}";
+            if (File.Exists(partialFilePath)) DeleteOldContent(partialFilePath);
             GeneratePartialFile(mainFilePath, partialFilePath);
             GenerateFixedContent(partialFilePath);
             GenerateTemplateContent(mainFilePath, partialFilePath, true);
@@ -219,6 +221,7 @@ public partial class CSharpGenerator : IGenerator
 
     bool IsFixedContent(AttributeSyntax attributeSyntax)
     {
+        if (attributeSyntax.ArgumentList == null) return false;
         SeparatedSyntaxList<AttributeArgumentSyntax> arguments = attributeSyntax.ArgumentList.Arguments;
         foreach (AttributeArgumentSyntax argument in arguments)
         {

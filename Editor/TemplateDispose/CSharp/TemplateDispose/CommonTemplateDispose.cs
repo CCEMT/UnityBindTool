@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BindTool;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace UnityBindTool
@@ -35,6 +37,10 @@ namespace UnityBindTool
             for (int i = 0; i < amount; i++)
             {
                 CommonDisposeCotentData disposeCotentData = this.disposes[i];
+
+                AttributeSyntax autoGenerateAttributeAttribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(AutoGenerate).FullName));
+                disposeCotentData.generateContent = disposeCotentData.generateContent.AddAttributeLists(SyntaxFactory.AttributeList().AddAttributes(autoGenerateAttributeAttribute));
+
                 if (disposeCotentData.generateTarget == this.mainTargetClass) { generateMain = generateMain.AddMembers(disposeCotentData.generateContent); }
                 else { generatePartial = generatePartial.AddMembers(disposeCotentData.generateContent); }
             }

@@ -59,8 +59,36 @@ public partial class BindWindow : OdinEditorWindow
         BindInfoListInit();
     }
 
+    protected override void OnEnable()
+    {
+        bindWindow = this;
+        base.OnEnable();
+    }
+
+    protected override void OnDestroy()
+    {
+        bindWindow = null;
+        base.OnDestroy();
+    }
+
     private void OnInspectorUpdate()
     {
         Repaint();
+    }
+
+    private void OnValidate()
+    {
+        if (bindObject == null) Close();
+        else
+        {
+            this.bindSetting = BindSetting.Get();
+            editorObjectInfo = ObjectInfoHelper.GetObjectInfo(bindObject);
+            generateData = new GenerateData();
+            generateData.objectInfo = this.editorObjectInfo;
+            generateData.bindObject = this.bindObject;
+            generateData.newScriptName = this.bindObject.name;
+
+            BindInfoListInit();
+        }
     }
 }
