@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -5,6 +6,7 @@ using BindTool;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using UnityEditor;
 using UnityEngine;
 
 public partial class CSharpGenerator : IGenerator
@@ -168,6 +170,11 @@ public partial class CSharpGenerator : IGenerator
     void DeleteOldContent(string filePath)
     {
         string code = File.ReadAllText(filePath);
+        if (this.scriptSetting.isSavaOldScript)
+        {
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            SaveOldCode(fileName, code);
+        }
         SyntaxTree tree = CSharpSyntaxTree.ParseText(code);
         CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
 
@@ -202,6 +209,18 @@ public partial class CSharpGenerator : IGenerator
         StreamWriter mainWriter = File.CreateText(filePath);
         mainWriter.Write(newCode);
         mainWriter.Close();
+    }
+
+    void SaveOldCode(string fileName, string code)
+    {
+        string folderPath = AssetDatabase.GetAssetPath(this.scriptSetting.oldScriptFolderPath);
+        string time = DateTime.Now.ToString("yyyy-M-d_HH-mm-ss");
+        string fileFullName = $"{fileName}_{time}{CommonConst.TextFileSuffix}";
+        string prefixPath = Application.dataPath.Replace("/Assets", "");
+        string fullPath = $"{prefixPath}/{folderPath}/{fileFullName}";
+        StreamWriter writer = File.CreateText(fullPath);
+        writer.Write(code);
+        writer.Close();
     }
 
     bool IsDelect(SyntaxList<AttributeListSyntax> attributeListSyntax)

@@ -35,10 +35,10 @@ MonoBehaviour:
       Data: 1|CommonSetting, UnityBindTool.Editor
     - Name: isCreateScript
       Entry: 5
-      Data: false
+      Data: true
     - Name: isCreateScriptFolder
       Entry: 5
-      Data: false
+      Data: true
     - Name: createScriptPath
       Entry: 1
       Data: Script
@@ -59,10 +59,10 @@ MonoBehaviour:
       Data: Files/GeneratePrefabs
     - Name: isCreateLua
       Entry: 5
-      Data: true
+      Data: false
     - Name: isCreateLuaFolder
       Entry: 5
-      Data: true
+      Data: false
     - Name: createLuaPath
       Entry: 1
       Data: luacode
