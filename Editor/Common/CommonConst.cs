@@ -21,6 +21,11 @@
         public const string DefaultScriptSettingName = "ScriptSetting";
         public const string DefaultAutoBindSettingName = "AutoBindSetting";
         public const string DefaultCreateNameSettingName = "CreateNameSetting";
+        
+        public const string LuaBaseClassNameIdentifier = "{BaseClass}";
+        public const string LuaInheritClassNameIdentifier = "{InheritClass}";
+        public const string LuaClassNameIdentifier = "{ClassName}";
+        public const string LuaGenerateContentIdentifier = "{GenerateContent}";
 
         public const string PrefabFileSuffix = ".prefab";
         public const string CSharpFileSuffix = ".cs";

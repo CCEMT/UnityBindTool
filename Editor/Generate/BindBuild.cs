@@ -19,39 +19,37 @@ namespace BindTool
         {
             CommonSetting commonSetting = setting.commonSetting;
 
-            string path = Application.dataPath + "/" + commonSetting.createScriptPath + "/";
-            if (Directory.Exists(path) == false)
+            BindComponentsHelper.AddBindComponent(generateData);
+
+            if (commonSetting.isCreateScript) CreateCSharp(generateData, setting, commonSetting);
+            if (commonSetting.isCreateLua) CreateLua(generateData, setting, commonSetting);
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("Build Finish.");
+        }
+
+        static void CreateCSharp(GenerateData generateData, CompositionSetting setting, CommonSetting commonSetting)
+        {
+            string csharpPath = Application.dataPath + "/" + commonSetting.createScriptPath + "/";
+
+            if (Directory.Exists(csharpPath) == false)
             {
-                Debug.LogError($"{path} 不是有效路径！");
+                Debug.LogError($"{csharpPath} 不是有效路径！");
                 return;
             }
 
             //创建文件夹
             if (commonSetting.isCreateScriptFolder)
             {
-                path += $"{generateData.newScriptName}/";
-                if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
+                csharpPath += $"{generateData.newScriptName}/";
+                if (Directory.Exists(csharpPath) == false) Directory.CreateDirectory(csharpPath);
             }
 
-            Debug.Log("脚本生成路径：" + path);
+            Debug.Log("CSharp脚本生成路径：" + csharpPath);
 
-            BindComponentsHelper.AddBindComponent(generateData);
-
-            if (commonSetting.isCreateScript)
-            {
-                IGenerator generator = GeneratorFactory.GetGenerator(GeneratorType.CSharp, setting, generateData);
-                CSharpBuild(generator, path, generateData);
-            }
-
-            if (commonSetting.isCreateLua)
-            {
-                IGenerator generator = GeneratorFactory.GetGenerator(GeneratorType.Lua, setting, generateData);
-                LuaBuild(generator, path, setting, generateData);
-            }
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-            Debug.Log("Create ScriptSetting Finish.");
+            IGenerator generator = GeneratorFactory.GetGenerator(GeneratorType.CSharp, setting, generateData);
+            CSharpBuild(generator, csharpPath, generateData);
         }
 
         static void CSharpBuild(IGenerator generator, string path, GenerateData generateData)
@@ -66,7 +64,6 @@ namespace BindTool
             if (EditorPrefs.HasKey(CSharpBuildGenerateDataKey) == false) return;
             BindSetting bindSetting = BindSetting.Get();
             CommonSetting commonSetting = bindSetting.selectCompositionSetting.commonSetting;
-            CSharpScriptSetting csharpScriptSetting = bindSetting.selectCompositionSetting.scriptSetting.csharpScriptSetting;
 
             GenerateData generateData = JsonUtility.FromJson<GenerateData>(EditorPrefs.GetString(CSharpBuildGenerateDataKey));
 
@@ -75,23 +72,8 @@ namespace BindTool
 
             GameObject bindObject = generateData.bindObject;
             if (bindObject == null) return;
-            string path = Application.dataPath + "/" + commonSetting.createPrefabPath;
 
-            //检查路径是否有效
-            if (Directory.Exists(path) == false)
-            {
-                Debug.LogError($"{path} 不是有效路径！");
-                return;
-            }
-
-            //创建文件夹
-            if (commonSetting.isCreatePrefabFolder)
-            {
-                path += $"/{bindObject.name}";
-                if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
-            }
-
-            path += $"/{bindObject.name}{CommonConst.PrefabFileSuffix}";
+            if (commonSetting.isCreatePrefab) CreatePrefab(bindObject, commonSetting);
 
             BindComponents bindComponents = bindObject.GetComponent<BindComponents>();
 
@@ -108,19 +90,30 @@ namespace BindTool
             }
             else { Debug.Log("添加类型为空"); }
 
-            if (commonSetting.isCreatePrefab)
-            {
-                //创建预制体
-                path = path.Substring(path.IndexOf("Assets", StringComparison.Ordinal));
-
-                if (csharpScriptSetting.isConnectPrefab) PrefabUtility.SaveAsPrefabAssetAndConnect(bindObject, path, InteractionMode.AutomatedAction);
-                else PrefabUtility.SaveAsPrefabAsset(bindObject, path);
-
-                Debug.Log("Create Prefab Finish.");
-            }
-
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+        }
+
+        static void CreateLua(GenerateData generateData, CompositionSetting setting, CommonSetting commonSetting)
+        {
+            string luaPath = Application.dataPath + "/" + commonSetting.createLuaPath + "/";
+            if (Directory.Exists(luaPath) == false)
+            {
+                Debug.LogError($"{luaPath} 不是有效路径！");
+                return;
+            }
+
+            //创建文件夹
+            if (commonSetting.isCreateLuaFolder)
+            {
+                luaPath += $"{generateData.newScriptName}/";
+                if (Directory.Exists(luaPath) == false) Directory.CreateDirectory(luaPath);
+            }
+
+            Debug.Log("Lua脚本生成路径：" + luaPath);
+
+            IGenerator generator = GeneratorFactory.GetGenerator(GeneratorType.Lua, setting, generateData);
+            LuaBuild(generator, luaPath, setting, generateData);
         }
 
         static void LuaBuild(IGenerator generator, string scriptPath, CompositionSetting setting, GenerateData generateData)
@@ -129,23 +122,35 @@ namespace BindTool
 
             GameObject bindObject = generateData.bindObject;
 
-            if (commonSetting.isCreatePrefab)
-            {
-                //创建预制体
-                string path = Application.dataPath + "/" + commonSetting.createPrefabPath;
-                if (Directory.Exists(path) == false)
-                {
-                    Debug.LogError($"{path} 不是有效路径！");
-                    return;
-                }
-                path += $"/{bindObject.name}{CommonConst.PrefabFileSuffix}";
-
-                if (File.Exists(path)) { path = path.Substring(path.IndexOf("Assets", StringComparison.Ordinal)); }
-                PrefabUtility.SaveAsPrefabAssetAndConnect(bindObject, path, InteractionMode.AutomatedAction);
-                Debug.Log("Create Prefab Finish.");
-            }
+            if (commonSetting.isCreatePrefab) CreatePrefab(bindObject, commonSetting);
 
             generator.Write(scriptPath);
+        }
+
+        static void CreatePrefab(GameObject bindObject, CommonSetting commonSetting)
+        {
+            //创建预制体
+            string path = Application.dataPath + "/" + commonSetting.createPrefabPath;
+            if (Directory.Exists(path) == false)
+            {
+                Debug.LogError($"{path} 不是有效路径！");
+                return;
+            }
+
+            //创建文件夹
+            if (commonSetting.isCreatePrefabFolder)
+            {
+                path += $"/{bindObject.name}";
+                if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
+            }
+
+            path += $"/{bindObject.name}{CommonConst.PrefabFileSuffix}";
+
+            path = path.Substring(path.IndexOf("Assets", StringComparison.Ordinal));
+
+            if (commonSetting.isDetachPrefab) PrefabUtility.SaveAsPrefabAsset(bindObject, path);
+            else PrefabUtility.SaveAsPrefabAssetAndConnect(bindObject, path, InteractionMode.AutomatedAction);
+            Debug.Log("Create Prefab Finish.");
         }
     }
 }

@@ -11,12 +11,6 @@ public class CSharpScriptSetting
     [LabelText("是否构建新的代码")]
     public bool isGenerateNew;
 
-    [LabelText("BindComponents是否绑定到预制体上")]
-    public bool isBindComponentsBindPrefab;
-
-    [LabelText("是否连接到预制体上")]
-    public bool isConnectPrefab;
-
     [LabelText("继承的类")]
     public TypeString inheritClass;
 

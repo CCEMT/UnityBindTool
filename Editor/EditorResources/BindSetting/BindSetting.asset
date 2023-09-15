@@ -18,6 +18,7 @@ MonoBehaviour:
     ReferencedUnityObjects:
     - {fileID: 102900000, guid: 924f928df3d31eb4cb46dfab75d84ddd, type: 3}
     - {fileID: 11500000, guid: 91a5540cf0f902a46be53fe1ff05e909, type: 3}
+    - {fileID: 4900000, guid: 99a157d2d8ea6644f864b4ad3029549b, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -34,10 +35,10 @@ MonoBehaviour:
       Data: 1|CommonSetting, UnityBindTool.Editor
     - Name: isCreateScript
       Entry: 5
-      Data: true
+      Data: false
     - Name: isCreateScriptFolder
       Entry: 5
-      Data: true
+      Data: false
     - Name: createScriptPath
       Entry: 1
       Data: Script
@@ -45,6 +46,9 @@ MonoBehaviour:
       Entry: 5
       Data: true
     - Name: isDetachPrefab
+      Entry: 5
+      Data: true
+    - Name: isBindComponentsBindPrefab
       Entry: 5
       Data: false
     - Name: isCreatePrefabFolder
@@ -55,13 +59,13 @@ MonoBehaviour:
       Data: Files/GeneratePrefabs
     - Name: isCreateLua
       Entry: 5
-      Data: false
+      Data: true
     - Name: isCreateLuaFolder
       Entry: 5
-      Data: false
+      Data: true
     - Name: createLuaPath
       Entry: 1
-      Data: 
+      Data: luacode
     - Name: 
       Entry: 8
       Data: 
@@ -110,12 +114,6 @@ MonoBehaviour:
     - Name: isGenerateNew
       Entry: 5
       Data: true
-    - Name: isBindComponentsBindPrefab
-      Entry: 5
-      Data: false
-    - Name: isConnectPrefab
-      Entry: 5
-      Data: false
     - Name: inheritClass
       Entry: 7
       Data: BindTool.TypeString, UnityBindTool.Editor
@@ -240,6 +238,15 @@ MonoBehaviour:
     - Name: luaScriptSetting
       Entry: 7
       Data: 5|LuaScriptSetting, UnityBindTool.Editor
+    - Name: baseClassName
+      Entry: 1
+      Data: BaseClass
+    - Name: inheritClass
+      Entry: 1
+      Data: UIPanelBase
+    - Name: luaTemplate
+      Entry: 10
+      Data: 2
     - Name: 
       Entry: 8
       Data: 

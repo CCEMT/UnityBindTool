@@ -62,9 +62,12 @@ public class CommonSetting
 
     [LabelText("是否创建预制体")]
     public bool isCreatePrefab;
-    
+
     [LabelText("是否分离预制体")]
     public bool isDetachPrefab;
+
+    [LabelText("BindComponents是否绑定到预制体上")]
+    public bool isBindComponentsBindPrefab;
 
     [LabelText("是否创建预制体文件夹")]
     public bool isCreatePrefabFolder;
