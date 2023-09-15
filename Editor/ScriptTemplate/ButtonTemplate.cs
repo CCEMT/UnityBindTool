@@ -1,26 +1,12 @@
-///该脚本为模板方法
-///注意：
-///生成方法使用到的类型必须为[命名空间].[类型名]，如果使用using引用命名空间生成时可能会生成失败
-namespace BindTool.Template
+using UnityBindTool;
+using UnityEngine;
+using UnityEngine.UI;
+
+[TemplateClass(CSharpTemplateType.Type)]
+public class ButtonTemplate : MonoBehaviour
 {
-	public class ButtonTemplate : UnityEngine.MonoBehaviour
-	{
-		public UnityEngine.UI.Button templateValue;
-        #region Template Method
-        public void AddClick(UnityEngine.Events.UnityAction callBack)
-        {
-            templateValue.onClick.AddListener(callBack);
-        }
+    [TemplateField]
+    public Button TemplateValue;
 
-        public void RemoveClick(UnityEngine.Events.UnityAction callBack)
-        {
-            templateValue.onClick.RemoveListener(callBack);
-        }
-
-        public void RemoveAllClick()
-        {
-            templateValue.onClick.RemoveAllListeners();
-        }
-        #endregion
-    }
+    public void Click() { }
 }
