@@ -5,38 +5,41 @@ using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
 using UnityEngine;
 
-public class EditorCollectionWindow : OdinEditorWindow
+namespace UnityBindTool
 {
-    public static void EditorCollection(BindCollection bindCollection)
+    public class EditorCollectionWindow : OdinEditorWindow
     {
-        EditorCollectionWindow window = GetWindow<EditorCollectionWindow>("EditorCollectionWindow");
-        window.position = GUIHelper.GetEditorWindowRect().AlignCenter(500, 600);
-        window.Init(bindCollection);
-    }
-
-    [HideInInspector]
-    private BindCollection editorCollection;
-
-    [LabelText("Item列表"), ListDrawerSettings(HideRemoveButton = true, HideAddButton = true), ExecuteAlways]
-    public List<EditorCollectionItemDrawData> editorCollectionItemDrawList = new List<EditorCollectionItemDrawData>();
-
-    void Init(BindCollection bindCollection)
-    {
-        this.editorCollection = bindCollection;
-
-        editorCollectionItemDrawList.Clear();
-        int amount = bindCollection.bindDataList.Count;
-        for (int i = 0; i < amount; i++)
+        public static void EditorCollection(BindCollection bindCollection)
         {
-            BindData bindData = bindCollection.bindDataList[i];
-            EditorCollectionItemDrawData drawDataItem = new EditorCollectionItemDrawData(bindData, RemoveItem);
-            editorCollectionItemDrawList.Add(drawDataItem);
+            EditorCollectionWindow window = GetWindow<EditorCollectionWindow>("EditorCollectionWindow");
+            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(500, 600);
+            window.Init(bindCollection);
         }
-    }
 
-    void RemoveItem(EditorCollectionItemDrawData item)
-    {
-        editorCollectionItemDrawList.Remove(item);
-        this.editorCollection.bindDataList.Remove(item.drawData);
+        [HideInInspector]
+        private BindCollection editorCollection;
+
+        [LabelText("Item列表"), ListDrawerSettings(HideRemoveButton = true, HideAddButton = true), ExecuteAlways]
+        public List<EditorCollectionItemDrawData> editorCollectionItemDrawList = new List<EditorCollectionItemDrawData>();
+
+        void Init(BindCollection bindCollection)
+        {
+            this.editorCollection = bindCollection;
+
+            editorCollectionItemDrawList.Clear();
+            int amount = bindCollection.bindDataList.Count;
+            for (int i = 0; i < amount; i++)
+            {
+                BindData bindData = bindCollection.bindDataList[i];
+                EditorCollectionItemDrawData drawDataItem = new EditorCollectionItemDrawData(bindData, RemoveItem);
+                editorCollectionItemDrawList.Add(drawDataItem);
+            }
+        }
+
+        void RemoveItem(EditorCollectionItemDrawData item)
+        {
+            editorCollectionItemDrawList.Remove(item);
+            this.editorCollection.bindDataList.Remove(item.drawData);
+        }
     }
 }

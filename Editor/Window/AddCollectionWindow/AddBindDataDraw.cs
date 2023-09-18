@@ -2,24 +2,27 @@ using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-[Serializable]
-public class AddBindDataDraw
+namespace UnityBindTool
 {
-    [HideInInspector]
-    public BindCollection drawCollection;
-
-    [HideInInspector]
-    public Action<BindCollection> selectCallback;
-
-    public AddBindDataDraw(BindCollection collection, Action<BindCollection> callback)
+    [Serializable]
+    public class AddBindDataDraw
     {
-        this.drawCollection = collection;
-        this.selectCallback = callback;
-    }
+        [HideInInspector]
+        public BindCollection drawCollection;
 
-    [Button("@" + nameof(drawCollection) + "." + nameof(BindCollection.name), ButtonSizes.Medium)]
-    void Select()
-    {
-        selectCallback?.Invoke(this.drawCollection);
+        [HideInInspector]
+        public Action<BindCollection> selectCallback;
+
+        public AddBindDataDraw(BindCollection collection, Action<BindCollection> callback)
+        {
+            this.drawCollection = collection;
+            this.selectCallback = callback;
+        }
+
+        [Button("@" + nameof(drawCollection) + "." + nameof(BindCollection.name), ButtonSizes.Medium)]
+        void Select()
+        {
+            selectCallback?.Invoke(this.drawCollection);
+        }
     }
 }

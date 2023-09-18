@@ -1,20 +1,22 @@
 using System;
-using BindTool;
 using Object = UnityEngine.Object;
 
-[Serializable]
-public class BindBase : BindInfo
+namespace UnityBindTool
 {
-    public Object target;
-    public TypeString[] typeStrings;
-
-    public TypeString[] GetTypeStrings()
+    [Serializable]
+    public class BindBase : IBindInfo
     {
-        return typeStrings;
-    }
+        public Object target;
+        public TypeString[] typeStrings;
 
-    public Object GetValue(int index)
-    {
-        return this.target;
+        public TypeString[] GetTypeStrings()
+        {
+            return typeStrings;
+        }
+
+        public Object GetValue(int index)
+        {
+            return this.target;
+        }
     }
 }

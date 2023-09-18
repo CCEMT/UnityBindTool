@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 
 #endregion
 
-namespace BindTool
+namespace UnityBindTool
 {
     public class BindComponents : SerializedMonoBehaviour
     {

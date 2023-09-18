@@ -3,20 +3,23 @@ using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
 
-public class NameCheckDrawer : OdinValueDrawer<NameCheck>
+namespace UnityBindTool
 {
-    protected override void DrawPropertyLayout(GUIContent label)
+    public class NameCheckDrawer : OdinValueDrawer<NameCheck>
     {
-        NameCheck nameCheck = ValueEntry.SmartValue;
-
-        EditorGUILayout.BeginHorizontal();
+        protected override void DrawPropertyLayout(GUIContent label)
         {
-            nameCheck.name = SirenixEditorFields.TextField("检查名称", nameCheck.name);
+            NameCheck nameCheck = ValueEntry.SmartValue;
 
-            nameCheck.nameRule.isCaseSensitive = EditorGUILayout.Toggle("是否大小写", nameCheck.nameRule.isCaseSensitive);
+            EditorGUILayout.BeginHorizontal();
+            {
+                nameCheck.name = SirenixEditorFields.TextField("检查名称", nameCheck.name);
 
-            OdinHelper.DrawOdinEnum("匹配规则", nameCheck.nameRule.nameMatchingRule, (result) => { nameCheck.nameRule.nameMatchingRule = (NameMatchingRule) result; });
+                nameCheck.nameRule.isCaseSensitive = EditorGUILayout.Toggle("是否大小写", nameCheck.nameRule.isCaseSensitive);
+
+                OdinHelper.DrawOdinEnum("匹配规则", nameCheck.nameRule.nameMatchingRule, (result) => { nameCheck.nameRule.nameMatchingRule = (NameMatchingRule) result; });
+            }
+            EditorGUILayout.EndHorizontal();
         }
-        EditorGUILayout.EndHorizontal();
     }
 }

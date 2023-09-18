@@ -1,15 +1,11 @@
-﻿#region Using
-
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 
-#endregion
-
-namespace BindTool
+namespace UnityBindTool
 {
     public static class BindBuild
     {
@@ -35,7 +31,7 @@ namespace BindTool
 
             if (Directory.Exists(csharpPath) == false)
             {
-                Debug.LogError($"{csharpPath} 不是有效路径！");
+                Debug.LogError($"创建C#脚本错误 路径：{csharpPath} 不是有效路径！");
                 return;
             }
 
@@ -99,7 +95,7 @@ namespace BindTool
             string luaPath = Application.dataPath + "/" + commonSetting.createLuaPath + "/";
             if (Directory.Exists(luaPath) == false)
             {
-                Debug.LogError($"{luaPath} 不是有效路径！");
+                Debug.LogError($"创建Lua脚本错误 路径{luaPath} 不是有效路径！");
                 return;
             }
 
@@ -133,7 +129,7 @@ namespace BindTool
             string path = Application.dataPath + "/" + commonSetting.createPrefabPath;
             if (Directory.Exists(path) == false)
             {
-                Debug.LogError($"{path} 不是有效路径！");
+                Debug.LogError($"创建预制体错误！路径：{path} 不是有效路径！");
                 return;
             }
 

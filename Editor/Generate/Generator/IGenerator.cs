@@ -1,8 +1,9 @@
-using BindTool;
-
-public interface IGenerator
+namespace UnityBindTool
 {
-    void Init(CompositionSetting setting, GenerateData generateData);
+    public interface IGenerator
+    {
+        void Init(CompositionSetting setting, GenerateData generateData);
 
-    void Write(string scriptPath);
+        void Write(string scriptPath);
+    }
 }

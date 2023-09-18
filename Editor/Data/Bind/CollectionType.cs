@@ -1,5 +1,8 @@
-public enum CollectionType
+namespace UnityBindTool
 {
-    Array,
-    List,
+    public enum CollectionType
+    {
+        Array,
+        List,
+    }
 }

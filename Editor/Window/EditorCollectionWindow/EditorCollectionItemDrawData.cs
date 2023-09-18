@@ -1,18 +1,21 @@
 using System;
 using UnityEngine;
 
-[Serializable]
-public class EditorCollectionItemDrawData
+namespace UnityBindTool
 {
-    [HideInInspector]
-    public BindData drawData;
-
-    [HideInInspector]
-    public Action<EditorCollectionItemDrawData> removeCallback;
-
-    public EditorCollectionItemDrawData(BindData bindData, Action<EditorCollectionItemDrawData> remove)
+    [Serializable]
+    public class EditorCollectionItemDrawData
     {
-        drawData = bindData;
-        this.removeCallback = remove;
+        [HideInInspector]
+        public BindData drawData;
+
+        [HideInInspector]
+        public Action<EditorCollectionItemDrawData> removeCallback;
+
+        public EditorCollectionItemDrawData(BindData bindData, Action<EditorCollectionItemDrawData> remove)
+        {
+            drawData = bindData;
+            this.removeCallback = remove;
+        }
     }
 }

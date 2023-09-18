@@ -2,27 +2,30 @@ using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
-public class SingletonScriptableObject<T> : SerializedScriptableObject where T : SingletonScriptableObject<T>
+namespace UnityBindTool
 {
-    private static T instance;
-
-    public static T Get()
+    public class SingletonScriptableObject<T> : SerializedScriptableObject where T : SingletonScriptableObject<T>
     {
-        if (instance != null) { return instance; }
+        private static T instance;
 
-        string typeSearchString = $" t:{typeof(T).Name}";
-        string[] guids = AssetDatabase.FindAssets(typeSearchString);
-        foreach (string guid in guids)
+        public static T Get()
         {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-            T preferences = AssetDatabase.LoadAssetAtPath<T>(path);
-            if (preferences != null)
+            if (instance != null) { return instance; }
+
+            string typeSearchString = $" t:{typeof(T).Name}";
+            string[] guids = AssetDatabase.FindAssets(typeSearchString);
+            foreach (string guid in guids)
             {
-                instance = preferences;
-                return preferences;
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                T preferences = AssetDatabase.LoadAssetAtPath<T>(path);
+                if (preferences != null)
+                {
+                    instance = preferences;
+                    return preferences;
+                }
             }
+            Debug.LogError("未找到资产：" + typeof(T));
+            return default(T);
         }
-        Debug.LogError("未找到资产：" + typeof(T));
-        return default(T);
     }
 }

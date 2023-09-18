@@ -1,12 +1,15 @@
 using System;
 using Sirenix.OdinInspector;
 
-[Serializable]
-public class NameReplaceData
+namespace UnityBindTool
 {
-    [LabelText("替换名称")]
-    public string targetName;
+    [Serializable]
+    public class NameReplaceData
+    {
+        [LabelText("替换名称")]
+        public string targetName;
 
-    [LabelText("名称检查规则")]
-    public NameCheck nameCheck = new NameCheck();
+        [LabelText("名称检查规则")]
+        public NameCheck nameCheck = new NameCheck();
+    }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using BindTool;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -25,7 +24,7 @@ namespace UnityBindTool
         public override void Dispose()
         {
             string typeName = this.templateClass.Identifier.ValueText;
-            Type templateType = Type.GetType(typeName);
+            Type templateType = Type.GetType($"{CommonConst.CSharpTemplateNameSpace}.{typeName}");
 
             FieldInfo[] fieldInfos = templateType.GetFields();
             int amount = fieldInfos.Length;

@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public interface IRepetitionNameDisposer
+namespace UnityBindTool
 {
-   string DisposeName(NameDisposeCentre nameDisposeCentre,string rawName);
+    public interface IRepetitionNameDisposer
+    {
+        string DisposeName(NameDisposeCentre nameDisposeCentre, string rawName);
+    }
 }

@@ -1,12 +1,14 @@
-using UnityBindTool;
 using UnityEngine;
 using UnityEngine.UI;
 
-[TemplateClass(CSharpTemplateType.Type)]
-public class ButtonTemplate : MonoBehaviour
+namespace UnityBindTool.Template
 {
-    [TemplateField]
-    public Button TemplateValue;
+    [TemplateClass(CSharpTemplateType.Type)]
+    public class ButtonTemplate : MonoBehaviour
+    {
+        [TemplateField]
+        public Button TemplateValue;
 
-    public void Click() { }
+        public void Click() { }
+    }
 }

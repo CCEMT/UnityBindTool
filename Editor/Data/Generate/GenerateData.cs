@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 
 #endregion
 
-namespace BindTool
+namespace UnityBindTool
 {
     [Serializable]
     public class GenerateData : ISerializationCallbackReceiver

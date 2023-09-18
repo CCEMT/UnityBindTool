@@ -1,11 +1,14 @@
 using System;
 
-public class NoneNameDisposer : IRepetitionNameDisposer
+namespace UnityBindTool
 {
-    public string DisposeName(NameDisposeCentre nameDisposeCentre, string rawName)
+    public class NoneNameDisposer : IRepetitionNameDisposer
     {
-        if (nameDisposeCentre.useNames.Contains(rawName)) throw new Exception($"名称重复：{rawName}");
-        nameDisposeCentre.useNames.Add(rawName);
-        return rawName;
+        public string DisposeName(NameDisposeCentre nameDisposeCentre, string rawName)
+        {
+            if (nameDisposeCentre.useNames.Contains(rawName)) throw new Exception($"名称重复：{rawName}");
+            nameDisposeCentre.useNames.Add(rawName);
+            return rawName;
+        }
     }
 }

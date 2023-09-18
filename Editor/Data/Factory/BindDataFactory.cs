@@ -1,80 +1,82 @@
 using System;
 using System.Collections.Generic;
-using BindTool;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public static class BindDataFactory
+namespace UnityBindTool
 {
-    public static BindData CreateBindData(Object bindTarget)
+    public static class BindDataFactory
     {
-        BindData bindData = new BindData();
-
-        BindBase bindBase = CreateBindBase(bindTarget);
-        bindData.bindInfos.Add(bindBase);
-        bindData.bindTarget = bindBase;
-
-        switch (bindTarget)
+        public static BindData CreateBindData(Object bindTarget)
         {
-            case GameObject gameObject:
+            BindData bindData = new BindData();
+
+            BindBase bindBase = CreateBindBase(bindTarget);
+            bindData.bindInfos.Add(bindBase);
+            bindData.bindTarget = bindBase;
+
+            switch (bindTarget)
             {
-                BindComponent bindComponent = CreateBindComponent(gameObject);
-                bindData.bindInfos.Add(bindComponent);
-                break;
+                case GameObject gameObject:
+                {
+                    BindComponent bindComponent = CreateBindComponent(gameObject);
+                    bindData.bindInfos.Add(bindComponent);
+                    break;
+                }
+                case Component component:
+                {
+                    BindComponent bindComponent = CreateBindComponent(component.gameObject);
+                    bindData.bindInfos.Add(bindComponent);
+                    break;
+                }
             }
-            case Component component:
+
+            return bindData;
+        }
+
+        public static BindBase CreateBindBase(Object target)
+        {
+            BindBase bindBase = new BindBase();
+            bindBase.target = target;
+
+            List<TypeString> addTypeString = new List<TypeString>();
+            Type disposeType = target.GetType();
+            Type objectType = typeof(Object);
+            while (true)
             {
-                BindComponent bindComponent = CreateBindComponent(component.gameObject);
-                bindData.bindInfos.Add(bindComponent);
-                break;
+                addTypeString.Add(new TypeString(disposeType));
+                if (disposeType == objectType) break;
+                disposeType = disposeType.BaseType;
             }
+            bindBase.typeStrings = addTypeString.ToArray();
+
+            return bindBase;
         }
 
-        return bindData;
-    }
-
-    public static BindBase CreateBindBase(Object target)
-    {
-        BindBase bindBase = new BindBase();
-        bindBase.target = target;
-
-        List<TypeString> addTypeString = new List<TypeString>();
-        Type disposeType = target.GetType();
-        Type objectType = typeof(Object);
-        while (true)
+        public static BindComponent CreateBindComponent(GameObject bindGameObject)
         {
-            addTypeString.Add(new TypeString(disposeType));
-            if (disposeType == objectType) break;
-            disposeType = disposeType.BaseType;
+            BindComponent bindComponent = new BindComponent();
+            bindComponent.bindGameObject = bindGameObject;
+
+            List<TypeString> typeStringList = new List<TypeString>();
+
+            Type gameObjectType = typeof(GameObject);
+            TypeString gameObjectTypeString = new TypeString(gameObjectType);
+            typeStringList.Add(gameObjectTypeString);
+
+            Component[] components = bindGameObject.GetComponents<Component>();
+            int componentAmount = components.Length;
+            for (int i = 0; i < componentAmount; i++)
+            {
+                Component component = components[i];
+                if (component == null) continue;
+                Type type = component.GetType();
+                TypeString typeString = new TypeString(type);
+                typeStringList.Add(typeString);
+            }
+
+            bindComponent.componentTypeStrings = typeStringList.ToArray();
+            return bindComponent;
         }
-        bindBase.typeStrings = addTypeString.ToArray();
-
-        return bindBase;
-    }
-
-    public static BindComponent CreateBindComponent(GameObject bindGameObject)
-    {
-        BindComponent bindComponent = new BindComponent();
-        bindComponent.bindGameObject = bindGameObject;
-
-        List<TypeString> typeStringList = new List<TypeString>();
-
-        Type gameObjectType = typeof(GameObject);
-        TypeString gameObjectTypeString = new TypeString(gameObjectType);
-        typeStringList.Add(gameObjectTypeString);
-
-        Component[] components = bindGameObject.GetComponents<Component>();
-        int componentAmount = components.Length;
-        for (int i = 0; i < componentAmount; i++)
-        {
-            Component component = components[i];
-            if (component == null) continue;
-            Type type = component.GetType();
-            TypeString typeString = new TypeString(type);
-            typeStringList.Add(typeString);
-        }
-
-        bindComponent.componentTypeStrings = typeStringList.ToArray();
-        return bindComponent;
     }
 }

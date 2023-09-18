@@ -1,17 +1,23 @@
 using System;
 using System.Collections.Generic;
-using BindTool;
+using Sirenix.OdinInspector;
 
-[Serializable]
-public class NameBindSetting
+namespace UnityBindTool
 {
-    public bool isEnable;
-    public List<NameBindData> nameBindDataList = new List<NameBindData>();
-}
+    [Serializable]
+    public class NameBindSetting
+    {
+        [LabelText("是否启用")]
+        public bool isEnable;
 
-[Serializable]
-public class NameBindData
-{
-    public NameCheck nameCheck = new NameCheck();
-    public TypeString typeString;
+        [LabelText("名称绑定列表")]
+        public List<NameBindData> nameBindDataList = new List<NameBindData>();
+    }
+
+    [Serializable]
+    public class NameBindData
+    {
+        public NameCheck nameCheck = new NameCheck();
+        public TypeString typeString;
+    }
 }

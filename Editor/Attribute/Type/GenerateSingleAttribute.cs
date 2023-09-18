@@ -1,12 +1,15 @@
 using System;
 
-[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
-public class GenerateSingleAttribute : Attribute
+namespace UnityBindTool
 {
-    public bool isSingleContent;
-
-    public GenerateSingleAttribute(bool isOn = false)
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
+    public class GenerateSingleAttribute : Attribute
     {
-        this.isSingleContent = isOn;
+        public bool isSingleContent;
+
+        public GenerateSingleAttribute(bool isOn = false)
+        {
+            this.isSingleContent = isOn;
+        }
     }
 }

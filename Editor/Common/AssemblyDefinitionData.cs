@@ -1,7 +1,10 @@
 using System;
 
-[Serializable]
-public class AssemblyDefinitionData
+namespace UnityBindTool
 {
-    public string name;
+    [Serializable]
+    public class AssemblyDefinitionData
+    {
+        public string name;
+    }
 }

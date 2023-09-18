@@ -4,7 +4,7 @@ using System;
 
 #endregion
 
-namespace BindTool
+namespace UnityBindTool
 {
     [Serializable]
     public struct TypeString

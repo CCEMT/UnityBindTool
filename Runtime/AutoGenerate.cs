@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BindTool
+namespace UnityBindTool
 {
     public enum AutoGenerateType
     {

@@ -1,5 +1,4 @@
-﻿using BindTool;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace UnityBindTool
 {

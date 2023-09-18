@@ -1,6 +1,9 @@
-public enum RemoveType
+namespace UnityBindTool
 {
-    This,
-    Child,
-    ThisAndChild,
+    public enum RemoveType
+    {
+        This,
+        Child,
+        ThisAndChild,
+    }
 }

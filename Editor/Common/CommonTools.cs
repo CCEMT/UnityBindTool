@@ -1,6 +1,4 @@
-﻿#region Using
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -8,9 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-#endregion
-
-namespace BindTool
+namespace UnityBindTool
 {
     public static class CommonTools
     {
@@ -143,7 +139,7 @@ namespace BindTool
             path = path.Substring(7);
             return path;
         }
-        
+
         public static bool IsExist(string typeName, string typeNameSpace, string assemblyName)
         {
             TypeString typeString = new TypeString();

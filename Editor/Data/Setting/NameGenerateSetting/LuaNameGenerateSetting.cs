@@ -1,4 +1,7 @@
 using System;
 
-[Serializable]
-public class LuaNameGenerateSetting { }
+namespace UnityBindTool
+{
+    [Serializable]
+    public class LuaNameGenerateSetting { }
+}

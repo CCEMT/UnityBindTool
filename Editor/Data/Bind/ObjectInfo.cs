@@ -1,12 +1,8 @@
-﻿#region Using
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Sirenix.Serialization;
 
-#endregion
-
-namespace BindTool
+namespace UnityBindTool
 {
     [Serializable]
     public class ObjectInfo

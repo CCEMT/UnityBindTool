@@ -1,19 +1,22 @@
 using System;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
-public class GeneratePathAttribute : Attribute
+namespace UnityBindTool
 {
-    public enum PathType
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
+    public class GeneratePathAttribute : Attribute
     {
-        Prefab,
-        CSharp,
-        Lua,
-    }
+        public enum PathType
+        {
+            Prefab,
+            CSharp,
+            Lua,
+        }
 
-    public PathType pathType;
+        public PathType pathType;
 
-    public GeneratePathAttribute(PathType pathType)
-    {
-        this.pathType = pathType;
+        public GeneratePathAttribute(PathType pathType)
+        {
+            this.pathType = pathType;
+        }
     }
 }

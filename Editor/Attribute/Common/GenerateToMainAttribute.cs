@@ -1,12 +1,15 @@
 using System;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
-public class GenerateToMainAttribute : Attribute
+namespace UnityBindTool
 {
-    public bool isResetGenerate;
-
-    public GenerateToMainAttribute(bool isReset = false)
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
+    public class GenerateToMainAttribute : Attribute
     {
-        this.isResetGenerate = isReset;
+        public bool isResetGenerate;
+
+        public GenerateToMainAttribute(bool isReset = false)
+        {
+            this.isResetGenerate = isReset;
+        }
     }
 }

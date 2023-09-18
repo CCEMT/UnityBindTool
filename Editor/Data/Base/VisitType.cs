@@ -1,7 +1,10 @@
-public enum VisitType
+namespace UnityBindTool
 {
-    Public,
-    Private,
-    Protected,
-    Internal
+    public enum VisitType
+    {
+        Public,
+        Private,
+        Protected,
+        Internal
+    }
 }

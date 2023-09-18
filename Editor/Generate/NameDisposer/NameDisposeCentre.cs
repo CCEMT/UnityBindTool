@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 
-public class NameDisposeCentre
+namespace UnityBindTool
 {
-    public List<string> useNames = new List<string>();
+    public class NameDisposeCentre
+    {
+        public List<string> useNames = new List<string>();
+    }
 }

@@ -1,4 +1,4 @@
-﻿namespace BindTool
+﻿namespace UnityBindTool
 {
     public static class CommonConst
     {
@@ -21,7 +21,9 @@
         public const string DefaultScriptSettingName = "ScriptSetting";
         public const string DefaultAutoBindSettingName = "AutoBindSetting";
         public const string DefaultCreateNameSettingName = "CreateNameSetting";
-        
+
+        public const string CSharpTemplateNameSpace = "UnityBindTool.Template";
+
         public const string LuaBaseClassNameIdentifier = "{BaseClass}";
         public const string LuaInheritClassNameIdentifier = "{InheritClass}";
         public const string LuaClassNameIdentifier = "{ClassName}";

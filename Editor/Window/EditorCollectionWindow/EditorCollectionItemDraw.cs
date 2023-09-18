@@ -3,17 +3,20 @@ using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
 
-public class EditorCollectionItemDraw : OdinValueDrawer<EditorCollectionItemDrawData>
+namespace UnityBindTool
 {
-    protected override void DrawPropertyLayout(GUIContent label)
+    public class EditorCollectionItemDraw : OdinValueDrawer<EditorCollectionItemDrawData>
     {
-        EditorCollectionItemDrawData data = ValueEntry.SmartValue;
-
-        EditorGUILayout.BeginHorizontal();
+        protected override void DrawPropertyLayout(GUIContent label)
         {
-            SirenixEditorFields.UnityObjectField(data.drawData.GetValue(), data.drawData.GetTypeString().ToType(), true);
-            if (GUILayout.Button("移除")) { data.removeCallback?.Invoke(data); }
+            EditorCollectionItemDrawData data = ValueEntry.SmartValue;
+
+            EditorGUILayout.BeginHorizontal();
+            {
+                SirenixEditorFields.UnityObjectField(data.drawData.GetValue(), data.drawData.GetTypeString().ToType(), true);
+                if (GUILayout.Button("移除")) { data.removeCallback?.Invoke(data); }
+            }
+            EditorGUILayout.EndHorizontal();
         }
-        EditorGUILayout.EndHorizontal();
     }
 }

@@ -1,19 +1,19 @@
-using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
 
-public static class DrawHelper
+namespace UnityBindTool
 {
-    public static void DrawList(GUIStyle guiStyle, float operateHight = 30f)
+    public static class DrawHelper
     {
-        //GUILayoutUtility.GetRect(content, style, options);
-        Rect listRect = EditorGUILayout.BeginVertical(guiStyle, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+        public static void DrawList(GUIStyle guiStyle, float operateHight = 30f)
         {
-            float contentHight = listRect.height- operateHight;
-            
+            //GUILayoutUtility.GetRect(content, style, options);
+            Rect listRect = EditorGUILayout.BeginVertical(guiStyle, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            {
+                float contentHight = listRect.height - operateHight;
 
-
+            }
+            EditorGUILayout.EndHorizontal();
         }
-        EditorGUILayout.EndHorizontal();
     }
 }

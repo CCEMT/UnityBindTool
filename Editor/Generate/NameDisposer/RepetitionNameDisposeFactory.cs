@@ -1,14 +1,15 @@
-using BindTool;
-
-public static class RepetitionNameDisposeFactory
+namespace UnityBindTool
 {
-    public static IRepetitionNameDisposer GetRepetitionNameDisposer(RepetitionNameDispose nameDispose)
+    public static class RepetitionNameDisposeFactory
     {
-        switch (nameDispose)
+        public static IRepetitionNameDisposer GetRepetitionNameDisposer(RepetitionNameDispose nameDispose)
         {
-            case RepetitionNameDispose.AddNumber:
-                return new NameAddNumberDisposer();
+            switch (nameDispose)
+            {
+                case RepetitionNameDispose.AddNumber:
+                    return new NameAddNumberDisposer();
+            }
+            return new NoneNameDisposer();
         }
-        return new NoneNameDisposer();
     }
 }

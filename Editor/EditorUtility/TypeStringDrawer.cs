@@ -1,21 +1,23 @@
-using BindTool;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
 
-public class TypeStringDrawer : OdinValueDrawer<TypeString>
+namespace UnityBindTool
 {
-    protected override void DrawPropertyLayout(GUIContent label)
+    public class TypeStringDrawer : OdinValueDrawer<TypeString>
     {
-        TypeString typeString = ValueEntry.SmartValue;
-
-        EditorGUILayout.BeginHorizontal();
+        protected override void DrawPropertyLayout(GUIContent label)
         {
-            GUILayout.Label(label);
-            GUI.color = Color.green;
-            if (GUILayout.Button(typeString.typeName)) TypeStringSelectHelper.DrawTypeStringSelect((select) => { ValueEntry.SmartValue = select; });
-            GUI.color = Color.white;
+            TypeString typeString = ValueEntry.SmartValue;
+
+            EditorGUILayout.BeginHorizontal();
+            {
+                GUILayout.Label(label);
+                GUI.color = Color.green;
+                if (GUILayout.Button(typeString.typeName)) TypeStringSelectHelper.DrawTypeStringSelect((select) => { ValueEntry.SmartValue = select; });
+                GUI.color = Color.white;
+            }
+            EditorGUILayout.EndHorizontal();
         }
-        EditorGUILayout.EndHorizontal();
     }
 }
